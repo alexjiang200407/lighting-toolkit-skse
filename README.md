@@ -1,0 +1,1 @@
+# CloseUP - High Resolution Screenshots
