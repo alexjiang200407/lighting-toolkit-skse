@@ -65,6 +65,13 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a
 }
 #endif
 
+void UpdateLight(RE::TESObjectLIGH* a_light, const RE::NiPointer<RE::NiPointLight>& a_ptLight, RE::TESObjectREFR* a_ref, float a_wantDimmer)
+{
+	using func_t = decltype(&UpdateLight);
+	static REL::Relocation<func_t> func{ RELOCATION_ID(17212, 17614) };
+	func(a_light, a_ptLight, a_ref, a_wantDimmer);
+}
+
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
 	SKSE::Init(a_skse);
@@ -73,8 +80,20 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	logger::info("Game version : {}", a_skse->RuntimeVersion().string());
 
     SKSE::GetMessagingInterface()->RegisterListener([](SKSE::MessagingInterface::Message* message) {
-		if (message->type == SKSE::MessagingInterface::kDataLoaded)
+		if (message->type == SKSE::MessagingInterface::kDataLoaded) {
 			RE::ConsoleLog::GetSingleton()->Print("CineStudio has been loaded");
+		}
+		if (message->type == SKSE::MessagingInterface::kPostLoadGame) {
+			// ALTERNATE START TORCH REFID 0x22073cac
+			auto*                                  torch = RE::TESForm::LookupByID(0xff000d4e)->As<RE::TESObjectREFR>();
+			static RE::NiPointer<RE::NiPointLight> pointLight(RE::NiPointLight::Create());
+			auto*                                  baseLight = reinterpret_cast<RE::TESObjectLIGH*>(torch->GetBaseObject());
+			pointLight->diffuse.red = 0;
+			pointLight->diffuse.blue = 255;
+			pointLight->diffuse.green = 0;
+			pointLight->radius = RE::NiPoint3(500.0f,500.0f,500.0f);
+			UpdateLight(baseLight, pointLight, torch, false);
+		}
 	});
 
 	return true;
