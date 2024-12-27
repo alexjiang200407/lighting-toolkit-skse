@@ -1,1 +1,1 @@
-# CloseUP - High Resolution Screenshots
+# CineStudioSKSE - Cinematography Utility for Skyrim
