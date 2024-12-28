@@ -2,6 +2,10 @@
   "name": "cinestudio",
   "description": "Cinematography mod for Skyrim SE",
   "dependencies": [
+    {
+      "name": "imgui",
+      "features": [ "dx11-binding", "win32-binding", "freetype", "wchar32" ]
+    },
     "spdlog",
     "rsm-binary-io",
     "xbyak"
