@@ -32,8 +32,8 @@ namespace ImGui
 		void        UnregisterRenderTarget(ImGuiComponent* target);
 
 	private:
-		static std::set<ImGuiComponent*> targets;
-		static inline std::atomic<bool>  installedHooks;
-		static const inline std::string  iniFile = fmt::format("{}ImGui.ini", Version::PROJECT);
+		static inline std::set<ImGuiComponent*> targets;
+		static inline std::atomic<bool>         installedHooks;
+		static const inline std::string         iniFile = fmt::format("{}ImGui.ini", Version::PROJECT);
 	};
 }

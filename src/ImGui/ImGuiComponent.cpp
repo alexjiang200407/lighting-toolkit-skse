@@ -1,3 +1,3 @@
 #include "ImGui/ImGuiComponent.h"
 
-bool ImGui::ImGuiComponent::ShouldSkip() { return true; }
+bool ImGui::ImGuiComponent::ShouldSkip() { return false; }
