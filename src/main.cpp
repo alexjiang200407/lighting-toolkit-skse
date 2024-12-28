@@ -29,7 +29,7 @@ void InitializeLog()
 extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
 	SKSE::PluginVersionData v;
 	v.PluginVersion(Version::MAJOR);
-	v.PluginName("CineStudio");
+	v.PluginName("SceneCraft");
 	v.AuthorName("shdowraithe101");
 	v.UsesAddressLibrary();
 	v.UsesUpdatedStructs();
@@ -41,7 +41,7 @@ extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 {
 	a_info->infoVersion = SKSE::PluginInfo::kVersion;
-	a_info->name        = "CineStudio";
+	a_info->name        = "SceneCraft";
 	a_info->version     = Version::MAJOR;
 
 	if (a_skse->IsEditor())
@@ -76,7 +76,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 
 	SKSE::GetMessagingInterface()->RegisterListener([](SKSE::MessagingInterface::Message* message) {
 		if (message->type == SKSE::MessagingInterface::kDataLoaded)
-			RE::ConsoleLog::GetSingleton()->Print("CineStudio has been loaded");
+			RE::ConsoleLog::GetSingleton()->Print("SceneCraft has been loaded");
 	});
 
 	return true;
