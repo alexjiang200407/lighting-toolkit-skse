@@ -5,6 +5,11 @@
 #include "RE/Skyrim.h"
 #include "SKSE/SKSE.h"
 
+#include "imgui_internal.h"
+#include <imgui.h>
+#include <imgui_impl_dx11.h>
+#include <imgui_impl_win32.h>
+
 #include <spdlog/sinks/basic_file_sink.h>
 #include <xbyak/xbyak.h>
 

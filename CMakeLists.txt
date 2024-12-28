@@ -117,6 +117,7 @@ source_group(
 		${CMAKE_CURRENT_BINARY_DIR}/include/Version.h
 )
 
+find_package(imgui CONFIG REQUIRED)
 
 add_library(
     ${PROJECT_NAME} 
@@ -150,6 +151,7 @@ target_link_libraries(
 	${PROJECT_NAME}
     PRIVATE
         ${CommonLibName}::${CommonLibName}
+		imgui::imgui
 )
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE include/PCH.h) # <--- PCH.h is required!
