@@ -13,6 +13,6 @@ private:
 	SceneCraft() = default;
 
 private:
-	ImGui::ImGuiRenderer renderer;
-	static SceneCraft    singleton;
+	ImGui::ImGuiRenderer     renderer;
+	static SceneCraft        singleton;
 };
