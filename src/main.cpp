@@ -5,8 +5,7 @@ void InitializeLog()
 	auto path = logger::log_directory();
 	if (!path)
 	{
-		SKSE::stl::report_and_fail(
-			"Failed to find standard logging directory"sv);
+		SKSE::stl::report_and_fail("Failed to find standard logging directory"sv);
 	}
 
 	*path /= Version::PROJECT;
@@ -31,8 +30,8 @@ void InitializeLog()
 extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
 	SKSE::PluginVersionData v;
 	v.PluginVersion(Version::MAJOR);
-	v.PluginName("powerofthree's Papyrus Extender");
-	v.AuthorName("powerofthree");
+	v.PluginName("CineStudio");
+	v.AuthorName("shdowraithe101");
 	v.UsesAddressLibrary();
 	v.UsesUpdatedStructs();
 	v.CompatibleVersions({ SKSE::RUNTIME_LATEST });
@@ -101,6 +100,10 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 
 	logger::info("Game version : {}", a_skse->RuntimeVersion().string());
 
+	SKSE::GetMessagingInterface()->RegisterListener([](SKSE::MessagingInterface::Message* message) {
+		if (message->type == SKSE::MessagingInterface::kDataLoaded)
+			RE::ConsoleLog::GetSingleton()->Print("CineStudio has been loaded");
+	});
 	SKSE::GetMessagingInterface()->RegisterListener(
 		[](SKSE::MessagingInterface::Message* message) {
 			if (message->type == SKSE::MessagingInterface::kDataLoaded)

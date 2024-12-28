@@ -99,14 +99,29 @@
       "configuration": "Debug"
     },
     {
+      "name": "vs2022-windows-vcpkg-ae-release",
+      "configurePreset": "vs2022-windows-vcpkg-ae",
+      "configuration": "Release"
+    },
+    {
       "name": "vs2022-windows-vcpkg-se",
       "configurePreset": "vs2022-windows-vcpkg-se",
-      "configuration": "Release"
+      "configuration": "Debug"
+    },
+    {
+      "name": "vs2022-windows-vcpkg-se-release",
+      "configurePreset": "vs2022-windows-vcpkg-se",
+      "configuration": "Debug"
     },
     {
       "name": "vs2022-windows-vcpkg-vr",
       "configurePreset": "vs2022-windows-vcpkg-vr",
-      "configuration": "Release"
+      "configuration": "Debug"
+    },
+    {
+      "name": "vs2022-windows-vcpkg-vr-release",
+      "configurePreset": "vs2022-windows-vcpkg-vr",
+      "configuration": "Debug"
     }
   ]
 }
