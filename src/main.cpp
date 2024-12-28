@@ -93,6 +93,50 @@ namespace RE
 	}
 }  // namespace RE
 
+class PoC : public RE::BSTEventSink<RE::InputEvent*>
+{
+public:
+	virtual RE::BSEventNotifyControl ProcessEvent(RE::InputEvent* const* a_event, RE::BSTEventSource<RE::InputEvent*>*) override
+	{
+		if (!a_event || !*a_event)
+			return RE::BSEventNotifyControl::kContinue;
+
+		auto* buttonEvt = (*a_event)->AsButtonEvent();
+
+		if (!buttonEvt)
+			return RE::BSEventNotifyControl::kContinue;
+		
+		if (buttonEvt->GetIDCode() != 207 || !buttonEvt->IsUp())
+			return RE::BSEventNotifyControl::kContinue;
+
+		// END Pressed create a light at player location
+
+		const auto       dataHandler = RE::TESDataHandler::GetSingleton();
+		const RE::FormID id          = dataHandler->LookupFormID(0x800, "CinematographyStudio.esp");
+
+		auto* lightObjRef = RE::PlayerCharacter::GetSingleton()->PlaceObjectAtMe(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), true).get();
+		lightObjRef->Load3D(false);
+
+		auto niRoot = lightObjRef->Get3D()->AsFadeNode();
+		for (const auto& a : niRoot->children)
+		{
+			logger::info("{}", a->name.c_str());
+		}
+
+		auto niAvNode = niRoot->children[0].get();
+
+		auto* light = skyrim_cast<RE::NiLight*>(niAvNode);
+
+		light->diffuse.red   = 0;
+		light->diffuse.blue  = 0.5f;
+		light->diffuse.green = 0;
+		light->radius        = RE::NiPoint3(500, 500, 500);
+		light->fade          = 2;
+	}
+};
+
+static PoC singleton;
+
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
 	SKSE::Init(a_skse);
@@ -101,37 +145,10 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	logger::info("Game version : {}", a_skse->RuntimeVersion().string());
 
 	SKSE::GetMessagingInterface()->RegisterListener([](SKSE::MessagingInterface::Message* message) {
-		if (message->type == SKSE::MessagingInterface::kDataLoaded)
-			RE::ConsoleLog::GetSingleton()->Print("CineStudio has been loaded");
-	});
-	SKSE::GetMessagingInterface()->RegisterListener(
-		[](SKSE::MessagingInterface::Message* message) {
 			if (message->type == SKSE::MessagingInterface::kDataLoaded)
 			{
 				RE::ConsoleLog::GetSingleton()->Print("CineStudio has been loaded");
-			}
-			if (message->type == SKSE::MessagingInterface::kPostLoadGame)
-			{
-				// ALTERNATE START TORCH REFID 0x22173cad
-				// ff000d4e
-				auto* lightObjRef = RE::TESForm::LookupByID(0x22173cad)->As<RE::TESObjectREFR>();
-
-				auto niRoot = lightObjRef->Get3D()->AsFadeNode();
-
-				for (const auto& a : niRoot->children)
-				{
-					logger::info("{}", a->name.c_str());
-				}
-
-				auto niAvNode = niRoot->children[0].get();
-
-				auto* light = skyrim_cast<RE::NiLight*>(niAvNode);
-
-				light->diffuse.red   = 0;
-				light->diffuse.blue  = 0.5f;
-				light->diffuse.green = 0;
-
-				// RE::UpdateNode(niAvNode);
+				RE::BSInputDeviceManager::GetSingleton()->AddEventSink(&singleton);
 			}
 		});
 
