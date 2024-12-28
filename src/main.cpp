@@ -29,8 +29,8 @@ void InitializeLog()
 extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
 	SKSE::PluginVersionData v;
 	v.PluginVersion(Version::MAJOR);
-	v.PluginName("powerofthree's Papyrus Extender");
-	v.AuthorName("powerofthree");
+	v.PluginName("CineStudio");
+	v.AuthorName("shdowraithe101");
 	v.UsesAddressLibrary();
 	v.UsesUpdatedStructs();
 	v.CompatibleVersions({ SKSE::RUNTIME_LATEST });
