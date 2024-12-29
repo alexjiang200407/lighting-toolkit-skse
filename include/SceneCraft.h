@@ -11,8 +11,12 @@ public:
 
 private:
 	SceneCraft() = default;
+	
+private:
+	void ToggleMenu();
 
 private:
-	ImGui::ImGuiRenderer     renderer;
-	static SceneCraft        singleton;
+	ImGui::ImGuiRenderer renderer;
+	bool                 showWindow = false;
+	static SceneCraft    singleton;
 };
