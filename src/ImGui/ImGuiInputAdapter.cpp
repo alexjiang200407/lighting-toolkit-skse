@@ -348,7 +348,7 @@ void ImGui::ImGuiInputAdapter::HandleButtonEvent(RE::ButtonEvent* const buttonEv
 		break;
 	case RE::INPUT_DEVICE::kGamepad:
 		{
-			singleton.HandleGamepadButtonEvent(buttonEvt->GetIDCode(), buttonEvt->Value(), buttonEvt->IsPressed());
+			singleton.HandleGamepadButtonEvent(buttonEvt->GetIDCode(), buttonEvt->IsPressed());
 			UpdateInputList(singleton.gamepadSuppress, list, removed, buttonEvt);
 		}
 		break;
@@ -384,7 +384,7 @@ void ImGui::ImGuiInputAdapter::HandleMouseButtonEvent(uint32_t key, float value,
 	io.AddMouseButtonEvent(key, isPressed);
 }
 
-void ImGui::ImGuiInputAdapter::HandleGamepadButtonEvent(uint32_t key, float value, bool isPressed) const
+void ImGui::ImGuiInputAdapter::HandleGamepadButtonEvent(uint32_t key, bool isPressed) const
 {
 	auto& io       = ImGui::GetIO();
 	auto  imguiKey = ToImGuiKey(static_cast<RE::BSWin32GamepadDevice::Key>(key));
