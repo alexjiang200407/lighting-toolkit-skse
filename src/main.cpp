@@ -1,5 +1,3 @@
-#include "ImGui/ImGuiInputAdapter.h"
-#include "ImGui/ImGuiRenderer.h"
 #include "SceneCraft.h"
 
 void InitializeLog()
@@ -75,9 +73,6 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	InitializeLog();
 
 	logger::info("Game version : {}", a_skse->RuntimeVersion().string());
-
-	ImGui::ImGuiRenderer::GetSingleton()->Init();
-	ImGui::ImGuiInputAdapter::GetSingleton()->Init();
 	SceneCraft::GetSingleton()->Init();
 
 	SKSE::GetMessagingInterface()->RegisterListener([](SKSE::MessagingInterface::Message* message) {

@@ -7,6 +7,7 @@ class SceneCraft :
 public:
 	void               Init();
 	void               DoFrame();
+	ImGuiStyle         Style();
 	static SceneCraft* GetSingleton();
 
 private:

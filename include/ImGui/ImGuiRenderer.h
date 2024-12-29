@@ -33,12 +33,13 @@ namespace ImGui
 		ImGuiRenderer& operator=(ImGuiRenderer&&)      = delete;
 
 	public:
-		void                  Init();
+		void                  Init(ImGuiStyle style);
 		void                  RegisterRenderTarget(ImGuiComponent* target);
 		void                  UnregisterRenderTarget(ImGuiComponent* target);
 		static ImGuiRenderer* GetSingleton();
 
 	private:
+		ImGuiStyle                style;
 		std::set<ImGuiComponent*> targets;
 		std::atomic<bool>         installedHooks;
 		std::string               iniFile = fmt::format("{}ImGui.ini", Version::PROJECT);
