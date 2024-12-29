@@ -1,5 +1,6 @@
 #pragma once
 #include "ImGui/ImGuiComponent.h"
+#include "Prop.h"
 
 class SceneCraft :
 	ImGui::ImGuiComponent
@@ -21,10 +22,12 @@ private:
 	void          UpdateLookingAround();
 
 private:
-	bool              lookingAround = false;
-	bool              previouslyInFreeCameraMode = false;
-	bool              previouslyFreezeTime       = false;
-	bool              showWindow = false;
-	static SceneCraft singleton;
-	static constexpr ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar;
+	bool                              lookingAround              = false;
+	bool                              previouslyInFreeCameraMode = false;
+	bool                              previouslyFreezeTime       = false;
+	bool                              showWindow                 = false;
+	std::vector<Prop>                 props;
+	int                               activePropIndex = -1;
+	static SceneCraft                 singleton;
+	static constexpr ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
 };
