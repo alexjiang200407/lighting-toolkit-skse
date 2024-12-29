@@ -14,6 +14,7 @@ private:
 	
 private:
 	void ToggleMenu();
+	bool ShouldDrawCursor() override;
 
 private:
 	ImGui::ImGuiRenderer renderer;

@@ -42,3 +42,8 @@ void SceneCraft::ToggleMenu()
 		ImGui::ImGuiInputAdapter::GetSingleton()->DisableSupression();
 	}
 }
+
+bool SceneCraft::ShouldDrawCursor()
+{
+	return showWindow;
+}
