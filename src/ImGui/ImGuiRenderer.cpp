@@ -52,16 +52,39 @@ void ImGui::ImGuiRenderer::CreateD3DAndSwapChain::thunk()
 	logger::info("ImGui initialized.");
 	ImGuiRenderer::installedHooks.store(true);
 
+	WndProc::func = reinterpret_cast<WNDPROC>(
+		SetWindowLongPtrA(
+			desc.OutputWindow,
+			GWLP_WNDPROC,
+			reinterpret_cast<LONG_PTR>(WndProc::thunk)));
+
+	if (!WndProc::func)
 	{
-		static const auto screenSize         = RE::BSGraphics::Renderer::GetSingleton()->GetScreenSize();
-		io.DisplaySize.x                     = static_cast<float>(screenSize.width);
-		io.DisplaySize.y                     = static_cast<float>(screenSize.height);
-		io.ConfigWindowsMoveFromTitleBarOnly = true;
-		io.WantCaptureMouse                  = false;
-		io.MouseDrawCursor                   = false;
-		io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+		logger::error("SetWindowLongPtrA failed!");
+
+		{
+			static const auto screenSize         = RE::BSGraphics::Renderer::GetSingleton()->GetScreenSize();
+			io.DisplaySize.x                     = static_cast<float>(screenSize.width);
+			io.DisplaySize.y                     = static_cast<float>(screenSize.height);
+			io.ConfigWindowsMoveFromTitleBarOnly = true;
+			io.WantCaptureKeyboard               = true;
+			io.WantCaptureMouse                  = true;
+			io.MouseDrawCursor                   = true;
+			io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+		}
+		logger::info("Set ImGui Style");
 	}
-	logger::info("Set ImGui Style");
+}
+
+LRESULT ImGui::ImGuiRenderer::WndProc::thunk(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	auto& io = ImGui::GetIO();
+	if (uMsg == WM_KILLFOCUS)
+	{
+		io.ClearInputCharacters();
+		io.ClearInputKeys();
+	}
+	return func(hWnd, uMsg, wParam, lParam);
 }
 
 void ImGui::ImGuiRenderer::StopTimer::thunk(std::uint32_t timer)
