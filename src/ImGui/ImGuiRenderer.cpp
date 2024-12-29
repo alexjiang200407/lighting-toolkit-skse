@@ -45,10 +45,8 @@ void ImGui::ImGuiRenderer::CreateD3DAndSwapChain::thunk()
 		io.DisplaySize.x                     = static_cast<float>(screenSize.width);
 		io.DisplaySize.y                     = static_cast<float>(screenSize.height);
 		io.ConfigWindowsMoveFromTitleBarOnly = true;
-		io.WantCaptureKeyboard               = true;
-		io.WantCaptureMouse                  = true;
+		io.WantCaptureMouse                  = false;
 		io.MouseDrawCursor                   = false;
-		io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 	}
 
 	if (!ImGui_ImplWin32_Init(desc.OutputWindow))
@@ -107,12 +105,14 @@ void ImGui::ImGuiRenderer::StopTimer::thunk(std::uint32_t timer)
 		io.DisplaySize.x             = static_cast<float>(screenSize.width);
 		io.DisplaySize.y             = static_cast<float>(screenSize.height);
 		io.MouseDrawCursor           = false;
+		io.WantCaptureMouse          = false;
 
 		for (const auto& target : singleton.targets)
 		{
 			if (target->ShouldDrawCursor())
 			{
 				io.MouseDrawCursor = true;
+				io.WantCaptureMouse = true;
 				break;
 			}
 		}
