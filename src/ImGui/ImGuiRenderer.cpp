@@ -38,6 +38,17 @@ void ImGui::ImGuiRenderer::CreateD3DAndSwapChain::thunk()
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 	io.MousePos                          = { io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f };
 
+	{
+		static const auto screenSize         = RE::BSGraphics::Renderer::GetSingleton()->GetScreenSize();
+		io.DisplaySize.x                     = static_cast<float>(screenSize.width);
+		io.DisplaySize.y                     = static_cast<float>(screenSize.height);
+		io.ConfigWindowsMoveFromTitleBarOnly = true;
+		io.WantCaptureKeyboard               = true;
+		io.WantCaptureMouse                  = true;
+		io.MouseDrawCursor                   = true;
+		io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+	}
+
 	if (!ImGui_ImplWin32_Init(desc.OutputWindow))
 	{
 		logger::error("ImGui initialization failed (Win32)");
@@ -61,19 +72,9 @@ void ImGui::ImGuiRenderer::CreateD3DAndSwapChain::thunk()
 	if (!WndProc::func)
 	{
 		logger::error("SetWindowLongPtrA failed!");
-
-		{
-			static const auto screenSize         = RE::BSGraphics::Renderer::GetSingleton()->GetScreenSize();
-			io.DisplaySize.x                     = static_cast<float>(screenSize.width);
-			io.DisplaySize.y                     = static_cast<float>(screenSize.height);
-			io.ConfigWindowsMoveFromTitleBarOnly = true;
-			io.WantCaptureKeyboard               = true;
-			io.WantCaptureMouse                  = true;
-			io.MouseDrawCursor                   = true;
-			io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-		}
-		logger::info("Set ImGui Style");
 	}
+
+	logger::info("Set ImGui Style");
 }
 
 LRESULT ImGui::ImGuiRenderer::WndProc::thunk(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
