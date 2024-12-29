@@ -419,5 +419,5 @@ ImGui::ImGuiInputAdapter* ImGui::ImGuiInputAdapter::GetSingleton()
 
 bool ImGui::ImGuiInputAdapter::IsSuppressingButtons()
 {
-	return !(kbdSuppress == mouseSuppress == gamepadSuppress == 0);
+	return !(kbdSuppress == 0 && mouseSuppress == 0 && gamepadSuppress == 0);
 }
