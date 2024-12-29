@@ -11,8 +11,13 @@ public:
 
 private:
 	SceneCraft() = default;
+	
+private:
+	void ToggleMenu();
+	bool ShouldDrawCursor() override;
 
 private:
 	ImGui::ImGuiRenderer renderer;
+	bool                 showWindow = false;
 	static SceneCraft    singleton;
 };

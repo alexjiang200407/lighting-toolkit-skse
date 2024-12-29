@@ -3,4 +3,5 @@ set(SOURCES ${SOURCES}
 	src/ImGui/ImGuiRenderer.cpp
 	src/SceneCraft.cpp
 	src/ImGui/ImGuiComponent.cpp
+	src/ImGui/ImGuiInputAdapter.cpp
 )
