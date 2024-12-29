@@ -1,11 +1,12 @@
 #include "SceneCraft.h"
 #include "ImGui/ImGuiInputAdapter.h"
+#include "ImGui/ImGuiRenderer.h"
 
 SceneCraft SceneCraft::singleton;
 
 void SceneCraft::Init()
 {
-	singleton.renderer.RegisterRenderTarget(&singleton);
+	ImGui::ImGuiRenderer::GetSingleton()->RegisterRenderTarget(&singleton);
 }
 
 void SceneCraft::DoFrame()
@@ -19,6 +20,11 @@ void SceneCraft::DoFrame()
 	{
 		ImGui::ShowDemoWindow();
 	}
+}
+
+SceneCraft* SceneCraft::GetSingleton()
+{
+	return &singleton;
 }
 
 void SceneCraft::ToggleMenu()

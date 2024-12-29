@@ -1,6 +1,8 @@
 #include "ImGui/ImGuiRenderer.h"
 #include <dxgi.h>
 
+ImGui::ImGuiRenderer ImGui::ImGuiRenderer::singleton;
+
 void ImGui::ImGuiRenderer::CreateD3DAndSwapChain::thunk()
 {
 	func();
@@ -34,7 +36,7 @@ void ImGui::ImGuiRenderer::CreateD3DAndSwapChain::thunk()
 	auto& io = ImGui::GetIO();
 	io.ConfigFlags |= (ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad | ImGuiConfigFlags_NoMouseCursorChange);
 
-	io.IniFilename                       = iniFile.c_str();
+	io.IniFilename                       = singleton.iniFile.c_str();
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 	io.MousePos                          = { io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f };
 
@@ -61,7 +63,7 @@ void ImGui::ImGuiRenderer::CreateD3DAndSwapChain::thunk()
 	}
 
 	logger::info("ImGui initialized.");
-	ImGuiRenderer::installedHooks.store(true);
+	singleton.installedHooks.store(true);
 
 	WndProc::func = reinterpret_cast<WNDPROC>(
 		SetWindowLongPtrA(
@@ -92,7 +94,7 @@ void ImGui::ImGuiRenderer::StopTimer::thunk(std::uint32_t timer)
 {
 	func(timer);
 
-	if (!installedHooks.load())
+	if (!singleton.installedHooks.load())
 		return;
 
 	ImGui_ImplDX11_NewFrame();
@@ -104,7 +106,7 @@ void ImGui::ImGuiRenderer::StopTimer::thunk(std::uint32_t timer)
 		io.DisplaySize.y             = static_cast<float>(screenSize.height);
 		io.MouseDrawCursor           = false;
 
-		for (const auto& target : targets)
+		for (const auto& target : singleton.targets)
 		{
 			if (target->ShouldDrawCursor())
 			{
@@ -116,7 +118,7 @@ void ImGui::ImGuiRenderer::StopTimer::thunk(std::uint32_t timer)
 
 	ImGui::NewFrame();
 	{
-		for (const auto& target : targets)
+		for (const auto& target : singleton.targets)
 		{
 			if (target->ShouldSkip())
 				continue;
@@ -146,4 +148,9 @@ void ImGui::ImGuiRenderer::RegisterRenderTarget(ImGuiComponent* target)
 void ImGui::ImGuiRenderer::UnregisterRenderTarget(ImGuiComponent* target)
 {
 	targets.erase(target);
+}
+
+ImGui::ImGuiRenderer* ImGui::ImGuiRenderer::GetSingleton()
+{
+	return &singleton;
 }

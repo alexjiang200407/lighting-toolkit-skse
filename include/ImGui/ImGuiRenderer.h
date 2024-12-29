@@ -25,7 +25,7 @@ namespace ImGui
 			static inline REL::Relocation<decltype(thunk)> func;
 		};
 
-	public:
+	private:
 		ImGuiRenderer()                                = default;
 		ImGuiRenderer(const ImGuiRenderer&)            = delete;
 		ImGuiRenderer& operator=(const ImGuiRenderer&) = delete;
@@ -33,13 +33,15 @@ namespace ImGui
 		ImGuiRenderer& operator=(ImGuiRenderer&&)      = delete;
 
 	public:
-		static void Init();
-		void        RegisterRenderTarget(ImGuiComponent* target);
-		void        UnregisterRenderTarget(ImGuiComponent* target);
+		void                  Init();
+		void                  RegisterRenderTarget(ImGuiComponent* target);
+		void                  UnregisterRenderTarget(ImGuiComponent* target);
+		static ImGuiRenderer* GetSingleton();
 
 	private:
-		static inline std::set<ImGuiComponent*> targets;
-		static inline std::atomic<bool>         installedHooks;
-		static const inline std::string         iniFile = fmt::format("{}ImGui.ini", Version::PROJECT);
+		std::set<ImGuiComponent*> targets;
+		std::atomic<bool>         installedHooks;
+		std::string               iniFile = fmt::format("{}ImGui.ini", Version::PROJECT);
+		static ImGuiRenderer      singleton;
 	};
 }

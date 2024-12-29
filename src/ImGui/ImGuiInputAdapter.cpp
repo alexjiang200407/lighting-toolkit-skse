@@ -54,22 +54,6 @@ void ImGui::ImGuiInputAdapter::Init()
 {
 	REL::Relocation<std::uintptr_t> target1{ RELOCATION_ID(67315, 68617), OFFSET(0x7B, 0x7B) };  // BSTEventSource<InputEvent*>::SendEvent
 	stl::write_thunk_call<SendInputEvent>(target1.address());
-
-	SKSE::GetMessagingInterface()->RegisterListener([](SKSE::MessagingInterface::Message* message) {
-		if (message->type == SKSE::MessagingInterface::kDataLoaded)
-		{
-			const auto renderer  = RE::BSGraphics::Renderer::GetSingleton();
-			const auto swapChain = (IDXGISwapChain*)renderer->data.renderWindows[0].swapChain;
-
-			DXGI_SWAP_CHAIN_DESC desc{};
-
-			if (FAILED(swapChain->GetDesc(std::addressof(desc))))
-			{
-				logger::error("Could not get desc");
-				exit(1);
-			}
-		}
-	});
 }
 
 ImGuiKey ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32KeyboardDevice::Key key)
