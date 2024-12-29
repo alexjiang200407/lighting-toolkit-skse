@@ -17,11 +17,42 @@ void SceneCraft::DoFrame()
 	{
 		ToggleMenu();
 	}
-	
-	if (showWindow)
+
+	if (!showWindow)
+		return;
+
+	if (ImGui::IsKeyPressed(ImGuiKey_F, false))
+		RE::Main::GetSingleton()->freezeTime = !RE::Main::GetSingleton()->freezeTime;
+	if (lookingAround != ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
 	{
-		ImGui::ShowDemoWindow();
+		lookingAround = !lookingAround;
+		UpdateLookingAround();
 	}
+
+	ImGui::Begin("##SCMain", nullptr, windowFlags);
+	{
+		ImGui::BeginDisabled(lookingAround);
+		{
+			ImGui::BeginTabBar("##propstabbar", ImGuiTabBarFlags_AutoSelectNewTabs | ImGuiTabBarFlags_FittingPolicyScroll);
+			{
+				if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip))
+				{
+					//PlaceProp();
+				}
+			}
+			ImGui::EndTabBar();
+
+			ImGui::BeginChild("###CameraControlWindow", ImVec2(0, 0), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
+			{
+				ImGui::Text("Camera Settings:");
+				ImGui::Checkbox("Freeze Time", &RE::Main::GetSingleton()->freezeTime);
+				ImGui::SliderFloat("Camera Speed", GetCameraMoveSpeed(), 0.1f, 50.0f);
+			}
+			ImGui::EndChild();
+		}
+		ImGui::EndDisabled();
+	}
+	ImGui::End();
 }
 
 SceneCraft* SceneCraft::GetSingleton()
@@ -35,25 +66,78 @@ void SceneCraft::ToggleMenu()
 
 	if (showWindow)
 	{
-		ImGui::ImGuiInputAdapter::KeyboardSupressionMask kbd;
-		ImGui::ImGuiInputAdapter::MouseSupressionMask    mouse;
-		ImGui::ImGuiInputAdapter::GamePadSupressionMask  gamepad;
+		SuppressDXInput();
+		previouslyInFreeCameraMode = RE::PlayerCamera::GetSingleton()->IsInFreeCameraMode();
+		if (!previouslyInFreeCameraMode)
+		{
+			RE::PlayerCamera::GetSingleton()->ToggleFreeCameraMode(false);
+			RE::ControlMap::GetSingleton()->PushInputContext(RE::ControlMap::InputContextID::kTFCMode);
+		}
 
-		kbd.set();
-		mouse.set();
-		gamepad.set();
-
-		ImGui::ImGuiInputAdapter::GetSingleton()->EnableSupression(kbd, mouse, gamepad, true, true);
+		previouslyFreezeTime = RE::Main::GetSingleton()->freezeTime;
 	}
 	else
 	{
 		ImGui::ImGuiInputAdapter::GetSingleton()->DisableSupression();
+		RE::Main::GetSingleton()->freezeTime = previouslyFreezeTime;
+		if (!previouslyInFreeCameraMode)
+		{
+			RE::PlayerCamera::GetSingleton()->ToggleFreeCameraMode(false);
+			RE::ControlMap::GetSingleton()->PopInputContext(RE::ControlMap::InputContextID::kTFCMode);
+		}
 	}
 }
 
 bool SceneCraft::ShouldDrawCursor()
 {
-	return showWindow;
+	return showWindow && !lookingAround;
+}
+
+float* SceneCraft::GetCameraMoveSpeed()
+{
+	return REL::Relocation<float*>{ RELOCATION_ID(509808, 382522) }.get();
+}
+
+void SceneCraft::SuppressDXInput()
+{
+	using INPUT_CONTEXT = RE::UserEvents::INPUT_CONTEXT_IDS;
+	ImGui::ImGuiInputAdapter::KeyboardSupressionMask kbd;
+	ImGui::ImGuiInputAdapter::MouseSupressionMask    mouse;
+	ImGui::ImGuiInputAdapter::GamePadSupressionMask  gamepad;
+
+	const auto* controlMap = RE::ControlMap::GetSingleton();
+	kbd.set();
+
+	kbd.flip(controlMap->GetMappedKey("Forward", RE::INPUT_DEVICE::kKeyboard, INPUT_CONTEXT::kGameplay));
+	kbd.flip(controlMap->GetMappedKey("Back", RE::INPUT_DEVICE::kKeyboard, INPUT_CONTEXT::kGameplay));
+	kbd.flip(controlMap->GetMappedKey("Strafe Left", RE::INPUT_DEVICE::kKeyboard, INPUT_CONTEXT::kGameplay));
+	kbd.flip(controlMap->GetMappedKey("Strafe Right", RE::INPUT_DEVICE::kKeyboard, INPUT_CONTEXT::kGameplay));
+
+	mouse.set();
+
+	gamepad.set();
+	gamepad.flip(controlMap->GetMappedKey("Forward", RE::INPUT_DEVICE::kGamepad, INPUT_CONTEXT::kGameplay));
+	gamepad.flip(controlMap->GetMappedKey("Back", RE::INPUT_DEVICE::kGamepad, INPUT_CONTEXT::kGameplay));
+	gamepad.flip(controlMap->GetMappedKey("Strafe Left", RE::INPUT_DEVICE::kGamepad, INPUT_CONTEXT::kGameplay));
+	gamepad.flip(controlMap->GetMappedKey("Strafe Right", RE::INPUT_DEVICE::kGamepad, INPUT_CONTEXT::kGameplay));
+
+	ImGui::ImGuiInputAdapter::GetSingleton()->EnableSupression(kbd, mouse, gamepad, true, true);
+}
+
+void SceneCraft::UpdateLookingAround()
+{
+	if (lookingAround)
+	{
+		ImGui::ImGuiInputAdapter::GetSingleton()->SetSuppressMouse(0);
+		ImGui::ImGuiInputAdapter::GetSingleton()->SetSuppressMouseMove(false);
+		return;
+	}
+
+	ImGui::ImGuiInputAdapter::MouseSupressionMask mouse;
+	mouse.set();
+
+	ImGui::ImGuiInputAdapter::GetSingleton()->SetSuppressMouse(mouse);
+	ImGui::ImGuiInputAdapter::GetSingleton()->SetSuppressMouseMove(true);
 }
 
 ImGuiStyle SceneCraft::Style()

@@ -42,7 +42,7 @@ namespace ImGui
 		ImGuiStyle                style;
 		std::set<ImGuiComponent*> targets;
 		std::atomic<bool>         installedHooks;
-		std::string               iniFile = fmt::format("{}ImGui.ini", Version::PROJECT);
+		std::string               iniFile = fmt::format("./Data/SKSE/Plugins/{}ImGui.ini", Version::PROJECT);
 		static ImGuiRenderer      singleton;
 	};
 }

@@ -19,6 +19,11 @@ namespace ImGui
 	public:
 		void                      Init();
 		void                      EnableSupression(KeyboardSupressionMask kbd, MouseSupressionMask mouse, GamePadSupressionMask gamepad, bool suppressChar, bool suppressMouseMove);
+		void                      SetSuppressKbd(KeyboardSupressionMask kbd);
+		void                      SetSuppressMouse(MouseSupressionMask mouse);
+		void                      SetSuppressGamepad(GamePadSupressionMask mouse);
+		void                      SetSuppressMouseMove(bool suppress);
+		void                      SetSuppressChar(bool suppress);
 		void                      DisableSupression();
 		static ImGuiInputAdapter* GetSingleton();
 		bool                      IsSuppressingButtons();
