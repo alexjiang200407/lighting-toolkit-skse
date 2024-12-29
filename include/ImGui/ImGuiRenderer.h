@@ -7,6 +7,12 @@ namespace ImGui
 	class ImGuiRenderer
 	{
 	private:
+		struct WndProc
+		{
+			static LRESULT        thunk(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+			static inline WNDPROC func;
+		};
+
 		struct CreateD3DAndSwapChain
 		{
 			static void                                    thunk();
