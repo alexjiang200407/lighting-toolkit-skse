@@ -6,4 +6,6 @@ set(HEADERS ${HEADERS}
 	include/SceneCraft.h
 	include/ImGui/ImGuiSelector.h
 	include/Palette.h
+	include/ImGui/ImGuiWidgets.h
+	include/Prop.h
 )

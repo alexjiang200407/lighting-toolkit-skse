@@ -28,27 +28,13 @@ void SceneCraft::DoFrame()
 		lookingAround = !lookingAround;
 		UpdateLookingAround();
 	}
-
 	ImGui::Begin("##SCMain", nullptr, windowFlags);
 	{
 		ImGui::BeginDisabled(lookingAround);
 		{
-			ImGui::BeginTabBar("##propstabbar", ImGuiTabBarFlags_AutoSelectNewTabs | ImGuiTabBarFlags_FittingPolicyScroll);
-			{
-				if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip))
-				{
-					//PlaceProp();
-				}
-			}
-			ImGui::EndTabBar();
-
-			ImGui::BeginChild("###CameraControlWindow", ImVec2(0, 0), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
-			{
-				ImGui::Text("Camera Settings:");
-				ImGui::Checkbox("Freeze Time", &RE::Main::GetSingleton()->freezeTime);
-				ImGui::SliderFloat("Camera Speed", GetCameraMoveSpeed(), 0.1f, 50.0f);
-			}
-			ImGui::EndChild();
+			int activePropIndex = DrawTabBar();
+			DrawPropControlWindow(activePropIndex);
+			DrawCameraControlWindow();
 		}
 		ImGui::EndDisabled();
 	}
@@ -138,6 +124,69 @@ void SceneCraft::UpdateLookingAround()
 
 	ImGui::ImGuiInputAdapter::GetSingleton()->SetSuppressMouse(mouse);
 	ImGui::ImGuiInputAdapter::GetSingleton()->SetSuppressMouseMove(true);
+}
+
+int SceneCraft::DrawTabBar()
+{
+	int activePropIndex = -1;
+	ImGui::BeginTabBar("##propstabbar", ImGuiTabBarFlags_AutoSelectNewTabs | ImGuiTabBarFlags_FittingPolicyScroll);
+	{
+		int i = 0;
+		for (auto prop = props.begin(); prop != props.end();)
+		{
+			bool activeProp = false;
+			if (!prop->DrawTabItem(activeProp))
+			{
+				prop = props.erase(props.begin() + i);
+				continue;
+			}
+
+			prop++;
+
+			if (activeProp)
+				activePropIndex = i;
+
+			i++;
+		}
+
+		if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip))
+		{
+			// TODO Add a PropFactory creation method here
+			const auto       dataHandler = RE::TESDataHandler::GetSingleton();
+			const RE::FormID id          = dataHandler->LookupFormID(0x800, "SceneCraft.esp");
+			props.push_back(RE::PlayerCharacter::GetSingleton()->PlaceObjectAtMe(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), true));
+		}
+	}
+	ImGui::EndTabBar();
+	return activePropIndex;
+}
+
+void SceneCraft::DrawPropControlWindow(int activePropIndex)
+{
+	ImGui::BeginChild("###PropControlWindow", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
+	{
+		ImGui::Text("Current Prop:");
+		if (activePropIndex != -1)
+		{
+			props[activePropIndex].DrawControlPanel();
+		}
+	}
+	ImGui::EndChild();
+}
+
+void SceneCraft::DrawCameraControlWindow()
+{
+	ImGui::BeginChild("###CameraControlWindow", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
+	{
+		ImGui::Text("Camera Settings:");
+		ImGui::Checkbox("Freeze Time", &RE::Main::GetSingleton()->freezeTime);
+		float availableWidth = ImGui::GetContentRegionAvail().x;
+
+		// Set the item width to the available width
+		ImGui::PushItemWidth(availableWidth);
+		ImGui::SliderAutoFill("Camera Speed", GetCameraMoveSpeed(), 0.1f, 50.0f);
+	}
+	ImGui::EndChild();
 }
 
 ImGuiStyle SceneCraft::Style()
