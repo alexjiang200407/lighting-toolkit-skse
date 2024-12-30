@@ -20,6 +20,9 @@ private:
 	static float* GetCameraMoveSpeed();
 	void          SuppressDXInput();
 	void          UpdateLookingAround();
+	int           DrawTabBar();
+	void          DrawPropControlWindow(int activePropIndex);
+	void          DrawCameraControlWindow();
 
 private:
 	bool                              lookingAround              = false;
@@ -27,7 +30,6 @@ private:
 	bool                              previouslyFreezeTime       = false;
 	bool                              showWindow                 = false;
 	std::vector<Prop>                 props;
-	int                               activePropIndex = -1;
 	static SceneCraft                 singleton;
 	static constexpr ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
 };
