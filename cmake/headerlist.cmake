@@ -5,4 +5,5 @@ set(HEADERS ${HEADERS}
 	include/ImGui/ImGuiInputAdapter.h
 	include/SceneCraft.h
 	include/ImGui/ImGuiSelector.h
+	include/Palette.h
 )
