@@ -91,6 +91,14 @@ namespace RE
 		static REL::Relocation<func_t> func{ RELOCATION_ID(35929, 36904) };
 		return func(self, a_obj);
 	}
+
+	void RemoveLight(ShadowSceneNode* self, NiLight* a_light)
+	{
+		using func_t = void            (*)(ShadowSceneNode*, NiLight*);
+		static REL::Relocation<func_t> func{ RELOCATION_ID(99697, 106331) };
+		return func(self, a_light);
+	}
+
 }  // namespace RE
 
 class PoC : public RE::BSTEventSink<RE::InputEvent*>
@@ -105,7 +113,7 @@ public:
 
 		if (!buttonEvt)
 			return RE::BSEventNotifyControl::kContinue;
-		
+
 		if (buttonEvt->GetIDCode() != 207 || !buttonEvt->IsUp())
 			return RE::BSEventNotifyControl::kContinue;
 
@@ -114,7 +122,8 @@ public:
 		const auto       dataHandler = RE::TESDataHandler::GetSingleton();
 		const RE::FormID id          = dataHandler->LookupFormID(0x800, "CinematographyStudio.esp");
 
-		auto* lightObjRef = RE::PlayerCharacter::GetSingleton()->PlaceObjectAtMe(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), true).get();
+		auto* tesObjLight = RE::TESForm::LookupByID(id)->As<RE::TESObjectLIGH>();
+		auto* lightObjRef = RE::PlayerCharacter::GetSingleton()->PlaceObjectAtMe(tesObjLight, true).get();
 		lightObjRef->Load3D(false);
 
 		auto niRoot = lightObjRef->Get3D()->AsFadeNode();
@@ -132,6 +141,27 @@ public:
 		light->diffuse.green = 0;
 		light->radius        = RE::NiPoint3(500, 500, 500);
 		light->fade          = 2;
+
+		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
+
+		RE::ShadowSceneNode::LIGHT_CREATE_PARAMS params;
+
+		params.affectLand     = true;
+		params.affectWater    = true;
+		params.dynamic        = true;
+		params.portalStrict   = true;
+		params.fov            = RE::NI_TWO_PI;
+		params.shadowLight    = true;
+		params.nearDistance   = 5.0f;
+		params.lensFlareData  = tesObjLight->lensFlare;
+		params.depthBias      = 1.0f;
+		params.neverFades     = true;
+		params.restrictedNode = nullptr;
+		params.falloff        = 1.0f;
+		params.unk18          = 0; // sceneGraphIndex 
+
+		//RE::RemoveLight(shadowSceneNode, light);
+		auto* bsLight = shadowSceneNode->AddLight(light, params);
 	}
 };
 
@@ -145,12 +175,12 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	logger::info("Game version : {}", a_skse->RuntimeVersion().string());
 
 	SKSE::GetMessagingInterface()->RegisterListener([](SKSE::MessagingInterface::Message* message) {
-			if (message->type == SKSE::MessagingInterface::kDataLoaded)
-			{
-				RE::ConsoleLog::GetSingleton()->Print("CineStudio has been loaded");
-				RE::BSInputDeviceManager::GetSingleton()->AddEventSink(&singleton);
-			}
-		});
+		if (message->type == SKSE::MessagingInterface::kDataLoaded)
+		{
+			RE::ConsoleLog::GetSingleton()->Print("CineStudio has been loaded");
+			RE::BSInputDeviceManager::GetSingleton()->AddEventSink(&singleton);
+		}
+	});
 
 	return true;
 }
