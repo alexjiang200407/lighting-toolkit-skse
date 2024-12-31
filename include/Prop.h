@@ -9,12 +9,12 @@ public:
 	virtual bool DrawTabItem(bool& active);
 	virtual void DrawControlPanel();
 	virtual void Remove();
-	void         Hide();
-	void         MoveToCameraLookingAt(float distanceFromCamera);
+	virtual void MoveToCameraLookingAt(float distanceFromCamera);
+	virtual void Hide();
 
 private:
 	static RE::NiPoint3 GetCameraPosition();
 
-private:
+protected:
 	RE::TESObjectREFRPtr ref;
 };

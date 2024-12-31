@@ -46,3 +46,4 @@ namespace stl
 }
 
 #include "Version.h"
+#include "RE.h"

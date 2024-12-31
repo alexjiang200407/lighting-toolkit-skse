@@ -28,7 +28,7 @@ void SceneCraft::DoFrame()
 
 	if (ImGui::IsKeyPressed(ImGuiKey_F, false))
 		RE::Main::GetSingleton()->freezeTime = !RE::Main::GetSingleton()->freezeTime;
-	if (lookingAround != ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+	if (lookingAround != (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_LeftAlt)))
 	{
 		lookingAround = !lookingAround;
 		UpdateLookingAround();
@@ -159,10 +159,11 @@ int SceneCraft::DrawTabBar()
 		{
 			// TODO Add a PropFactory creation method here
 			const auto       dataHandler = RE::TESDataHandler::GetSingleton();
-			const RE::FormID id          = dataHandler->LookupFormID(0x800, "SceneCraft.esp");
+			const RE::FormID id          = dataHandler->LookupFormID(0x801, "SceneCraft.esp");
 			const auto       ref         = RE::PlayerCharacter::GetSingleton()->PlaceObjectAtMe(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), true);
 
 			props.push_back(std::make_unique<Lighting>(Lighting(ref, 0, 0)));
+			(*props.rbegin())->MoveToCameraLookingAt(50.0f);
 		}
 	}
 	ImGui::EndTabBar();
@@ -176,6 +177,8 @@ void SceneCraft::DrawPropControlWindow(int activePropIndex)
 		ImGui::Text("Current Prop:");
 		if (activePropIndex != -1)
 		{
+			if (ImGui::IsKeyDown(ImGuiKey_LeftAlt))
+				props[activePropIndex]->MoveToCameraLookingAt(50.0f);
 			props[activePropIndex]->DrawControlPanel();
 		}
 	}

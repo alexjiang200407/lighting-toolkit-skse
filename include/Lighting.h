@@ -13,9 +13,11 @@ public:
 	void         UpdateLightColor();
 	void         UpdateLightTemplate();
 	void         Remove() override;
+	void         MoveToCameraLookingAt(float distanceFromCamera) override;
 
 private:
 	void ShadowSceneRemove(RE::ShadowSceneNode* shadowSceneNode);
+	void AttachLight();
 
 private:
 	RE::NiPointer<RE::BSLight>      bsLight = nullptr;
