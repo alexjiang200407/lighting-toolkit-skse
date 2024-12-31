@@ -10,10 +10,11 @@ public:
 public:
 	typedef std::pair<std::string, RE::NiColor> Color;
 
-	const char* SelectionName(int idx) const override;
-	int         GetSelectionCount() const override;
-	static void LoadPaletteFile();
-	const char* GetSelectionID() override;
+	const char*        SelectionName(int idx) const override;
+	int                GetSelectionCount() const override;
+	static void        LoadPaletteFile();
+	const char*        GetSelectionID() override;
+	const RE::NiColor& GetCurrentSelection() const override;
 
 private:
 	static inline std::vector<Color>  colors;

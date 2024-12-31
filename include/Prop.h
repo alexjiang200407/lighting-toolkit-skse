@@ -8,7 +8,7 @@ public:
 public:
 	virtual bool DrawTabItem(bool& active);
 	virtual void DrawControlPanel();
-	void         Remove();
+	virtual void Remove();
 	void         Hide();
 	void         MoveToCameraLookingAt(float distanceFromCamera);
 
