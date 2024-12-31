@@ -1,6 +1,8 @@
 #include "SceneCraft.h"
 #include "ImGui/ImGuiInputAdapter.h"
 #include "ImGui/ImGuiRenderer.h"
+#include "Lighting.h"
+#include "LightingTemplate.h"
 #include "Palette.h"
 
 SceneCraft SceneCraft::singleton;
@@ -11,6 +13,7 @@ void SceneCraft::Init()
 	ImGui::ImGuiInputAdapter::GetSingleton()->Init();
 	ImGui::ImGuiRenderer::GetSingleton()->RegisterRenderTarget(&singleton);
 	Palette::LoadPaletteFile();
+	LightingTemplate::LoadLightingTemplates();
 }
 
 void SceneCraft::DoFrame()
@@ -159,7 +162,7 @@ int SceneCraft::DrawTabBar()
 			const RE::FormID id          = dataHandler->LookupFormID(0x800, "SceneCraft.esp");
 			const auto       ref         = RE::PlayerCharacter::GetSingleton()->PlaceObjectAtMe(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), true);
 
-			props.push_back(std::make_unique<Prop>(Prop(ref)));
+			props.push_back(std::make_unique<Lighting>(Lighting(ref, 0, 0)));
 		}
 	}
 	ImGui::EndTabBar();

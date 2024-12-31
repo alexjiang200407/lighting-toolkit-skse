@@ -7,4 +7,6 @@ set(SOURCES ${SOURCES}
 	src/Palette.cpp
 	src/ImGui/ImGuiWidgets.cpp
 	src/Prop.cpp
+	src/Lighting.cpp
+	src/LightingTemplate.cpp
 )
