@@ -25,11 +25,11 @@ private:
 	void          DrawCameraControlWindow();
 
 private:
-	bool                              lookingAround              = false;
-	bool                              previouslyInFreeCameraMode = false;
-	bool                              previouslyFreezeTime       = false;
-	bool                              showWindow                 = false;
-	std::vector<Prop>                 props;
-	static SceneCraft                 singleton;
-	static constexpr ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
+	bool                               lookingAround              = false;
+	bool                               previouslyInFreeCameraMode = false;
+	bool                               previouslyFreezeTime       = false;
+	bool                               showWindow                 = false;
+	std::vector<std::unique_ptr<Prop>> props;
+	static SceneCraft                  singleton;
+	static constexpr ImGuiWindowFlags  windowFlags = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
 };

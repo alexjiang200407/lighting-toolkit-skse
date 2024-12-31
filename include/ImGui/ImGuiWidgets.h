@@ -18,7 +18,7 @@ namespace ImGui
 		{
 			retVal = ImGui::SliderInt(label, v, v_min, v_max, flags);
 		}
-
+		ImGui::PopItemWidth();
 		return retVal;
 	}
 

@@ -1,6 +1,7 @@
 #include "SceneCraft.h"
 #include "ImGui/ImGuiInputAdapter.h"
 #include "ImGui/ImGuiRenderer.h"
+#include "Palette.h"
 
 SceneCraft SceneCraft::singleton;
 
@@ -9,6 +10,7 @@ void SceneCraft::Init()
 	ImGui::ImGuiRenderer::GetSingleton()->Init(Style());
 	ImGui::ImGuiInputAdapter::GetSingleton()->Init();
 	ImGui::ImGuiRenderer::GetSingleton()->RegisterRenderTarget(&singleton);
+	Palette::LoadPaletteFile();
 }
 
 void SceneCraft::DoFrame()
@@ -135,8 +137,9 @@ int SceneCraft::DrawTabBar()
 		for (auto prop = props.begin(); prop != props.end();)
 		{
 			bool activeProp = false;
-			if (!prop->DrawTabItem(activeProp))
+			if (!(*prop)->DrawTabItem(activeProp))
 			{
+				(*prop)->Remove();
 				prop = props.erase(props.begin() + i);
 				continue;
 			}
@@ -154,7 +157,9 @@ int SceneCraft::DrawTabBar()
 			// TODO Add a PropFactory creation method here
 			const auto       dataHandler = RE::TESDataHandler::GetSingleton();
 			const RE::FormID id          = dataHandler->LookupFormID(0x800, "SceneCraft.esp");
-			props.push_back(RE::PlayerCharacter::GetSingleton()->PlaceObjectAtMe(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), true));
+			const auto       ref         = RE::PlayerCharacter::GetSingleton()->PlaceObjectAtMe(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), true);
+
+			props.push_back(std::make_unique<Prop>(Prop(ref)));
 		}
 	}
 	ImGui::EndTabBar();
@@ -168,7 +173,7 @@ void SceneCraft::DrawPropControlWindow(int activePropIndex)
 		ImGui::Text("Current Prop:");
 		if (activePropIndex != -1)
 		{
-			props[activePropIndex].DrawControlPanel();
+			props[activePropIndex]->DrawControlPanel();
 		}
 	}
 	ImGui::EndChild();
@@ -180,10 +185,6 @@ void SceneCraft::DrawCameraControlWindow()
 	{
 		ImGui::Text("Camera Settings:");
 		ImGui::Checkbox("Freeze Time", &RE::Main::GetSingleton()->freezeTime);
-		float availableWidth = ImGui::GetContentRegionAvail().x;
-
-		// Set the item width to the available width
-		ImGui::PushItemWidth(availableWidth);
 		ImGui::SliderAutoFill("Camera Speed", GetCameraMoveSpeed(), 0.1f, 50.0f);
 	}
 	ImGui::EndChild();

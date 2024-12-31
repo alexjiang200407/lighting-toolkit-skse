@@ -16,8 +16,9 @@ namespace ImGui
 		int                 DrawSelectionComboBox();
 		virtual const char* SelectionName(int idx) const = 0;
 		virtual int         GetSelectionCount() const    = 0;
+		virtual const T&    GetCurrentSelection() const  = 0;
 
-	private:
+	protected:
 		int selectionIdx;
 	};
 
