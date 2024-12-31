@@ -8,4 +8,6 @@ set(HEADERS ${HEADERS}
 	include/Palette.h
 	include/ImGui/ImGuiWidgets.h
 	include/Prop.h
+	include/Lighting.h
+	include/LightingTemplate.h
 )
