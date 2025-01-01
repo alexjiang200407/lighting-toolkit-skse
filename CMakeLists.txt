@@ -118,6 +118,7 @@ source_group(
 )
 
 find_package(imgui CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 add_library(
     ${PROJECT_NAME} 
@@ -152,6 +153,8 @@ target_link_libraries(
     PRIVATE
         ${CommonLibName}::${CommonLibName}
 		imgui::imgui
+		nlohmann_json 
+        nlohmann_json::nlohmann_json
 )
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE include/PCH.h) # <--- PCH.h is required!
