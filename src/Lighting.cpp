@@ -4,7 +4,8 @@ Lighting::Lighting(RE::TESObjectREFRPtr ref, int colorIdx, int lightTemplateIdx)
 	Prop(ref), palette(colorIdx), lightTemplate(lightTemplateIdx)
 {
 	niLight.reset(RE::NiPointLight::Create());
-	AttachLight();
+
+	FindOrCreateLight();
 }
 
 void Lighting::DrawControlPanel()
@@ -31,7 +32,9 @@ void Lighting::UpdateLightTemplate()
 	auto  params          = lightTemplate.GetCurrentSelection().ToLightCreateParams();
 	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 
-	ShadowSceneRemove(shadowSceneNode);
+	if (bsLight.get())
+	shadowSceneNode->RemoveLight(bsLight);
+	
 	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), params));
 }
 
@@ -44,8 +47,16 @@ void Lighting::Remove()
 
 void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
 {
-	Prop::MoveToCameraLookingAt(distanceFromCamera);
-	RE::UpdateNode(niLight.get());
+	if (ref->GetParentCell() != RE::PlayerCharacter::GetSingleton()->GetParentCell())
+	{
+		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
+		ref->MoveTo(RE::PlayerCharacter::GetSingleton());
+		shadowSceneNode->RemoveLight(bsLight);
+		shadowSceneNode->RemoveLight(niLight.get());
+		FindOrCreateLight();
+	}
+	attachNode->world.translate = GetCameraLookingAt(distanceFromCamera);
+	niLight->world.translate    = GetCameraLookingAt(distanceFromCamera);
 }
 
 void Lighting::ShadowSceneRemove(RE::ShadowSceneNode* shadowSceneNode)
@@ -56,24 +67,33 @@ void Lighting::ShadowSceneRemove(RE::ShadowSceneNode* shadowSceneNode)
 	}
 }
 
-void Lighting::AttachLight()
+void Lighting::FindOrCreateLight()
 {
 	// TODO Perform Error check here
-	ref->Load3D(false);
+	if (!ref->Is3DLoaded())
+		ref->Load3D(false);
 	auto* niRoot = ref->Get3D()->AsFadeNode();
-	auto* niNode = niRoot->GetObjectByName("AttachLight")->AsNode();
 
-	niLight->name = "SceneCraftLight";
-	RE::AttachNode(niNode, niLight.get());
-
-	// TODO put these into a settings class
-	niLight->ambient = RE::NiColor();
-	niLight->radius  = RE::NiPoint3(500, 500, 500);
-	niLight->SetLightAttenuation(500);
-	niLight->fade = 2;
-
+	if (auto* newLight = niRoot->GetObjectByName("SceneCraftLight"))
+	{
+		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
+		shadowSceneNode->RemoveLight(niLight.get());
+		shadowSceneNode->RemoveLight(bsLight);
+		niLight.reset(skyrim_cast<RE::NiPointLight*>(newLight));
+	}
+	else
+	{
+		auto* niNode  = niRoot->GetObjectByName("AttachLight")->AsNode();
+		niLight->name = "SceneCraftLight";
+		RE::AttachNode(niNode, niLight.get());
+		attachNode.reset(niNode);
+		// TODO put these into a settings class
+		niLight->ambient = RE::NiColor();
+		niLight->radius  = RE::NiPoint3(500, 500, 500);
+		niLight->SetLightAttenuation(500);
+		niLight->fade = 2;
+	}
 	UpdateLightColor();
 	UpdateLightTemplate();
-
 	RE::UpdateNode(niLight.get());
 }

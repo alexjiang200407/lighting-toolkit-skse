@@ -39,6 +39,17 @@ void Prop::Hide()
 	ref->Disable();
 }
 
+RE::NiPoint3 Prop::GetCameraLookingAt(float distanceFromCamera)
+{
+	auto cameraNode = RE::PlayerCamera::GetSingleton()->cameraRoot.get()->AsNode();
+	auto cameraNI   = reinterpret_cast<RE::NiCamera*>((cameraNode->children.size() == 0) ? nullptr : cameraNode->children[0].get());
+
+	if (cameraNI)
+		return GetCameraPosition() + (cameraNI->world.rotate * RE::NiPoint3{ distanceFromCamera, 0.0f, 0.0f });
+
+	return RE::NiPoint3();
+}
+
 void Prop::MoveToCameraLookingAt(float distanceFromCamera)
 {
 	auto cameraNode = RE::PlayerCamera::GetSingleton()->cameraRoot.get()->AsNode();
