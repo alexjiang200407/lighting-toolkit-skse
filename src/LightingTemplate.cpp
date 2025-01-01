@@ -73,3 +73,8 @@ RE::ShadowSceneNode::LIGHT_CREATE_PARAMS LightingTemplateData::ToLightCreatePara
 
 	return params;
 }
+
+LightingTemplateData::operator RE::ShadowSceneNode::LIGHT_CREATE_PARAMS() const
+{
+	return ToLightCreateParams();
+}
