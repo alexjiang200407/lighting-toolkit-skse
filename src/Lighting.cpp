@@ -33,8 +33,8 @@ void Lighting::UpdateLightTemplate()
 	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 
 	if (bsLight.get())
-	shadowSceneNode->RemoveLight(bsLight);
-	
+		shadowSceneNode->RemoveLight(bsLight);
+
 	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), params));
 }
 
@@ -42,7 +42,9 @@ void Lighting::Remove()
 {
 	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 	Prop::Remove();
-	ShadowSceneRemove(shadowSceneNode);
+
+	if (bsLight.get())
+		shadowSceneNode->RemoveLight(bsLight);
 }
 
 void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
@@ -64,14 +66,6 @@ void Lighting::OnEnterCell()
 	// Skyrim creates a new niLight when we enter a cell
 	// so we have to update our state
 	FindOrCreateLight();
-}
-
-void Lighting::ShadowSceneRemove(RE::ShadowSceneNode* shadowSceneNode)
-{
-	if (bsLight.get())
-	{
-		shadowSceneNode->RemoveLight(bsLight);
-	}
 }
 
 void Lighting::FindOrCreateLight()

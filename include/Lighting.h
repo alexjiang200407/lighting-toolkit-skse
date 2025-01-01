@@ -18,7 +18,6 @@ public:
 	void         OnEnterCell() override;
 
 private:
-	void ShadowSceneRemove(RE::ShadowSceneNode* shadowSceneNode);
 	void FindOrCreateLight();
 
 private:
