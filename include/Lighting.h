@@ -15,6 +15,7 @@ public:
 	void         UpdateLightTemplate();
 	void         Remove() override;
 	void         MoveToCameraLookingAt(float distanceFromCamera) override;
+	void         OnEnterCell() override;
 
 private:
 	void ShadowSceneRemove(RE::ShadowSceneNode* shadowSceneNode);

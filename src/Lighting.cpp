@@ -59,6 +59,13 @@ void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
 	niLight->world.translate    = GetCameraLookingAt(distanceFromCamera);
 }
 
+void Lighting::OnEnterCell()
+{
+	// Skyrim creates a new niLight when we enter a cell
+	// so we have to update our state
+	FindOrCreateLight();
+}
+
 void Lighting::ShadowSceneRemove(RE::ShadowSceneNode* shadowSceneNode)
 {
 	if (bsLight.get())

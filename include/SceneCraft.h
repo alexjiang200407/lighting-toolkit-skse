@@ -3,10 +3,12 @@
 #include "Prop.h"
 
 class SceneCraft :
-	ImGui::ImGuiComponent
+	ImGui::ImGuiComponent,
+	public RE::BSTEventSink<RE::BGSActorCellEvent>
 {
 public:
 	void               Init();
+	void               OnDataLoaded();
 	void               DoFrame();
 	ImGuiStyle         Style();
 	static SceneCraft* GetSingleton();
@@ -15,14 +17,15 @@ private:
 	SceneCraft() = default;
 
 private:
-	void          ToggleMenu();
-	bool          ShouldDrawCursor() override;
-	static float* GetCameraMoveSpeed();
-	void          SuppressDXInput();
-	void          UpdateLookingAround();
-	int           DrawTabBar();
-	void          DrawPropControlWindow(int activePropIndex);
-	void          DrawCameraControlWindow();
+	void                     ToggleMenu();
+	bool                     ShouldDrawCursor() override;
+	static float*            GetCameraMoveSpeed();
+	void                     SuppressDXInput();
+	void                     UpdateLookingAround();
+	int                      DrawTabBar();
+	void                     DrawPropControlWindow(int activePropIndex);
+	void                     DrawCameraControlWindow();
+	RE::BSEventNotifyControl ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>* a_eventSource) override;
 
 private:
 	bool                               lookingAround              = false;

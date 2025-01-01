@@ -16,6 +16,11 @@ void SceneCraft::Init()
 	LightingTemplate::LoadLightingTemplates();
 }
 
+void SceneCraft::OnDataLoaded()
+{
+	RE::PlayerCharacter::GetSingleton()->AddEventSink(this);
+}
+
 void SceneCraft::DoFrame()
 {
 	if (ImGui::IsKeyPressed(ImGuiKey_End, false))
@@ -194,6 +199,29 @@ void SceneCraft::DrawCameraControlWindow()
 		ImGui::SliderAutoFill("Camera Speed", GetCameraMoveSpeed(), 0.1f, 50.0f);
 	}
 	ImGui::EndChild();
+}
+
+RE::BSEventNotifyControl SceneCraft::ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>*)
+{
+	if (!a_event || a_event->flags == RE::BGSActorCellEvent::CellFlag::kLeave)
+	{
+		return RE::BSEventNotifyControl::kContinue;
+	}
+
+	auto cell = RE::TESForm::LookupByID<RE::TESObjectCELL>(a_event->cellID);
+	if (!cell)
+	{
+		return RE::BSEventNotifyControl::kContinue;
+	}
+
+	for (const auto& prop : props)
+	{
+		if (prop->GetCellID() == a_event->cellID)
+		{
+			prop->OnEnterCell();
+		}
+	}
+	return RE::BSEventNotifyControl::kContinue;
 }
 
 ImGuiStyle SceneCraft::Style()

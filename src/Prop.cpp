@@ -39,6 +39,17 @@ void Prop::Hide()
 	ref->Disable();
 }
 
+void Prop::OnEnterCell()
+{
+	// TODO Add default behavior
+}
+
+RE::FormID Prop::GetCellID()
+{
+	assert(ref->GetParentCell());
+	return ref->GetParentCell()->formID;
+}
+
 RE::NiPoint3 Prop::GetCameraLookingAt(float distanceFromCamera)
 {
 	auto cameraNode = RE::PlayerCamera::GetSingleton()->cameraRoot.get()->AsNode();
