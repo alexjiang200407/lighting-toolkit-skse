@@ -10,4 +10,5 @@ set(HEADERS ${HEADERS}
 	include/Prop.h
 	include/Lighting.h
 	include/LightingTemplate.h
+	include/RE.h
 )

@@ -16,6 +16,11 @@ void SceneCraft::Init()
 	LightingTemplate::LoadLightingTemplates();
 }
 
+void SceneCraft::OnDataLoaded()
+{
+	RE::PlayerCharacter::GetSingleton()->AddEventSink(this);
+}
+
 void SceneCraft::DoFrame()
 {
 	if (ImGui::IsKeyPressed(ImGuiKey_End, false))
@@ -28,7 +33,7 @@ void SceneCraft::DoFrame()
 
 	if (ImGui::IsKeyPressed(ImGuiKey_F, false))
 		RE::Main::GetSingleton()->freezeTime = !RE::Main::GetSingleton()->freezeTime;
-	if (lookingAround != ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+	if (lookingAround != (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_LeftAlt)))
 	{
 		lookingAround = !lookingAround;
 		UpdateLookingAround();
@@ -159,10 +164,11 @@ int SceneCraft::DrawTabBar()
 		{
 			// TODO Add a PropFactory creation method here
 			const auto       dataHandler = RE::TESDataHandler::GetSingleton();
-			const RE::FormID id          = dataHandler->LookupFormID(0x800, "SceneCraft.esp");
+			const RE::FormID id          = dataHandler->LookupFormID(0x801, "SceneCraft.esp");
 			const auto       ref         = RE::PlayerCharacter::GetSingleton()->PlaceObjectAtMe(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), true);
 
 			props.push_back(std::make_unique<Lighting>(Lighting(ref, 0, 0)));
+			(*props.rbegin())->MoveToCameraLookingAt(50.0f);
 		}
 	}
 	ImGui::EndTabBar();
@@ -176,6 +182,8 @@ void SceneCraft::DrawPropControlWindow(int activePropIndex)
 		ImGui::Text("Current Prop:");
 		if (activePropIndex != -1)
 		{
+			if (ImGui::IsKeyDown(ImGuiKey_LeftAlt))
+				props[activePropIndex]->MoveToCameraLookingAt(50.0f);
 			props[activePropIndex]->DrawControlPanel();
 		}
 	}
@@ -191,6 +199,29 @@ void SceneCraft::DrawCameraControlWindow()
 		ImGui::SliderAutoFill("Camera Speed", GetCameraMoveSpeed(), 0.1f, 50.0f);
 	}
 	ImGui::EndChild();
+}
+
+RE::BSEventNotifyControl SceneCraft::ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>*)
+{
+	if (!a_event || a_event->flags == RE::BGSActorCellEvent::CellFlag::kLeave)
+	{
+		return RE::BSEventNotifyControl::kContinue;
+	}
+
+	auto cell = RE::TESForm::LookupByID<RE::TESObjectCELL>(a_event->cellID);
+	if (!cell)
+	{
+		return RE::BSEventNotifyControl::kContinue;
+	}
+
+	for (const auto& prop : props)
+	{
+		if (prop->GetCellID() == a_event->cellID)
+		{
+			prop->OnEnterCell();
+		}
+	}
+	return RE::BSEventNotifyControl::kContinue;
 }
 
 ImGuiStyle SceneCraft::Style()

@@ -3,7 +3,8 @@
 #include "Palette.h"
 #include "Prop.h"
 
-class Lighting : public Prop
+class Lighting :
+	public Prop
 {
 public:
 	Lighting(RE::TESObjectREFRPtr ref, int colorIdx, int lightTemplateIdx);
@@ -13,13 +14,16 @@ public:
 	void         UpdateLightColor();
 	void         UpdateLightTemplate();
 	void         Remove() override;
+	void         MoveToCameraLookingAt(float distanceFromCamera) override;
+	void         OnEnterCell() override;
 
 private:
-	void ShadowSceneRemove(RE::ShadowSceneNode* shadowSceneNode);
+	void FindOrCreateLight();
 
 private:
-	RE::NiPointer<RE::BSLight>      bsLight = nullptr;
-	RE::NiPointer<RE::NiPointLight> niLight = nullptr;
+	RE::NiPointer<RE::NiNode>       attachNode = nullptr;
+	RE::NiPointer<RE::BSLight>      bsLight    = nullptr;
+	RE::NiPointer<RE::NiPointLight> niLight    = nullptr;
 	Palette                         palette;
 	LightingTemplate                lightTemplate;
 };

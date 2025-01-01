@@ -77,7 +77,10 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 
 	SKSE::GetMessagingInterface()->RegisterListener([](SKSE::MessagingInterface::Message* message) {
 		if (message->type == SKSE::MessagingInterface::kDataLoaded)
+		{
 			RE::ConsoleLog::GetSingleton()->Print("SceneCraft has been loaded");
+			SceneCraft::GetSingleton()->OnDataLoaded();
+		}
 	});
 
 	return true;

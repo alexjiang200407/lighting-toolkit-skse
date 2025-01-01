@@ -9,4 +9,5 @@ set(SOURCES ${SOURCES}
 	src/Prop.cpp
 	src/Lighting.cpp
 	src/LightingTemplate.cpp
+	src/RE.cpp
 )
