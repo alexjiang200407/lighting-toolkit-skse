@@ -18,6 +18,8 @@ struct LightingTemplateData
 
 	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS ToLightCreateParams() const;
 
+	operator RE::ShadowSceneNode::LIGHT_CREATE_PARAMS() const;
+
 	LightFlags  flags;
 	float       fov;
 	float       falloff;

@@ -29,13 +29,13 @@ void Lighting::UpdateLightColor()
 
 void Lighting::UpdateLightTemplate()
 {
-	auto  params          = lightTemplate.GetCurrentSelection().ToLightCreateParams();
-	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
+	const auto& templateData    = lightTemplate.GetCurrentSelection();
+	auto*       shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 
 	if (bsLight.get())
 		shadowSceneNode->RemoveLight(bsLight);
 
-	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), params));
+	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), templateData));
 }
 
 void Lighting::Remove()
@@ -49,7 +49,10 @@ void Lighting::Remove()
 
 void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
 {
-	if (ref->GetParentCell() != RE::PlayerCharacter::GetSingleton()->GetParentCell())
+	assert(RE::PlayerCharacter::GetSingleton());
+	assert(RE::PlayerCharacter::GetSingleton()->GetParentCell());
+
+	if (GetCellID() != RE::PlayerCharacter::GetSingleton()->GetParentCell()->formID)
 	{
 		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 		ref->MoveTo(RE::PlayerCharacter::GetSingleton());
@@ -70,10 +73,16 @@ void Lighting::OnEnterCell()
 
 void Lighting::FindOrCreateLight()
 {
-	// TODO Perform Error check here
 	if (!ref->Is3DLoaded())
 		ref->Load3D(false);
+
 	auto* niRoot = ref->Get3D()->AsFadeNode();
+
+	if (!niRoot)
+	{
+		logger::error("Base Root Node not found!");
+		return;
+	}
 
 	if (auto* newLight = niRoot->GetObjectByName("SceneCraftLight"))
 	{
@@ -84,10 +93,19 @@ void Lighting::FindOrCreateLight()
 	}
 	else
 	{
-		auto* niNode  = niRoot->GetObjectByName("AttachLight")->AsNode();
+		auto* niObj   = niRoot->GetObjectByName("AttachLight");
+
+		if (!niObj)
+		{
+			logger::error("AttachLight node not found!");
+			return;
+		}
+
+		auto* niNode  = niObj->AsNode();
 		niLight->name = "SceneCraftLight";
 		RE::AttachNode(niNode, niLight.get());
 		attachNode.reset(niNode);
+
 		// TODO put these into a settings class
 		niLight->ambient = RE::NiColor();
 		niLight->radius  = RE::NiPoint3(500, 500, 500);

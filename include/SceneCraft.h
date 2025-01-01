@@ -18,6 +18,7 @@ private:
 
 private:
 	void                     ToggleMenu();
+	bool                     CanOpenWindow();
 	bool                     ShouldDrawCursor() override;
 	static float*            GetCameraMoveSpeed();
 	void                     SuppressDXInput();

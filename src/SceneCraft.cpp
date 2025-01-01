@@ -62,26 +62,75 @@ void SceneCraft::ToggleMenu()
 
 	if (showWindow)
 	{
+		if (!CanOpenWindow())
+		{
+			RE::DebugNotification("Cannot open SceneCraft menu at this time...", "UIMenuOK");
+			showWindow = false;
+			return;
+		}
+
+		RE::PlaySound("UIMenuOK");
 		SuppressDXInput();
 		previouslyInFreeCameraMode = RE::PlayerCamera::GetSingleton()->IsInFreeCameraMode();
 		if (!previouslyInFreeCameraMode)
 		{
-			RE::PlayerCamera::GetSingleton()->ToggleFreeCameraMode(false);
+			RE::PlayerCamera::GetSingleton()->ToggleFreeCameraMode(true);
 			RE::ControlMap::GetSingleton()->PushInputContext(RE::ControlMap::InputContextID::kTFCMode);
 		}
 
+		RE::UI::GetSingleton()->ShowMenus(false);
 		previouslyFreezeTime = RE::Main::GetSingleton()->freezeTime;
 	}
 	else
 	{
+		RE::PlaySound("UIMenuCancel");
 		ImGui::ImGuiInputAdapter::GetSingleton()->DisableSupression();
+		RE::UI::GetSingleton()->ShowMenus(true);
 		RE::Main::GetSingleton()->freezeTime = previouslyFreezeTime;
 		if (!previouslyInFreeCameraMode)
 		{
 			RE::PlayerCamera::GetSingleton()->ToggleFreeCameraMode(false);
 			RE::ControlMap::GetSingleton()->PopInputContext(RE::ControlMap::InputContextID::kTFCMode);
 		}
+		lookingAround = false;
 	}
+}
+
+bool SceneCraft::CanOpenWindow()
+{
+	static constexpr std::array badMenus{
+		RE::MainMenu::MENU_NAME,
+		RE::MistMenu::MENU_NAME,
+		RE::LoadingMenu::MENU_NAME,
+		RE::FaderMenu::MENU_NAME,
+		"LootMenu"sv,
+		"CustomMenu"sv
+	};
+
+	if (const auto UI = RE::UI::GetSingleton();
+	    !UI || std::ranges::any_of(badMenus, [&](const auto& menuName) { return UI->IsMenuOpen(menuName); }) || UI->IsItemMenuOpen())
+	{
+		return false;
+	}
+
+	const auto* controlMap = RE::ControlMap::GetSingleton();
+	if (!controlMap)
+	{
+		return false;
+	}
+
+	auto context_id = controlMap->contextPriorityStack.back();
+	if (context_id != RE::UserEvents::INPUT_CONTEXT_ID::kGameplay && context_id != RE::UserEvents::INPUT_CONTEXT_ID::kTFCMode && context_id != RE::UserEvents::INPUT_CONTEXT_ID::kConsole)
+	{
+		return false;
+	}
+
+	if (RE::MenuControls::GetSingleton()->InBeastForm() || RE::VATS::GetSingleton()->mode == RE::VATS::VATS_MODE::kKillCam)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 bool SceneCraft::ShouldDrawCursor()
