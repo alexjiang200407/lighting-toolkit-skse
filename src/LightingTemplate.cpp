@@ -1,55 +1,8 @@
 #include "LightingTemplate.h"
 
-LightingTemplate::LightingTemplate(int lightTemplateIdx) :
-	ImGui::ImGuiSelector<LightingTemplateData>(lightTemplateIdx)
+LightingTemplateData::LightingTemplateData(PresetID id, std::string name, LightFlags flags) :
+	Preset(PresetTID::kLightTemplate, id, name), flags(flags)
 {
-}
-
-const char* LightingTemplate::GetSelectionID()
-{
-	return "Lighting Template";
-}
-
-const char* LightingTemplate::SelectionName(int idx) const
-{
-	return templates[idx].nameID.c_str();
-}
-
-int LightingTemplate::GetSelectionCount() const
-{
-	return (int)templates.size();
-}
-
-void LightingTemplate::LoadLightingTemplates()
-{
-	using FLAGS = LightingTemplateData::Flags;
-	// TODO read from JSON file
-	LightingTemplateData data;
-
-	data.depthBias    = 1.0f;
-	data.falloff      = 1.0f;
-	data.fov          = RE::NI_PI;
-	data.nearDistance = 6.0;
-	data.depthBias    = 1.0f;
-	data.nameID       = "Shadow90";
-	data.flags.set(FLAGS::kAffectAll, FLAGS::kCastsShadow, FLAGS::kPortalStrict, FLAGS::kNeverFades);
-
-	templates.push_back(data);
-
-	data.fov    = RE::NI_TWO_PI;
-	data.nameID = "Shadow180";
-
-	templates.push_back(data);
-
-	data.flags = FLAGS();
-	data.flags.set(FLAGS::kAffectAll, FLAGS::kDynamic, FLAGS::kPortalStrict, FLAGS::kNeverFades);
-	data.nameID = "Dynamic180";
-	templates.push_back(data);
-}
-
-const LightingTemplateData& LightingTemplate::GetCurrentSelection() const
-{
-	return templates[selectionIdx];
 }
 
 RE::ShadowSceneNode::LIGHT_CREATE_PARAMS LightingTemplateData::ToLightCreateParams() const

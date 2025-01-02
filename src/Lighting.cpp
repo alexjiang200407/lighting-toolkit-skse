@@ -1,22 +1,32 @@
 #include "Lighting.h"
+#include "Color.h"
 
-Lighting::Lighting(RE::TESObjectREFRPtr ref, int colorIdx, int lightTemplateIdx) :
-	Prop(ref), palette(colorIdx), lightTemplate(lightTemplateIdx)
+Lighting::Lighting(RE::TESObjectREFRPtr ref, PresetID colorIdx, PresetID lightTemplateIdx) :
+	Prop(ref), currentLightColor(colorIdx), currentLightTemplate(lightTemplateIdx)
 {
 	niLight.reset(RE::NiPointLight::Create());
 
 	FindOrCreateLight();
 }
 
-void Lighting::DrawControlPanel()
+void Lighting::DrawControlPanel(PresetDatabase& config)
 {
-	if (palette.DrawSelectionComboBox() != -1)
 	{
-		UpdateLightColor();
+		auto opt = config.DrawSelectionComboBox<Color>(PresetTID::kColor, "Color", currentLightColor);
+		if (opt.has_value())
+		{
+			niLight->diffuse = (*opt)->GetColor();
+			currentLightColor = (*opt)->GetID();
+		}
 	}
-	if (lightTemplate.DrawSelectionComboBox() != -1)
+
 	{
-		UpdateLightTemplate();
+		auto opt = config.DrawSelectionComboBox<LightingTemplateData>(PresetTID::kLightTemplate, "Light Template", templateData.GetID());
+		if (opt.has_value())
+		{
+			templateData = *opt.value();
+			UpdateLightTemplate();
+		}
 	}
 	ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
 	ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
@@ -24,12 +34,11 @@ void Lighting::DrawControlPanel()
 
 void Lighting::UpdateLightColor()
 {
-	niLight->diffuse = palette.GetCurrentSelection();
+	//niLight->diffuse = palette.GetCurrentSelection();
 }
 
 void Lighting::UpdateLightTemplate()
 {
-	const auto& templateData    = lightTemplate.GetCurrentSelection();
 	auto*       shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 
 	if (bsLight.get())

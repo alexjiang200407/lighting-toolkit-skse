@@ -5,10 +5,12 @@ set(HEADERS ${HEADERS}
 	include/ImGui/ImGuiInputAdapter.h
 	include/SceneCraft.h
 	include/ImGui/ImGuiSelector.h
-	include/Palette.h
 	include/ImGui/ImGuiWidgets.h
 	include/Prop.h
 	include/Lighting.h
 	include/LightingTemplate.h
 	include/RE.h
+	include/PresetDatabase.h
+	include/Preset.h
+	include/Color.h
 )

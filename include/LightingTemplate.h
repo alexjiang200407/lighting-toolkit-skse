@@ -1,7 +1,9 @@
 #pragma once
 #include "ImGui/ImGuiSelector.h"
+#include "Preset.h"
 
-struct LightingTemplateData
+struct LightingTemplateData :
+	Preset
 {
 	enum class Flags
 	{
@@ -13,34 +15,18 @@ struct LightingTemplateData
 		kAffectAll    = kAffectLand | kAffectWater,
 		kNeverFades   = 1 << 5
 	};
-
 	typedef stl::enumeration<Flags, uint32_t> LightFlags;
+	LightingTemplateData() = default;
+	LightingTemplateData(PresetID id, std::string name, LightFlags flags);
+
 
 	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS ToLightCreateParams() const;
 
 	operator RE::ShadowSceneNode::LIGHT_CREATE_PARAMS() const;
 
 	LightFlags  flags;
-	float       fov;
-	float       falloff;
-	float       depthBias;
-	float       nearDistance;
-	std::string nameID;
-};
-
-class LightingTemplate :
-	public ImGui::ImGuiSelector<LightingTemplateData>
-{
-public:
-	LightingTemplate(int lightTemplateIdx);
-
-public:
-	const char*                 GetSelectionID() override;
-	const char*                 SelectionName(int idx) const override;
-	int                         GetSelectionCount() const override;
-	static void                 LoadLightingTemplates();
-	const LightingTemplateData& GetCurrentSelection() const override;
-
-private:
-	static inline std::vector<LightingTemplateData> templates;
+	float       fov = RE::NI_PI;
+	float       falloff = 1.0f;
+	float       depthBias = 1.0f;
+	float       nearDistance = 6.0f;
 };

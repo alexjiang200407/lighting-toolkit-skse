@@ -3,7 +3,6 @@
 #include "ImGui/ImGuiRenderer.h"
 #include "Lighting.h"
 #include "LightingTemplate.h"
-#include "Palette.h"
 
 SceneCraft SceneCraft::singleton;
 
@@ -12,8 +11,7 @@ void SceneCraft::Init()
 	ImGui::ImGuiRenderer::GetSingleton()->Init(Style());
 	ImGui::ImGuiInputAdapter::GetSingleton()->Init();
 	ImGui::ImGuiRenderer::GetSingleton()->RegisterRenderTarget(&singleton);
-	Palette::LoadPaletteFile();
-	LightingTemplate::LoadLightingTemplates();
+	config.LoadConfigFromFile();
 }
 
 void SceneCraft::OnDataLoaded()
@@ -233,7 +231,7 @@ void SceneCraft::DrawPropControlWindow(int activePropIndex)
 		{
 			if (ImGui::IsKeyDown(ImGuiKey_LeftAlt))
 				props[activePropIndex]->MoveToCameraLookingAt(50.0f);
-			props[activePropIndex]->DrawControlPanel();
+			props[activePropIndex]->DrawControlPanel(config);
 		}
 	}
 	ImGui::EndChild();

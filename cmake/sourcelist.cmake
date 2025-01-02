@@ -4,10 +4,12 @@ set(SOURCES ${SOURCES}
 	src/SceneCraft.cpp
 	src/ImGui/ImGuiComponent.cpp
 	src/ImGui/ImGuiInputAdapter.cpp
-	src/Palette.cpp
 	src/ImGui/ImGuiWidgets.cpp
 	src/Prop.cpp
 	src/Lighting.cpp
 	src/LightingTemplate.cpp
 	src/RE.cpp
+	src/PresetDatabase.cpp
+	src/Preset.cpp
+	src/Color.cpp
 )

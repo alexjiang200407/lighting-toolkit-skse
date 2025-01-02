@@ -1,4 +1,5 @@
 #pragma once
+#include "PresetDatabase.h"
 
 class Prop
 {
@@ -7,7 +8,7 @@ public:
 
 public:
 	virtual bool        DrawTabItem(bool& active);
-	virtual void        DrawControlPanel();
+	virtual void        DrawControlPanel(PresetDatabase& config);
 	virtual void        Remove();
 	virtual void        MoveToCameraLookingAt(float distanceFromCamera);
 	virtual void        Hide();
