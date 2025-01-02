@@ -12,4 +12,5 @@ set(SOURCES ${SOURCES}
 	src/PresetDatabase.cpp
 	src/Preset.cpp
 	src/Color.cpp
+	src/PresetSerializationControl.cpp
 )

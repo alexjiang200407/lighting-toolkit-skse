@@ -11,6 +11,7 @@ void SceneCraft::Init()
 	ImGui::ImGuiRenderer::GetSingleton()->Init(Style());
 	ImGui::ImGuiInputAdapter::GetSingleton()->Init();
 	ImGui::ImGuiRenderer::GetSingleton()->RegisterRenderTarget(&singleton);
+	presetSerializationControl.Deserialize(config);
 }
 
 void SceneCraft::OnDataLoaded()
