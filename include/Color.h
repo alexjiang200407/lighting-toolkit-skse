@@ -10,6 +10,10 @@ public:
 public:
 	RE::NiColor GetColor() const;
 
+
+public:
+	static constexpr PresetTID TID = PresetTID::kColor;
+
 private:
 	RE::NiColor color;
 };

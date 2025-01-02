@@ -37,60 +37,11 @@ public:
 	void                          LoadConfigFromFile();
 	void                          SaveConfigToFile();
 	std::pair<iterator, iterator> GetAllPresetsOfType(PresetTID type) const;
-
-	template <typename T>
-	std::optional<T*> DrawSelectionComboBox(PresetTID tid, const char* selectionID, PresetID oldID) const;
+	bool                          IsEnd(const iterator& it) const;
+	iterator                      Find(PresetID key) const;
 
 private:
 	std::set<PresetPtr, PresetPtrComparator> presets;
 	static constexpr std::string_view        filePath = "./Data/SKSE/Plugins/SceneCraft.json"sv;
 };
 
-template <typename T>
-inline std::optional<T*> PresetDatabase::DrawSelectionComboBox(PresetTID tid, const char* selectionID, PresetID oldID) const
-{
-	ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(selectionID).x - ImGui::GetStyle().ItemSpacing.x);
-
-	auto [st, end] = GetAllPresetsOfType(tid);
-
-	if (st == end)
-	{
-		if (ImGui::BeginCombo(selectionID, "No Presets Found"))
-		{
-			ImGui::EndCombo();
-		}
-		ImGui::PopItemWidth();
-		return std::nullopt;
-	}
-
-	bool     doUpdate   = false;
-	iterator selectedIt = presets.find(oldID);
-
-	if (selectedIt == presets.end())
-	{
-		doUpdate   = true;
-		selectedIt = st;
-	}
-
-	Preset* selected = selectedIt->get();
-	if (ImGui::BeginCombo(selectionID, (*selectedIt)->GetSelectionName()))
-	{
-		while (st != end)
-		{
-			bool isSelected = selectedIt == st;
-			if (ImGui::Selectable((*st)->GetSelectionName(), isSelected))
-				selected = const_cast<Preset*>(st->get());
-			if (isSelected)
-				ImGui::SetItemDefaultFocus();
-			st++;
-		}
-		ImGui::EndCombo();
-	}
-	ImGui::PopItemWidth();
-
-	if (selected != selectedIt->get())
-		doUpdate = true;
-
-	auto ans = dynamic_cast<T*>(selected);
-	return doUpdate ? std::optional(ans) : std::nullopt;
-}

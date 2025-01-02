@@ -8,6 +8,7 @@ set(HEADERS ${HEADERS}
 	include/Prop.h
 	include/Lighting.h
 	include/LightingPreset.h
+	include/ImGui/ImGuiSelector.h
 	include/RE.h
 	include/PresetDatabase.h
 	include/Preset.h

@@ -24,6 +24,7 @@ public:
 
 public:
 	static constexpr PresetID configTypeMask = 0xffff000000000000;
+	static constexpr PresetTID TID            = PresetTID::kUnassigned;
 
 private:
 	std::string name;

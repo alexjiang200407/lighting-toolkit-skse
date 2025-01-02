@@ -18,14 +18,15 @@ struct LightingPreset :
 	LightingPreset() = default;
 	LightingPreset(PresetID id, std::string name, LightFlags flags);
 
-
 	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS ToLightCreateParams() const;
 
 	operator RE::ShadowSceneNode::LIGHT_CREATE_PARAMS() const;
 
-	LightFlags  flags;
-	float       fov = RE::NI_PI;
-	float       falloff = 1.0f;
-	float       depthBias = 1.0f;
-	float       nearDistance = 6.0f;
+	LightFlags flags;
+	float      fov          = RE::NI_PI;
+	float      falloff      = 1.0f;
+	float      depthBias    = 1.0f;
+	float      nearDistance = 6.0f;
+
+	static constexpr PresetTID TID = PresetTID::kLightTemplate;
 };
