@@ -17,6 +17,7 @@ struct LightingPreset :
 	typedef stl::enumeration<Flags, uint32_t> LightFlags;
 	LightingPreset() = default;
 	LightingPreset(PresetID id, std::string name, LightFlags flags);
+	LightingPreset(std::string name, LightFlags flags);
 
 	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS ToLightCreateParams() const;
 

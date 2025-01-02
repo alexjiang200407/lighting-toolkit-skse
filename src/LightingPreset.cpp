@@ -1,7 +1,12 @@
 #include "LightingPreset.h"
 
 LightingPreset::LightingPreset(PresetID id, std::string name, LightFlags flags) :
-	Preset(PresetTID::kLightTemplate, id, name), flags(flags)
+	Preset(id, name), flags(flags)
+{
+}
+
+LightingPreset::LightingPreset(std::string name, LightFlags flags) :
+	Preset(PresetID::GenID<LightingPreset>(), name), flags(flags)
 {
 }
 

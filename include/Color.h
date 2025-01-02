@@ -6,6 +6,7 @@ class Color :
 {
 public:
 	Color(PresetID id, std::string name, RE::NiColor color);
+	Color(std::string name, RE::NiColor color);
 
 public:
 	RE::NiColor GetColor() const;

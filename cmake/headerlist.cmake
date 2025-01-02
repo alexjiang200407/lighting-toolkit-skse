@@ -13,4 +13,5 @@ set(HEADERS ${HEADERS}
 	include/PresetDatabase.h
 	include/Preset.h
 	include/Color.h
+	include/uuid.h
 )

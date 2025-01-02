@@ -9,6 +9,13 @@ namespace ImGui
 	class ImGuiSelector
 	{
 	public:
+		ImGuiSelector() = default;
+		ImGuiSelector(PresetID id):
+			currentSelection(id)
+		{
+
+		}
+	public:
 		T* DrawSelectionComboBox(const PresetDatabase& presetDB, const char* selectionID)
 		{
 			ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(selectionID).x - ImGui::GetStyle().ItemSpacing.x);
@@ -28,9 +35,8 @@ namespace ImGui
 			bool doUpdate   = false;
 			PresetDatabase::iterator selectedIt;
 				
-			if (currentSelection)
-				selectedIt = presetDB.Find(currentSelection->GetID());
-			else
+			selectedIt = presetDB.Find(currentSelection);
+			if (presetDB.IsEnd(selectedIt))
 			{
 				doUpdate   = true;
 				selectedIt = st;
@@ -64,12 +70,12 @@ namespace ImGui
 			}
 
 			if (doUpdate)
-				currentSelection = ans;
+				currentSelection = ans->GetID();
 
 			return doUpdate ? ans : nullptr;
 		}
 
 	protected:
-		T* currentSelection = nullptr;
+		PresetID currentSelection;
 	};
 }

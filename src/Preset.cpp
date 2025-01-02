@@ -1,9 +1,13 @@
 #include "Preset.h"
 
-Preset::Preset(PresetTID type, PresetID objID, std::string name) :
-	id(objID | (PresetID(type) << 48)), name(name)
+Preset::Preset(PresetTID type, std::string name) :
+	Preset(PresetID(type, uuids::uuid_system_generator{}()), name)
 {
-	assert(objID <= PresetID(UINT64_MAX ^ configTypeMask));
+}
+
+Preset::Preset(PresetID id, std::string name):
+	id(id), name(name)
+{
 }
 
 bool Preset::operator<(const Preset& rhs) const
@@ -19,4 +23,27 @@ PresetID Preset::GetID() const
 const char* Preset::GetSelectionName() const
 {
 	return name.c_str();
+}
+
+PresetID::PresetID(PresetTID tid, PresetSID sid) :
+	tid(tid), sid(sid) {}
+
+bool PresetID::operator<(const PresetID& id) const
+{
+	return tid < id.tid || (tid == id.tid && sid < id.sid);
+}
+
+bool PresetID::operator<(const PresetTID& tid) const
+{
+	return this->tid < tid;
+}
+
+PresetTID PresetID::GetTID() const
+{
+	return tid;
+}
+
+bool PresetID::IsNull() const
+{
+	return sid.is_nil() || tid == kUnassigned;
 }

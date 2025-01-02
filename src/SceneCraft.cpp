@@ -11,7 +11,6 @@ void SceneCraft::Init()
 	ImGui::ImGuiRenderer::GetSingleton()->Init(Style());
 	ImGui::ImGuiInputAdapter::GetSingleton()->Init();
 	ImGui::ImGuiRenderer::GetSingleton()->RegisterRenderTarget(&singleton);
-	config.LoadConfigFromFile();
 }
 
 void SceneCraft::OnDataLoaded()
@@ -212,10 +211,11 @@ int SceneCraft::DrawTabBar()
 			// TODO Add a PropFactory creation method here
 			const auto       dataHandler = RE::TESDataHandler::GetSingleton();
 			const RE::FormID id          = dataHandler->LookupFormID(0x801, "SceneCraft.esp");
-			const auto       ref         = RE::PlayerCharacter::GetSingleton()->PlaceObjectAtMe(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), true);
-
-			props.push_back(std::make_unique<Lighting>(Lighting(ref, 0, 0)));
-			(*props.rbegin())->MoveToCameraLookingAt(50.0f);
+			const auto       ref         = dataHandler->CreateReferenceAtLocation(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(),
+				Prop::GetCameraLookingAt(50.0f), RE::NiPoint3(), RE::PlayerCharacter::GetSingleton()->GetParentCell(),
+				RE::PlayerCharacter::GetSingleton()->GetWorldspace(),
+				nullptr, nullptr, RE::ObjectRefHandle(), true, true).get();
+			props.push_back(std::make_unique<Lighting>(Lighting(ref)));
 		}
 	}
 	ImGui::EndTabBar();

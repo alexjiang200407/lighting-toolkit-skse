@@ -12,6 +12,7 @@ private:
 	typedef ImGui::ImGuiSelector<Color>          ColorSelector;
 
 public:
+	Lighting(RE::TESObjectREFRPtr ref);
 	Lighting(RE::TESObjectREFRPtr ref, PresetID colorId, PresetID lightTemplateId);
 
 public:
@@ -26,12 +27,8 @@ private:
 	void FindOrCreateLight();
 
 private:
-	PresetID                        currentLightTemplate = 0;
-	PresetID                        currentLightColor    = 0;
-	RE::NiPointer<RE::NiNode>       attachNode           = nullptr;
 	RE::NiPointer<RE::BSLight>      bsLight              = nullptr;
 	RE::NiPointer<RE::NiPointLight> niLight              = nullptr;
 	ColorSelector                   colorPalette;
 	LightPresetSelector             lightingPreset;
-	LightingPreset                  templateData;
 };

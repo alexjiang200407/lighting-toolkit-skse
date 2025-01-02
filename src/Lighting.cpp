@@ -1,11 +1,17 @@
 #include "Lighting.h"
 #include "Color.h"
 
-Lighting::Lighting(RE::TESObjectREFRPtr ref, PresetID colorIdx, PresetID lightTemplateIdx) :
-	Prop(ref), currentLightColor(colorIdx), currentLightTemplate(lightTemplateIdx)
+Lighting::Lighting(RE::TESObjectREFRPtr ref) :
+	Prop(ref)
 {
 	niLight.reset(RE::NiPointLight::Create());
+	FindOrCreateLight();
+}
 
+Lighting::Lighting(RE::TESObjectREFRPtr ref, PresetID colorId, PresetID lightTemplateId) :
+	Prop(ref), colorPalette(colorId), lightingPreset(lightTemplateId)
+{
+	niLight.reset(RE::NiPointLight::Create());
 	FindOrCreateLight();
 }
 
@@ -62,8 +68,7 @@ void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
 		shadowSceneNode->RemoveLight(niLight.get());
 		FindOrCreateLight();
 	}
-	attachNode->world.translate = GetCameraLookingAt(distanceFromCamera);
-	niLight->world.translate    = GetCameraLookingAt(distanceFromCamera);
+	niLight->world.translate = GetCameraLookingAt(distanceFromCamera);
 }
 
 void Lighting::OnEnterCell()
@@ -106,7 +111,6 @@ void Lighting::FindOrCreateLight()
 		auto* niNode  = niObj->AsNode();
 		niLight->name = "SceneCraftLight";
 		RE::AttachNode(niNode, niLight.get());
-		attachNode.reset(niNode);
 
 		// TODO put these into a settings class
 		niLight->ambient = RE::NiColor();
@@ -114,7 +118,6 @@ void Lighting::FindOrCreateLight()
 		niLight->SetLightAttenuation(500);
 		niLight->fade = 2;
 	}
-	//UpdateLightColor();
-	//UpdateLightTemplate();
+	UpdateLightTemplate();
 	//RE::UpdateNode(niLight.get());
 }
