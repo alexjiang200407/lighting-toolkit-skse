@@ -1,19 +1,19 @@
 #include "PresetDatabase.h"
 #include "Color.h"
-#include "LightingTemplate.h"
+#include "LightingPreset.h"
 
 void PresetDatabase::LoadConfigFromFile()
 {
-	using FLAGS = LightingTemplateData::Flags;
+	using FLAGS = LightingPreset::Flags;
 
 	//presets.insert(std::make_unique<Color>(1, "Red", RE::NiColor(1, 0, 0)));
 	//presets.insert(std::make_unique<Color>(2, "Green", RE::NiColor(0, 1, 0)));
 	//presets.insert(std::make_unique<Color>(3, "Blue", RE::NiColor(0, 0, 1)));
 
-	LightingTemplateData::LightFlags flags;
+	LightingPreset::LightFlags flags;
 	flags.set(FLAGS::kAffectAll, FLAGS::kCastsShadow, FLAGS::kPortalStrict, FLAGS::kNeverFades);
 
-	//presets.insert(new LightingTemplateData(1, "Dynamic", flags));
+	//presets.insert(new LightingPreset(1, "Dynamic", flags));
 }
 
 void PresetDatabase::SaveConfigToFile()

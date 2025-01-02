@@ -7,7 +7,7 @@ set(SOURCES ${SOURCES}
 	src/ImGui/ImGuiWidgets.cpp
 	src/Prop.cpp
 	src/Lighting.cpp
-	src/LightingTemplate.cpp
+	src/LightingPreset.cpp
 	src/RE.cpp
 	src/PresetDatabase.cpp
 	src/Preset.cpp

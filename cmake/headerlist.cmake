@@ -4,11 +4,10 @@ set(HEADERS ${HEADERS}
 	include/ImGui/ImGuiComponent.h
 	include/ImGui/ImGuiInputAdapter.h
 	include/SceneCraft.h
-	include/ImGui/ImGuiSelector.h
 	include/ImGui/ImGuiWidgets.h
 	include/Prop.h
 	include/Lighting.h
-	include/LightingTemplate.h
+	include/LightingPreset.h
 	include/RE.h
 	include/PresetDatabase.h
 	include/Preset.h

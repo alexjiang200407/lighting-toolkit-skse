@@ -33,7 +33,7 @@ namespace ImGui
 		ImGuiRenderer& operator=(ImGuiRenderer&&)      = delete;
 
 	public:
-		void                  Init(ImGuiStyle style);
+		void                  Init(ImGuiStyle a_style);
 		void                  RegisterRenderTarget(ImGuiComponent* target);
 		void                  UnregisterRenderTarget(ImGuiComponent* target);
 		static ImGuiRenderer* GetSingleton();

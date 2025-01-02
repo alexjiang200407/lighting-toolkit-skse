@@ -1,13 +1,13 @@
-#include "LightingTemplate.h"
+#include "LightingPreset.h"
 
-LightingTemplateData::LightingTemplateData(PresetID id, std::string name, LightFlags flags) :
+LightingPreset::LightingPreset(PresetID id, std::string name, LightFlags flags) :
 	Preset(PresetTID::kLightTemplate, id, name), flags(flags)
 {
 }
 
-RE::ShadowSceneNode::LIGHT_CREATE_PARAMS LightingTemplateData::ToLightCreateParams() const
+RE::ShadowSceneNode::LIGHT_CREATE_PARAMS LightingPreset::ToLightCreateParams() const
 {
-	using FLAGS = LightingTemplateData::Flags;
+	using FLAGS = LightingPreset::Flags;
 	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS params{};
 
 	params.affectLand      = flags.all(FLAGS::kAffectLand);
@@ -27,7 +27,7 @@ RE::ShadowSceneNode::LIGHT_CREATE_PARAMS LightingTemplateData::ToLightCreatePara
 	return params;
 }
 
-LightingTemplateData::operator RE::ShadowSceneNode::LIGHT_CREATE_PARAMS() const
+LightingPreset::operator RE::ShadowSceneNode::LIGHT_CREATE_PARAMS() const
 {
 	return ToLightCreateParams();
 }

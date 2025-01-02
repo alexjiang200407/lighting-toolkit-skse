@@ -59,6 +59,7 @@ inline std::optional<T*> PresetDatabase::DrawSelectionComboBox(PresetTID tid, co
 		{
 			ImGui::EndCombo();
 		}
+		ImGui::PopItemWidth();
 		return std::nullopt;
 	}
 
@@ -85,6 +86,7 @@ inline std::optional<T*> PresetDatabase::DrawSelectionComboBox(PresetTID tid, co
 		}
 		ImGui::EndCombo();
 	}
+	ImGui::PopItemWidth();
 
 	if (selected != selectedIt->get())
 		doUpdate = true;

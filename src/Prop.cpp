@@ -9,7 +9,7 @@ bool Prop::DrawTabItem(bool& active)
 {
 	bool open     = true;
 	bool selected = false;
-	if (selected = ImGui::BeginTabItem(std::format("{} 0x{:X}", ref->GetFormEditorID(), ref->GetFormID()).c_str(), &open))
+	if ((selected = ImGui::BeginTabItem(std::format("{} 0x{:X}", ref->GetFormEditorID(), ref->GetFormID()).c_str(), &open)))
 	{
 		active = selected;
 		ImGui::EndTabItem();
@@ -23,7 +23,7 @@ bool Prop::DrawTabItem(bool& active)
 	return open;
 }
 
-void Prop::DrawControlPanel(PresetDatabase& config)
+void Prop::DrawControlPanel(PresetDatabase&)
 {
 	ImGui::Text("This is a Prop");
 }

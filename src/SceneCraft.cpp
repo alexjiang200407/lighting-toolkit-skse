@@ -2,7 +2,7 @@
 #include "ImGui/ImGuiInputAdapter.h"
 #include "ImGui/ImGuiRenderer.h"
 #include "Lighting.h"
-#include "LightingTemplate.h"
+#include "LightingPreset.h"
 
 SceneCraft SceneCraft::singleton;
 

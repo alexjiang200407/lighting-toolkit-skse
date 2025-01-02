@@ -21,7 +21,7 @@ void Lighting::DrawControlPanel(PresetDatabase& config)
 	}
 
 	{
-		auto opt = config.DrawSelectionComboBox<LightingTemplateData>(PresetTID::kLightTemplate, "Light Template", templateData.GetID());
+		auto opt = config.DrawSelectionComboBox<LightingPreset>(PresetTID::kLightTemplate, "Light Template", templateData.GetID());
 		if (opt.has_value())
 		{
 			templateData = *opt.value();

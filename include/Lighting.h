@@ -1,5 +1,5 @@
 #pragma once
-#include "LightingTemplate.h"
+#include "LightingPreset.h"
 #include "Prop.h"
 
 class Lighting :
@@ -25,5 +25,5 @@ private:
 	RE::NiPointer<RE::NiNode>       attachNode = nullptr;
 	RE::NiPointer<RE::BSLight>      bsLight    = nullptr;
 	RE::NiPointer<RE::NiPointLight> niLight    = nullptr;
-	LightingTemplateData            templateData;
+	LightingPreset            templateData;
 };

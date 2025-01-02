@@ -1,8 +1,7 @@
 #pragma once
-#include "ImGui/ImGuiSelector.h"
 #include "Preset.h"
 
-struct LightingTemplateData :
+struct LightingPreset :
 	Preset
 {
 	enum class Flags
@@ -16,8 +15,8 @@ struct LightingTemplateData :
 		kNeverFades   = 1 << 5
 	};
 	typedef stl::enumeration<Flags, uint32_t> LightFlags;
-	LightingTemplateData() = default;
-	LightingTemplateData(PresetID id, std::string name, LightFlags flags);
+	LightingPreset() = default;
+	LightingPreset(PresetID id, std::string name, LightFlags flags);
 
 
 	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS ToLightCreateParams() const;
