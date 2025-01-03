@@ -19,3 +19,8 @@ PresetDatabase::iterator PresetDatabase::Find(PresetID key) const
 {
 	return presets.find(key);
 }
+
+void PresetDatabase::Insert(PresetPtr preset)
+{
+	presets.insert(std::move(preset));
+}

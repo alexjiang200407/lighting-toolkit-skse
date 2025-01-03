@@ -11,27 +11,25 @@ public:
 	void Serialize(const PresetDatabase& presetDB);
 	void Deserialize(PresetDatabase& presetDB);
 
-private:
-	using json = nlohmann::json;
-
-	//template<typename T>
+public:
 	class DeserializationStrategy
 	{
 	public:
-		virtual Preset* operator()(PresetID id, std::string name, json json) const = 0;
+		virtual PresetPtr operator()(PresetID id, std::string name, nlohmann::json json) const = 0;
 	};
 
 	class ColorDeserialization : public DeserializationStrategy
 	{
-		Preset* operator()(PresetID id, std::string name, json json) const override;
+		PresetPtr operator()(PresetID id, std::string name, nlohmann::json json) const override;
 	};
 
 	class LightingPresetDeserialization : public DeserializationStrategy
 	{
-		Preset* operator()(PresetID id, std::string name, json json) const override;
+		PresetPtr operator()(PresetID id, std::string name, nlohmann::json json) const override;
 	};
 
 private:
+	using json = nlohmann::json;
 	void RegisterPresets(PresetDatabase& presetDB, PresetTID tid, json array) const;
 
 private:

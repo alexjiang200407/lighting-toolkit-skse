@@ -58,10 +58,7 @@ public:
 		return presets.lower_bound(T::TID);
 	}
 
-	void Insert(Preset* preset)
-	{
-		presets.insert(PresetPtr(preset));
-	}
+	void Insert(PresetPtr preset);
 
 private:
 	std::set<PresetPtr, PresetPtrComparator> presets;

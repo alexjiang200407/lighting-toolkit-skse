@@ -69,14 +69,13 @@ void PresetSerializationControl::RegisterPresets(PresetDatabase& presetDB, Prese
 	}
 }
 
-//PresetPtr&& PresetSerializationControl::ColorDeserialization::operator()(PresetID id, std::string name, json json) const
-Preset* PresetSerializationControl::ColorDeserialization::operator()(PresetID id, std::string name, json json) const
+PresetPtr PresetSerializationControl::ColorDeserialization::operator()(PresetID id, std::string name, json json) const
 {
 	uint32_t color = json["colorcode"];
-	return new Color(id, name, RE::NiColor(color));
+	return std::make_unique<Color>(Color(id, name, RE::NiColor(color)));
 }
 
-Preset* PresetSerializationControl::LightingPresetDeserialization::operator()(PresetID id, std::string name, json json) const
+PresetPtr PresetSerializationControl::LightingPresetDeserialization::operator()(PresetID id, std::string name, json json) const
 {
 	LightingPreset::LightFlags flags;
 	for (const auto& value : json["flags"])
@@ -84,5 +83,5 @@ Preset* PresetSerializationControl::LightingPresetDeserialization::operator()(Pr
 		int idx = value;
 		flags.set(static_cast<LightingPreset::Flags>(idx));
 	}
-	return new LightingPreset(id, name, flags);
+	return std::make_unique<LightingPreset>(LightingPreset(id, name, flags));
 }
