@@ -17,6 +17,11 @@ bool Preset::operator<(const Preset& rhs) const
 	return id < rhs.id;
 }
 
+PresetTID preset::Preset::GetTID() const
+{
+	return id.GetTID();
+}
+
 PresetID Preset::GetID() const
 {
 	return id;

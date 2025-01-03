@@ -14,12 +14,12 @@ private:
 
 public:
 	Lighting(RE::TESObjectREFRPtr ref);
-	Lighting(RE::TESObjectREFRPtr ref, preset::PresetID colorId, preset::PresetID lightTemplateId);
+	Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::LightingPreset lightPreset);
 
 public:
 	void DrawControlPanel(preset::PresetDatabase& config) override;
+	void UpdateLightColor();
 	void UpdateLightTemplate();
-	void UpdateLightTemplate(const preset::LightingPreset& lightingPreset);
 	void Remove() override;
 	void MoveToCameraLookingAt(float distanceFromCamera) override;
 	void OnEnterCell() override;

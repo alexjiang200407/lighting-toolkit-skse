@@ -55,9 +55,14 @@ namespace preset
 		iterator                      Find(PresetID key) const;
 
 		template <typename T, typename std::enable_if<std::is_base_of<Preset, T>::value>::type* = nullptr>
-		iterator                      FirstOfType() const
+		PresetID FirstOfType() const
 		{
-			return presets.lower_bound(T::TID);
+			iterator lo = presets.lower_bound(T::TID);
+			if (lo == presets.end() || (*lo)->GetTID() != T::TID)
+			{
+				return PresetID();
+			}
+			return (*lo)->GetID();
 		}
 
 		void Insert(PresetPtr preset);
@@ -67,4 +72,3 @@ namespace preset
 		static constexpr std::string_view        filePath = "./Data/SKSE/Plugins/SceneCraft.json"sv;
 	};
 }
-

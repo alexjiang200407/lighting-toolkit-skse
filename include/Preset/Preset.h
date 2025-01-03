@@ -52,6 +52,11 @@ namespace preset
 			return PresetID();
 		}
 
+		explicit operator bool() const
+		{
+			return IsNull();
+		}
+
 		PresetTID GetTID() const;
 
 		bool IsNull() const;
@@ -72,6 +77,7 @@ namespace preset
 	public:
 		bool operator<(const Preset& rhs) const;
 
+		PresetTID   GetTID() const;
 		PresetID    GetID() const;
 		const char* GetSelectionName() const;
 

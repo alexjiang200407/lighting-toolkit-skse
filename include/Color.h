@@ -19,6 +19,8 @@ namespace preset
 		Color(PresetID id, std::string name, RE::NiColor color);
 		Color(std::string name, RE::NiColor color);
 
+		operator RE::NiColor() const;
+
 	public:
 		RE::NiColor GetColor() const;
 

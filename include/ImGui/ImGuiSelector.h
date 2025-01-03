@@ -2,7 +2,7 @@
 #include "Preset/Preset.h"
 #include "Preset/PresetDatabase.h"
 #include <type_traits>
-  
+
 namespace ImGui
 {
 	template <typename T, typename std::enable_if<std::is_base_of<preset::Preset, T>::value>::type* = nullptr>
@@ -10,13 +10,13 @@ namespace ImGui
 	{
 	public:
 		ImGuiSelector() = default;
-		ImGuiSelector(preset::PresetID id) :
-			currentSelection(id)
+		ImGuiSelector(T current) :
+			selection(current)
 		{
-
 		}
+
 	public:
-		T* DrawSelectionComboBox(const preset::PresetDatabase& presetDB, const char* selectionID)
+		bool DrawSelectionComboBox(const preset::PresetDatabase& presetDB, const char* selectionID)
 		{
 			ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(selectionID).x - ImGui::GetStyle().ItemSpacing.x);
 
@@ -28,15 +28,17 @@ namespace ImGui
 				{
 					ImGui::EndCombo();
 				}
+				selection.reset();
 				ImGui::PopItemWidth();
-				return nullptr;
+				return false;
 			}
 
-			bool doUpdate   = false;
+			bool                             doUpdate = false;
 			preset::PresetDatabase::iterator selectedIt;
-				
-			selectedIt = presetDB.Find(currentSelection);
-			if (presetDB.IsEnd(selectedIt))
+
+			if (selection.has_value())
+				selectedIt = presetDB.Find(selection.value().GetID());
+			if (!selection.has_value() || presetDB.IsEnd(selectedIt))
 			{
 				doUpdate   = true;
 				selectedIt = st;
@@ -66,16 +68,28 @@ namespace ImGui
 			if (!ans)
 			{
 				logger::error("DrawSelectionComboBox could not cast {} to {}", typeid(*selected).name(), typeid(T).name());
-				return nullptr;
+				return false;
 			}
 
 			if (doUpdate)
-				currentSelection = ans->GetID();
+			{
+				selection = *ans;
+			}
 
-			return doUpdate ? ans : nullptr;
+			return doUpdate;
+		}
+
+		bool HasSelection() const
+		{
+			return selection.has_value();
+		}
+		T GetSelection() const
+		{
+			assert(selection.has_value());
+			return selection.value();
 		}
 
 	protected:
-		preset::PresetID currentSelection;
+		std::optional<T> selection;
 	};
 }

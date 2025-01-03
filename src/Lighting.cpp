@@ -7,8 +7,8 @@ Lighting::Lighting(RE::TESObjectREFRPtr ref) :
 	FindOrCreateLight();
 }
 
-Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetID colorId, preset::PresetID lightTemplateId) :
-	Prop(ref), colorPalette(colorId), lightingPreset(lightTemplateId)
+Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::LightingPreset lightPreset) :
+	Prop(ref), colorPalette(color), lightingPreset(lightPreset)
 {
 	niLight.reset(RE::NiPointLight::Create());
 	FindOrCreateLight();
@@ -16,33 +16,38 @@ Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetID colorId, preset::P
 
 void Lighting::DrawControlPanel(preset::PresetDatabase& config)
 {
-	if (auto* opt = colorPalette.DrawSelectionComboBox(config, "Color"))
+	if (colorPalette.DrawSelectionComboBox(config, "Color"))
 	{
-		niLight->diffuse = opt->GetColor();
+		UpdateLightColor();
 	}
 
-	if (auto* opt = lightingPreset.DrawSelectionComboBox(config, "Lighting"))
+	if (lightingPreset.DrawSelectionComboBox(config, "Lighting"))
 	{
-		UpdateLightTemplate(*opt);
+		UpdateLightTemplate();
 	}
 
 	ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
 	ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
 }
 
-void Lighting::UpdateLightTemplate()
+void Lighting::UpdateLightColor()
 {
-	UpdateLightTemplate(preset::LightingPreset());
+	if (!colorPalette.HasSelection())
+		return;
+	niLight->diffuse = colorPalette.GetSelection();
 }
 
-void Lighting::UpdateLightTemplate(const preset::LightingPreset& lightingPreset)
+void Lighting::UpdateLightTemplate()
 {
+	if (!lightingPreset.HasSelection())
+		return;
+
 	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 
 	if (bsLight.get())
 		shadowSceneNode->RemoveLight(bsLight);
 
-	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), lightingPreset));
+	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), lightingPreset.GetSelection()));
 }
 
 void Lighting::Remove()
@@ -117,6 +122,7 @@ void Lighting::FindOrCreateLight()
 		niLight->SetLightAttenuation(500);
 		niLight->fade = 2;
 	}
+	UpdateLightColor();
 	UpdateLightTemplate();
 	//RE::UpdateNode(niLight.get());
 }

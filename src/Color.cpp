@@ -11,6 +11,11 @@ Color::Color(std::string name, RE::NiColor color) :
 	Preset(PresetID::GenID<Color>(), name), color(color)
 {}
 
+preset::Color::operator RE::NiColor() const
+{
+	return color;
+}
+
 
 RE::NiColor Color::GetColor() const
 {
