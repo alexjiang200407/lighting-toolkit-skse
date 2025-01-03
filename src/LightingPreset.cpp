@@ -44,11 +44,13 @@ PresetPtr LightingPreset::Deserializer::operator()(PresetID id, std::string name
 	if (!json.contains("flags"))
 		throw std::runtime_error("LightingPreset must include flags field");
 
-	LightingPreset::LightFlags lightFlags;
-	for (const auto& value : json["flags"])
-	{
-		int idx = value;
-		lightFlags.set(static_cast<LightingPreset::Flags>(idx));
-	}
-	return std::make_unique<LightingPreset>(LightingPreset(id, name, lightFlags));
+	uint32_t lightFlags = json["flags"];
+	return std::make_unique<LightingPreset>(LightingPreset(id, name, LightFlags(lightFlags)));
+}
+
+json preset::LightingPreset::Serializer::ToJSON(LightingPreset* it) const
+{
+	json obj = SerializationStrategy<LightingPreset>::ToJSON(it);
+	obj["flags"] = it->flags.underlying();	
+	return obj;
 }

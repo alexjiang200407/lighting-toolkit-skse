@@ -29,3 +29,10 @@ PresetPtr Color::Deserializer::operator()(PresetID a_id, std::string a_name, nlo
 	uint32_t colorHex = json["colorcode"];
 	return std::make_unique<Color>(Color(a_id, a_name, RE::NiColor(colorHex)));
 }
+
+json preset::Color::Serializer::ToJSON(Color* a_color) const
+{
+	json obj         = SerializationStrategy<Color>::ToJSON(a_color);
+	obj["colorcode"] = a_color->color.ToInt();
+	return obj;
+}

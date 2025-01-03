@@ -5,6 +5,39 @@ using namespace preset;
 
 void PresetSerializationControl::Serialize(const PresetDatabase& a_presetDB)
 {
+	PresetTID currentTID = kInvalid;
+	auto      it         = a_presetDB.cbegin();
+	json      jsonBuf;
+
+	while (it != a_presetDB.cend())
+	{
+		currentTID           = (*it)->GetTID();
+		std::string tidAsStr = std::to_string(currentTID);
+		jsonBuf[tidAsStr]    = json::array();
+
+		while (it != a_presetDB.cend() && currentTID == (*it)->GetTID())
+		{
+			logger::info("Serialising preset with tid: {} and id: {}", static_cast<int>(currentTID), (*it)->GetSIDAsString());
+			jsonBuf[tidAsStr].push_back(PresetToJSON(currentTID, it));
+			it++;
+		}
+	}
+
+	std::ofstream f(file);
+	f << jsonBuf.dump();
+}
+
+json preset::PresetSerializationControl::PresetToJSON(PresetTID tid, const PresetDatabase::const_iterator& it) const
+{
+	switch (tid)
+	{
+	case Color::TID:
+		return Color::Serializer{}(*it);
+	case LightingPreset::TID:
+		return LightingPreset::Serializer{}(*it);
+	default:
+		return json::object();
+	}
 }
 
 void PresetSerializationControl::Deserialize(PresetDatabase& a_presetDB)
@@ -16,7 +49,7 @@ void PresetSerializationControl::Deserialize(PresetDatabase& a_presetDB)
 		logger::warn("File {} not found", file);
 		return;
 	}
-	std::this_thread::sleep_for(std::chrono::seconds(3));
+
 	try
 	{
 		json data = json::parse(f);
@@ -45,21 +78,6 @@ void PresetSerializationControl::Deserialize(PresetDatabase& a_presetDB)
 
 void PresetSerializationControl::RegisterPresets(PresetDatabase& a_presetDB, PresetTID tid, json json) const
 {
-	std::unique_ptr<DeserializationStrategy> strat;
-
-	switch (tid)
-	{
-	case LightingPreset::TID:
-		strat = std::make_unique<LightingPreset::Deserializer>();
-		break;
-	case Color::TID:
-		strat = std::make_unique<Color::Deserializer>();
-		break;
-	default:
-		throw std::out_of_range("TypeID is invalid");
-		break;
-	}
-
 	for (const auto& preset : json)
 	{
 		if (!preset.contains("sid") || !preset.contains("name"))
@@ -70,6 +88,17 @@ void PresetSerializationControl::RegisterPresets(PresetDatabase& a_presetDB, Pre
 		if (presetID.IsNull())
 			throw std::runtime_error("invalid sid");
 
-		a_presetDB.Insert((*strat)(presetID, preset["name"], preset));
+		switch (tid)
+		{
+		case LightingPreset::TID:
+			a_presetDB.Insert(LightingPreset::Deserializer{}(presetID, preset["name"], preset));
+			break;
+		case Color::TID:
+			a_presetDB.Insert(Color::Deserializer{}(presetID, preset["name"], preset));
+			break;
+		default:
+			throw std::out_of_range("TypeID is invalid");
+			break;
+		}
 	}
 }

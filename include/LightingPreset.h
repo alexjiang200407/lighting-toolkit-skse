@@ -1,6 +1,8 @@
 #pragma once
 #include "Preset/Preset.h"
 #include "Preset/SerializationStrategy.h"
+#include "Preset/PresetDatabase.h"
+#include "MyEnumSet.h"
 
 namespace preset
 {
@@ -13,6 +15,11 @@ namespace preset
 			PresetPtr operator()(PresetID id, std::string name, json json) const override;
 		};
 
+		class Serializer : public SerializationStrategy<LightingPreset>
+		{
+			json ToJSON(LightingPreset* it) const override;
+		};
+
 		enum class Flags
 		{
 			kPortalStrict = 1,
@@ -23,7 +30,8 @@ namespace preset
 			kAffectAll    = kAffectLand | kAffectWater,
 			kNeverFades   = 1 << 5
 		};
-		typedef stl::enumeration<Flags, uint32_t> LightFlags;
+
+		typedef lib::EnumSet<Flags, uint32_t> LightFlags;
 		LightingPreset() = default;
 		LightingPreset(PresetID id, std::string name, LightFlags flags);
 		LightingPreset(std::string name, LightFlags flags);

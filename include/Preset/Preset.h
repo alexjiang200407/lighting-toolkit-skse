@@ -61,6 +61,8 @@ namespace preset
 
 		bool IsNull() const;
 
+		std::string GetSIDAsString() const;
+
 	private:
 		PresetTID tid = kUnassigned;
 		PresetSID sid;
@@ -77,6 +79,7 @@ namespace preset
 	public:
 		bool operator<(const Preset& rhs) const;
 
+		std::string GetSIDAsString() const;
 		PresetTID   GetTID() const;
 		PresetID    GetID() const;
 		const char* GetSelectionName() const;

@@ -7,7 +7,7 @@ namespace preset
 	{
 	public:
 		typedef std::set<PresetPtr>::iterator iterator;
-
+		typedef std::set<PresetPtr>::const_iterator const_iterator;
 	private:
 		struct PresetPtrComparator
 		{
@@ -50,6 +50,8 @@ namespace preset
 		};
 
 	public:
+		const_iterator                cbegin() const;
+		const_iterator                cend() const;
 		std::pair<iterator, iterator> GetAllPresetsOfType(PresetTID type) const;
 		bool                          IsEnd(const iterator& it) const;
 		iterator                      Find(PresetID key) const;

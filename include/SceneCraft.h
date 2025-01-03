@@ -28,6 +28,7 @@ private:
 	int                      DrawTabBar();
 	void                     DrawPropControlWindow(int activePropIndex);
 	void                     DrawCameraControlWindow();
+	void                     DrawSceneControlWindow();
 	RE::BSEventNotifyControl ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>* a_eventSource) override;
 
 private:

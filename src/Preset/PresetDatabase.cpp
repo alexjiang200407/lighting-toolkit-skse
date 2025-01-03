@@ -2,6 +2,16 @@
 
 using namespace preset;
 
+preset::PresetDatabase::const_iterator preset::PresetDatabase::cbegin() const
+{
+	return presets.cbegin();
+}
+
+preset::PresetDatabase::const_iterator preset::PresetDatabase::cend() const
+{
+	return presets.cend();
+}
+
 std::pair<PresetDatabase::iterator, PresetDatabase::iterator> PresetDatabase::GetAllPresetsOfType(PresetTID type) const
 {
 	std::pair<iterator, iterator> ret;

@@ -16,4 +16,5 @@ set(HEADERS ${HEADERS}
 	include/Preset/Preset.h
 	include/Color.h
 	include/Preset/uuid.h
+	include/MyEnumSet.h
 )

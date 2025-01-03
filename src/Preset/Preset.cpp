@@ -17,6 +17,11 @@ bool Preset::operator<(const Preset& rhs) const
 	return id < rhs.id;
 }
 
+std::string preset::Preset::GetSIDAsString() const
+{
+	return id.GetSIDAsString();
+}
+
 PresetTID preset::Preset::GetTID() const
 {
 	return id.GetTID();
@@ -53,4 +58,9 @@ PresetTID PresetID::GetTID() const
 bool PresetID::IsNull() const
 {
 	return sid.is_nil() || tid == kUnassigned;
+}
+
+std::string preset::PresetID::GetSIDAsString() const
+{
+	return uuids::to_string(sid);
 }

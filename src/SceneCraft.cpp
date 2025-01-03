@@ -43,6 +43,7 @@ void SceneCraft::DoFrame()
 			int activePropIndex = DrawTabBar();
 			DrawPropControlWindow(activePropIndex);
 			DrawCameraControlWindow();
+			DrawSceneControlWindow();
 		}
 		ImGui::EndDisabled();
 	}
@@ -245,6 +246,19 @@ void SceneCraft::DrawCameraControlWindow()
 		ImGui::Text("Camera Settings:");
 		ImGui::Checkbox("Freeze Time", &RE::Main::GetSingleton()->freezeTime);
 		ImGui::SliderAutoFill("Camera Speed", GetCameraMoveSpeed(), 0.1f, 50.0f);
+	}
+	ImGui::EndChild();
+}
+
+void SceneCraft::DrawSceneControlWindow()
+{
+	ImGui::BeginChild("###SceneControlWindow", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
+	{
+		ImGui::Text("Scene Settings:");
+		if (ImGui::Button("Save Presets"))
+		{
+			presetSerializationControl.Serialize(config);
+		}
 	}
 	ImGui::EndChild();
 }
