@@ -41,11 +41,14 @@ LightingPreset::operator RE::ShadowSceneNode::LIGHT_CREATE_PARAMS() const
 
 PresetPtr LightingPreset::Deserializer::operator()(PresetID id, std::string name, json json) const
 {
-	LightingPreset::LightFlags flags;
+	if (!json.contains("flags"))
+		throw std::runtime_error("LightingPreset must include flags field");
+
+	LightingPreset::LightFlags lightFlags;
 	for (const auto& value : json["flags"])
 	{
 		int idx = value;
-		flags.set(static_cast<LightingPreset::Flags>(idx));
+		lightFlags.set(static_cast<LightingPreset::Flags>(idx));
 	}
-	return std::make_unique<LightingPreset>(LightingPreset(id, name, flags));
+	return std::make_unique<LightingPreset>(LightingPreset(id, name, lightFlags));
 }

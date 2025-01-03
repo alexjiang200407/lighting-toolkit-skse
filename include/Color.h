@@ -12,11 +12,11 @@ namespace preset
 			public DeserializationStrategy
 		{
 		public:
-			PresetPtr operator()(PresetID id, std::string name, json json) const override;
+			PresetPtr operator()(PresetID a_id, std::string a_name, json json) const override;
 		};
 
 	public:
-		Color(PresetID id, std::string name, RE::NiColor color);
+		Color(PresetID a_id, std::string a_name, RE::NiColor color);
 		Color(std::string name, RE::NiColor color);
 
 		operator RE::NiColor() const;

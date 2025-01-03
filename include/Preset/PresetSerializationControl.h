@@ -9,11 +9,11 @@ namespace preset
 	class PresetSerializationControl
 	{
 	public:
-		void Serialize(const PresetDatabase& presetDB);
-		void Deserialize(PresetDatabase& presetDB);
+		void Serialize(const PresetDatabase& a_presetDB);
+		void Deserialize(PresetDatabase& a_presetDB);
 
 	private:
-		void RegisterPresets(PresetDatabase& presetDB, PresetTID tid, json array) const;
+		void RegisterPresets(PresetDatabase& a_presetDB, PresetTID tid, json array) const;
 
 	private:
 		static const constexpr char* file = "./Data/SKSE/Plugins/SceneCraftPresets.json";

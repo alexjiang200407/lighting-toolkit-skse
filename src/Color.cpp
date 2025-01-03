@@ -22,8 +22,10 @@ RE::NiColor Color::GetColor() const
 	return color;
 }
 
-PresetPtr Color::Deserializer::operator()(PresetID id, std::string name, nlohmann::json json) const
+PresetPtr Color::Deserializer::operator()(PresetID a_id, std::string a_name, nlohmann::json json) const
 {
-	uint32_t color = json["colorcode"];
-	return std::make_unique<Color>(Color(id, name, RE::NiColor(color)));
+	if (!json.contains("colorcode"))
+		throw std::runtime_error("Requires colorcode");
+	uint32_t colorHex = json["colorcode"];
+	return std::make_unique<Color>(Color(a_id, a_name, RE::NiColor(colorHex)));
 }
