@@ -133,7 +133,7 @@ void ImGui::ImGuiRenderer::StopTimer::thunk(std::uint32_t timer)
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ImGui::ImGuiRenderer::Init(ImGuiStyle style)
+void ImGui::ImGuiRenderer::Init(ImGuiStyle a_style)
 {
 	REL::Relocation<std::uintptr_t> target{ RELOCATION_ID(75595, 77226), OFFSET(0x9, 0x275) };  // BSGraphics::InitD3D
 	stl::write_thunk_call<CreateD3DAndSwapChain>(target.address());
@@ -141,7 +141,7 @@ void ImGui::ImGuiRenderer::Init(ImGuiStyle style)
 	REL::Relocation<std::uintptr_t> target2{ RELOCATION_ID(75461, 77246), 0x9 };  // BSGraphics::Renderer::End
 	stl::write_thunk_call<StopTimer>(target2.address());
 
-	this->style = style;
+	style = a_style;
 }
 
 void ImGui::ImGuiRenderer::RegisterRenderTarget(ImGuiComponent* target)

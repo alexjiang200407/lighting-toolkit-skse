@@ -1,41 +1,53 @@
 #include "Lighting.h"
 
-Lighting::Lighting(RE::TESObjectREFRPtr ref, int colorIdx, int lightTemplateIdx) :
-	Prop(ref), palette(colorIdx), lightTemplate(lightTemplateIdx)
+Lighting::Lighting(RE::TESObjectREFRPtr ref) :
+	Prop(ref)
 {
 	niLight.reset(RE::NiPointLight::Create());
-
 	FindOrCreateLight();
 }
 
-void Lighting::DrawControlPanel()
+Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::LightingPreset lightPreset) :
+	Prop(ref), colorPalette(color), lightingPreset(lightPreset)
 {
-	if (palette.DrawSelectionComboBox() != -1)
+	niLight.reset(RE::NiPointLight::Create());
+	FindOrCreateLight();
+}
+
+void Lighting::DrawControlPanel(preset::PresetDatabase& config)
+{
+	if (colorPalette.DrawSelectionComboBox(config, "Color"))
 	{
 		UpdateLightColor();
 	}
-	if (lightTemplate.DrawSelectionComboBox() != -1)
+
+	if (lightingPreset.DrawSelectionComboBox(config, "Lighting"))
 	{
 		UpdateLightTemplate();
 	}
+
 	ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
 	ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
 }
 
 void Lighting::UpdateLightColor()
 {
-	niLight->diffuse = palette.GetCurrentSelection();
+	if (!colorPalette.HasSelection())
+		return;
+	niLight->diffuse = colorPalette.GetSelection();
 }
 
 void Lighting::UpdateLightTemplate()
 {
-	const auto& templateData    = lightTemplate.GetCurrentSelection();
-	auto*       shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
+	if (!lightingPreset.HasSelection())
+		return;
+
+	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 
 	if (bsLight.get())
 		shadowSceneNode->RemoveLight(bsLight);
 
-	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), templateData));
+	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), lightingPreset.GetSelection()));
 }
 
 void Lighting::Remove()
@@ -60,8 +72,7 @@ void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
 		shadowSceneNode->RemoveLight(niLight.get());
 		FindOrCreateLight();
 	}
-	attachNode->world.translate = GetCameraLookingAt(distanceFromCamera);
-	niLight->world.translate    = GetCameraLookingAt(distanceFromCamera);
+	niLight->world.translate = GetCameraLookingAt(distanceFromCamera);
 }
 
 void Lighting::OnEnterCell()
@@ -93,7 +104,7 @@ void Lighting::FindOrCreateLight()
 	}
 	else
 	{
-		auto* niObj   = niRoot->GetObjectByName("AttachLight");
+		auto* niObj = niRoot->GetObjectByName("AttachLight");
 
 		if (!niObj)
 		{
@@ -104,7 +115,6 @@ void Lighting::FindOrCreateLight()
 		auto* niNode  = niObj->AsNode();
 		niLight->name = "SceneCraftLight";
 		RE::AttachNode(niNode, niLight.get());
-		attachNode.reset(niNode);
 
 		// TODO put these into a settings class
 		niLight->ambient = RE::NiColor();
@@ -114,5 +124,5 @@ void Lighting::FindOrCreateLight()
 	}
 	UpdateLightColor();
 	UpdateLightTemplate();
-	RE::UpdateNode(niLight.get());
+	//RE::UpdateNode(niLight.get());
 }

@@ -1,5 +1,7 @@
 #pragma once
 #include "ImGui/ImGuiComponent.h"
+#include "Preset/PresetDatabase.h"
+#include "Preset/PresetSerializationControl.h"
 #include "Prop.h"
 
 class SceneCraft :
@@ -26,9 +28,12 @@ private:
 	int                      DrawTabBar();
 	void                     DrawPropControlWindow(int activePropIndex);
 	void                     DrawCameraControlWindow();
+	void                     DrawSceneControlWindow();
 	RE::BSEventNotifyControl ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>* a_eventSource) override;
 
 private:
+	preset::PresetSerializationControl presetSerializationControl;
+	preset::PresetDatabase             config;
 	bool                               lookingAround              = false;
 	bool                               previouslyInFreeCameraMode = false;
 	bool                               previouslyFreezeTime       = false;

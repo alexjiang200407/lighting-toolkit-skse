@@ -2,8 +2,7 @@
 #include "ImGui/ImGuiInputAdapter.h"
 #include "ImGui/ImGuiRenderer.h"
 #include "Lighting.h"
-#include "LightingTemplate.h"
-#include "Palette.h"
+#include "LightingPreset.h"
 
 SceneCraft SceneCraft::singleton;
 
@@ -12,8 +11,7 @@ void SceneCraft::Init()
 	ImGui::ImGuiRenderer::GetSingleton()->Init(Style());
 	ImGui::ImGuiInputAdapter::GetSingleton()->Init();
 	ImGui::ImGuiRenderer::GetSingleton()->RegisterRenderTarget(&singleton);
-	Palette::LoadPaletteFile();
-	LightingTemplate::LoadLightingTemplates();
+	presetSerializationControl.Deserialize(config);
 }
 
 void SceneCraft::OnDataLoaded()
@@ -45,6 +43,7 @@ void SceneCraft::DoFrame()
 			int activePropIndex = DrawTabBar();
 			DrawPropControlWindow(activePropIndex);
 			DrawCameraControlWindow();
+			DrawSceneControlWindow();
 		}
 		ImGui::EndDisabled();
 	}
@@ -214,10 +213,11 @@ int SceneCraft::DrawTabBar()
 			// TODO Add a PropFactory creation method here
 			const auto       dataHandler = RE::TESDataHandler::GetSingleton();
 			const RE::FormID id          = dataHandler->LookupFormID(0x801, "SceneCraft.esp");
-			const auto       ref         = RE::PlayerCharacter::GetSingleton()->PlaceObjectAtMe(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), true);
-
-			props.push_back(std::make_unique<Lighting>(Lighting(ref, 0, 0)));
-			(*props.rbegin())->MoveToCameraLookingAt(50.0f);
+			const auto       ref         = dataHandler->CreateReferenceAtLocation(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(),
+				Prop::GetCameraLookingAt(50.0f), RE::NiPoint3(), RE::PlayerCharacter::GetSingleton()->GetParentCell(),
+				RE::PlayerCharacter::GetSingleton()->GetWorldspace(),
+				nullptr, nullptr, RE::ObjectRefHandle(), true, true).get();
+			props.push_back(std::make_unique<Lighting>(Lighting(ref)));
 		}
 	}
 	ImGui::EndTabBar();
@@ -233,7 +233,7 @@ void SceneCraft::DrawPropControlWindow(int activePropIndex)
 		{
 			if (ImGui::IsKeyDown(ImGuiKey_LeftAlt))
 				props[activePropIndex]->MoveToCameraLookingAt(50.0f);
-			props[activePropIndex]->DrawControlPanel();
+			props[activePropIndex]->DrawControlPanel(config);
 		}
 	}
 	ImGui::EndChild();
@@ -246,6 +246,19 @@ void SceneCraft::DrawCameraControlWindow()
 		ImGui::Text("Camera Settings:");
 		ImGui::Checkbox("Freeze Time", &RE::Main::GetSingleton()->freezeTime);
 		ImGui::SliderAutoFill("Camera Speed", GetCameraMoveSpeed(), 0.1f, 50.0f);
+	}
+	ImGui::EndChild();
+}
+
+void SceneCraft::DrawSceneControlWindow()
+{
+	ImGui::BeginChild("###SceneControlWindow", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
+	{
+		ImGui::Text("Scene Settings:");
+		if (ImGui::Button("Save Presets"))
+		{
+			presetSerializationControl.Serialize(config);
+		}
 	}
 	ImGui::EndChild();
 }
