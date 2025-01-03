@@ -10,10 +10,10 @@ set(HEADERS ${HEADERS}
 	include/LightingPreset.h
 	include/ImGui/ImGuiSelector.h
 	include/RE.h
-	include/PresetDatabase.h
-	include/SerializationStrategy.h
-	include/PresetSerializationControl.h
-	include/Preset.h
+	include/Preset/PresetDatabase.h
+	include/Preset/SerializationStrategy.h
+	include/Preset/PresetSerializationControl.h
+	include/Preset/Preset.h
 	include/Color.h
-	include/uuid.h
+	include/Preset/uuid.h
 )

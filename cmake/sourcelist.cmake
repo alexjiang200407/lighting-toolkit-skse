@@ -9,8 +9,8 @@ set(SOURCES ${SOURCES}
 	src/Lighting.cpp
 	src/LightingPreset.cpp
 	src/RE.cpp
-	src/PresetDatabase.cpp
-	src/Preset.cpp
+	src/Preset/PresetDatabase.cpp
+	src/Preset/Preset.cpp
 	src/Color.cpp
-	src/PresetSerializationControl.cpp
+	src/Preset/PresetSerializationControl.cpp
 )

@@ -1,4 +1,6 @@
-#include "Preset.h"
+#include "Preset/Preset.h"
+
+using namespace preset;
 
 Preset::Preset(PresetTID type, std::string name) :
 	Preset(PresetID(type, uuids::uuid_system_generator{}()), name)

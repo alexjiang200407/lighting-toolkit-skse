@@ -1,6 +1,6 @@
-#include "PresetDatabase.h"
-#include "Color.h"
-#include "LightingPreset.h"
+#include "Preset/PresetDatabase.h"
+
+using namespace preset;
 
 std::pair<PresetDatabase::iterator, PresetDatabase::iterator> PresetDatabase::GetAllPresetsOfType(PresetTID type) const
 {

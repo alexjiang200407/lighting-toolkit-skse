@@ -1,5 +1,7 @@
 #include "LightingPreset.h"
 
+using namespace preset;
+
 LightingPreset::LightingPreset(PresetID id, std::string name, LightFlags flags) :
 	Preset(id, name), flags(flags)
 {

@@ -1,5 +1,7 @@
 #include "Color.h"
 
+using namespace preset;
+
 Color::Color(PresetID id, std::string name, RE::NiColor color) :
 	Preset(id, name), color(color)
 {

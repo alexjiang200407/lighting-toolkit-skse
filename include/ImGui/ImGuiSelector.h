@@ -1,22 +1,22 @@
 #pragma once
-#include "Preset.h"
-#include "PresetDatabase.h"
+#include "Preset/Preset.h"
+#include "Preset/PresetDatabase.h"
 #include <type_traits>
   
 namespace ImGui
 {
-	template <typename T, typename std::enable_if<std::is_base_of<Preset, T>::value>::type* = nullptr>
+	template <typename T, typename std::enable_if<std::is_base_of<preset::Preset, T>::value>::type* = nullptr>
 	class ImGuiSelector
 	{
 	public:
 		ImGuiSelector() = default;
-		ImGuiSelector(PresetID id):
+		ImGuiSelector(preset::PresetID id) :
 			currentSelection(id)
 		{
 
 		}
 	public:
-		T* DrawSelectionComboBox(const PresetDatabase& presetDB, const char* selectionID)
+		T* DrawSelectionComboBox(const preset::PresetDatabase& presetDB, const char* selectionID)
 		{
 			ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(selectionID).x - ImGui::GetStyle().ItemSpacing.x);
 
@@ -33,7 +33,7 @@ namespace ImGui
 			}
 
 			bool doUpdate   = false;
-			PresetDatabase::iterator selectedIt;
+			preset::PresetDatabase::iterator selectedIt;
 				
 			selectedIt = presetDB.Find(currentSelection);
 			if (presetDB.IsEnd(selectedIt))
@@ -42,14 +42,14 @@ namespace ImGui
 				selectedIt = st;
 			}
 
-			Preset* selected = selectedIt->get();
+			preset::Preset* selected = selectedIt->get();
 			if (ImGui::BeginCombo(selectionID, (*selectedIt)->GetSelectionName()))
 			{
 				while (st != end)
 				{
 					bool isSelected = selectedIt == st;
 					if (ImGui::Selectable((*st)->GetSelectionName(), isSelected))
-						selected = const_cast<Preset*>(st->get());
+						selected = const_cast<preset::Preset*>(st->get());
 					if (isSelected)
 						ImGui::SetItemDefaultFocus();
 					st++;
@@ -76,6 +76,6 @@ namespace ImGui
 		}
 
 	protected:
-		PresetID currentSelection;
+		preset::PresetID currentSelection;
 	};
 }

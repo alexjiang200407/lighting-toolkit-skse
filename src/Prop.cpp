@@ -23,7 +23,7 @@ bool Prop::DrawTabItem(bool& active)
 	return open;
 }
 
-void Prop::DrawControlPanel(PresetDatabase&)
+void Prop::DrawControlPanel(preset::PresetDatabase&)
 {
 	ImGui::Text("This is a Prop");
 }

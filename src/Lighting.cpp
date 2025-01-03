@@ -1,5 +1,4 @@
 #include "Lighting.h"
-#include "Color.h"
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref) :
 	Prop(ref)
@@ -8,14 +7,14 @@ Lighting::Lighting(RE::TESObjectREFRPtr ref) :
 	FindOrCreateLight();
 }
 
-Lighting::Lighting(RE::TESObjectREFRPtr ref, PresetID colorId, PresetID lightTemplateId) :
+Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetID colorId, preset::PresetID lightTemplateId) :
 	Prop(ref), colorPalette(colorId), lightingPreset(lightTemplateId)
 {
 	niLight.reset(RE::NiPointLight::Create());
 	FindOrCreateLight();
 }
 
-void Lighting::DrawControlPanel(PresetDatabase& config)
+void Lighting::DrawControlPanel(preset::PresetDatabase& config)
 {
 	if (auto* opt = colorPalette.DrawSelectionComboBox(config, "Color"))
 	{
@@ -33,10 +32,10 @@ void Lighting::DrawControlPanel(PresetDatabase& config)
 
 void Lighting::UpdateLightTemplate()
 {
-	UpdateLightTemplate(LightingPreset());
+	UpdateLightTemplate(preset::LightingPreset());
 }
 
-void Lighting::UpdateLightTemplate(const LightingPreset& lightingPreset)
+void Lighting::UpdateLightTemplate(const preset::LightingPreset& lightingPreset)
 {
 	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 
