@@ -36,3 +36,14 @@ LightingPreset::operator RE::ShadowSceneNode::LIGHT_CREATE_PARAMS() const
 {
 	return ToLightCreateParams();
 }
+
+PresetPtr LightingPreset::Deserializer::operator()(PresetID id, std::string name, json json) const
+{
+	LightingPreset::LightFlags flags;
+	for (const auto& value : json["flags"])
+	{
+		int idx = value;
+		flags.set(static_cast<LightingPreset::Flags>(idx));
+	}
+	return std::make_unique<LightingPreset>(LightingPreset(id, name, flags));
+}

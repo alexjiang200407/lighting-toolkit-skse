@@ -1,9 +1,16 @@
 #pragma once
 #include "Preset.h"
+#include "SerializationStrategy.h"
 
 struct LightingPreset :
 	Preset
 {
+	class Deserializer : public DeserializationStrategy
+	{
+	public:
+		PresetPtr operator()(PresetID id, std::string name, json json) const override;
+	};
+
 	enum class Flags
 	{
 		kPortalStrict = 1,

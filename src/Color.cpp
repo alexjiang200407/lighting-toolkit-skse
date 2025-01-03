@@ -14,3 +14,9 @@ RE::NiColor Color::GetColor() const
 {
 	return color;
 }
+
+PresetPtr Color::Deserializer::operator()(PresetID id, std::string name, nlohmann::json json) const
+{
+	uint32_t color = json["colorcode"];
+	return std::make_unique<Color>(Color(id, name, RE::NiColor(color)));
+}

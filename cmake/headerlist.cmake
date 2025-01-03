@@ -11,6 +11,7 @@ set(HEADERS ${HEADERS}
 	include/ImGui/ImGuiSelector.h
 	include/RE.h
 	include/PresetDatabase.h
+	include/SerializationStrategy.h
 	include/PresetSerializationControl.h
 	include/Preset.h
 	include/Color.h

@@ -1,8 +1,6 @@
 #include "PresetSerializationControl.h"
 #include <fstream>
 
-using json = nlohmann::json;
-
 void PresetSerializationControl::Serialize(const PresetDatabase& presetDB)
 {
 }
@@ -48,10 +46,10 @@ void PresetSerializationControl::RegisterPresets(PresetDatabase& presetDB, Prese
 	switch (tid)
 	{
 	case LightingPreset::TID:
-		strat = std::make_unique<LightingPresetDeserialization>();
+		strat = std::make_unique<LightingPreset::Deserializer>();
 		break;
 	case Color::TID:
-		strat = std::make_unique<ColorDeserialization>();
+		strat = std::make_unique<Color::Deserializer>();
 		break;
 	default:
 		throw std::out_of_range("TypeID is invalid");
@@ -67,21 +65,4 @@ void PresetSerializationControl::RegisterPresets(PresetDatabase& presetDB, Prese
 
 		presetDB.Insert((*strat)(presetID, preset["name"], preset));
 	}
-}
-
-PresetPtr PresetSerializationControl::ColorDeserialization::operator()(PresetID id, std::string name, json json) const
-{
-	uint32_t color = json["colorcode"];
-	return std::make_unique<Color>(Color(id, name, RE::NiColor(color)));
-}
-
-PresetPtr PresetSerializationControl::LightingPresetDeserialization::operator()(PresetID id, std::string name, json json) const
-{
-	LightingPreset::LightFlags flags;
-	for (const auto& value : json["flags"])
-	{
-		int idx = value;
-		flags.set(static_cast<LightingPreset::Flags>(idx));
-	}
-	return std::make_unique<LightingPreset>(LightingPreset(id, name, flags));
 }

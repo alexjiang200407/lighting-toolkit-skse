@@ -47,3 +47,6 @@ namespace stl
 
 #include "Version.h"
 #include "RE.h"
+
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
