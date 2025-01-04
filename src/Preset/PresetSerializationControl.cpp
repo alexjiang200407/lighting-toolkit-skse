@@ -18,26 +18,13 @@ void PresetSerializationControl::Serialize(const PresetDatabase& a_presetDB)
 		while (it != a_presetDB.cend() && currentTID == (*it)->GetTID())
 		{
 			logger::info("Serialising preset with tid: {} and id: {}", static_cast<int>(currentTID), (*it)->GetSIDAsString());
-			jsonBuf[tidAsStr].push_back(PresetToJSON(currentTID, it));
+			jsonBuf[tidAsStr].push_back((*it)->Serialize());
 			it++;
 		}
 	}
 
 	std::ofstream f(file);
 	f << jsonBuf.dump();
-}
-
-json preset::PresetSerializationControl::PresetToJSON(PresetTID tid, const PresetDatabase::const_iterator& it) const
-{
-	switch (tid)
-	{
-	case Color::TID:
-		return Color::Serializer{}(*it);
-	case LightingPreset::TID:
-		return LightingPreset::Serializer{}(*it);
-	default:
-		return json::object();
-	}
 }
 
 void PresetSerializationControl::Deserialize(PresetDatabase& a_presetDB)
