@@ -15,11 +15,6 @@ namespace preset
 			PresetPtr operator()(PresetID id, std::string name, json json) const override;
 		};
 
-		class Serializer : public SerializationStrategy<LightingPreset>
-		{
-			json ToJSON(LightingPreset* it) const override;
-		};
-
 		enum class Flags
 		{
 			kPortalStrict = 1,
@@ -37,6 +32,7 @@ namespace preset
 		LightingPreset(std::string name, LightFlags flags);
 
 		RE::ShadowSceneNode::LIGHT_CREATE_PARAMS ToLightCreateParams() const;
+		json                                     Serialize() const override;
 
 		operator RE::ShadowSceneNode::LIGHT_CREATE_PARAMS() const;
 

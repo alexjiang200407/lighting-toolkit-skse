@@ -22,17 +22,17 @@ RE::NiColor Color::GetColor() const
 	return color;
 }
 
+json preset::Color::Serialize() const
+{
+	json buf = Preset::Serialize();
+	buf["colorcode"] = color.ToInt();
+	return buf;
+}
+
 PresetPtr Color::Deserializer::operator()(PresetID a_id, std::string a_name, nlohmann::json json) const
 {
 	if (!json.contains("colorcode"))
 		throw std::runtime_error("Requires colorcode");
 	uint32_t colorHex = json["colorcode"];
 	return std::make_unique<Color>(Color(a_id, a_name, RE::NiColor(colorHex)));
-}
-
-json preset::Color::Serializer::ToJSON(Color* a_color) const
-{
-	json obj         = SerializationStrategy<Color>::ToJSON(a_color);
-	obj["colorcode"] = a_color->color.ToInt();
-	return obj;
 }

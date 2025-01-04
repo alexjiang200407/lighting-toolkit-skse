@@ -37,6 +37,14 @@ const char* Preset::GetSelectionName() const
 	return name.c_str();
 }
 
+json preset::Preset::Serialize() const
+{
+	json buf = json::object();
+	buf["sid"] = GetSIDAsString();
+	buf["name"] = name;
+	return buf;
+}
+
 PresetID::PresetID(PresetTID tid, PresetSID sid) :
 	tid(tid), sid(sid) {}
 
