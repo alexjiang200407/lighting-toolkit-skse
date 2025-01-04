@@ -195,7 +195,6 @@ int SceneCraft::DrawTabBar()
 			bool activeProp = false;
 			if (!(*prop)->DrawTabItem(activeProp))
 			{
-				(*prop)->Remove();
 				prop = props.erase(props.begin() + i);
 				continue;
 			}
