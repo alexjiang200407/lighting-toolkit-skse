@@ -10,7 +10,6 @@ namespace preset
 	{
 	public:
 		void Serialize(const PresetDatabase& a_presetDB);
-		json PresetToJSON(PresetTID tid, const PresetDatabase::const_iterator& it) const;
 		void Deserialize(PresetDatabase& a_presetDB);
 
 	private:

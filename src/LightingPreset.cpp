@@ -34,6 +34,13 @@ RE::ShadowSceneNode::LIGHT_CREATE_PARAMS LightingPreset::ToLightCreateParams() c
 	return params;
 }
 
+json preset::LightingPreset::Serialize() const
+{
+	json buf     = Preset::Serialize();
+	buf["flags"] = flags.underlying();
+	return buf;
+}
+
 LightingPreset::operator RE::ShadowSceneNode::LIGHT_CREATE_PARAMS() const
 {
 	return ToLightCreateParams();
@@ -46,11 +53,4 @@ PresetPtr LightingPreset::Deserializer::operator()(PresetID id, std::string name
 
 	uint32_t lightFlags = json["flags"];
 	return std::make_unique<LightingPreset>(LightingPreset(id, name, LightFlags(lightFlags)));
-}
-
-json preset::LightingPreset::Serializer::ToJSON(LightingPreset* it) const
-{
-	json obj = SerializationStrategy<LightingPreset>::ToJSON(it);
-	obj["flags"] = it->flags.underlying();	
-	return obj;
 }

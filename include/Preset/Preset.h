@@ -2,6 +2,7 @@
 
 #define UUID_SYSTEM_GENERATOR
 #include "uuid.h"
+#include <nlohmann/json.hpp>
 
 namespace preset
 {
@@ -79,10 +80,11 @@ namespace preset
 	public:
 		bool operator<(const Preset& rhs) const;
 
-		std::string GetSIDAsString() const;
-		PresetTID   GetTID() const;
-		PresetID    GetID() const;
-		const char* GetSelectionName() const;
+		std::string  GetSIDAsString() const;
+		PresetTID    GetTID() const;
+		PresetID     GetID() const;
+		const char*  GetSelectionName() const;
+		virtual json Serialize() const;
 
 	public:
 		static constexpr PresetTID TID = PresetTID::kUnassigned;
