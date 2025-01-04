@@ -57,6 +57,12 @@ void Lighting::Remove()
 
 	if (bsLight.get())
 		shadowSceneNode->RemoveLight(bsLight);
+
+	if (niLight.get())
+		shadowSceneNode->RemoveLight(niLight.get());
+
+	niLight->parent->SetAppCulled(true);
+	niLight->SetAppCulled(true);
 }
 
 void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
