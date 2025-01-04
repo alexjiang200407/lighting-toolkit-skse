@@ -1,5 +1,6 @@
 #pragma once
 #include "Color.h"
+#include "ImGui/ImGuiNavBar.h"
 #include "ImGui/ImGuiSelector.h"
 #include "LightingPreset.h"
 #include "Preset/PresetDatabase.h"
@@ -7,6 +8,7 @@
 
 class Lighting :
 	public Prop
+//public ImGui::ImGuiNavBar
 {
 private:
 	typedef ImGui::ImGuiSelector<preset::LightingPreset> LightPresetSelector;
@@ -28,6 +30,7 @@ private:
 	void FindOrCreateLight();
 
 private:
+	ImGui::ImGuiNavBar<2>           navBar{ "##lightingnavbar", { "a", "b" } };
 	RE::NiPointer<RE::BSLight>      bsLight = nullptr;
 	RE::NiPointer<RE::NiPointLight> niLight = nullptr;
 	ColorSelector                   colorPalette;

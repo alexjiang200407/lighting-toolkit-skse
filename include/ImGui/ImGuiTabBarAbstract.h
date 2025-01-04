@@ -2,12 +2,6 @@
 
 namespace ImGui
 {
-	class ImGuiTabBarItem
-	{
-	public:
-		virtual bool DrawTabItem(bool& isActive) = 0;
-	};
-
 	template <typename T, typename It>
 	class ImGuiTabBarAbstract
 	{

@@ -15,6 +15,7 @@ set(HEADERS ${HEADERS}
 	include/Preset/PresetDatabase.h
 	include/Preset/SerializationStrategy.h
 	include/Preset/PresetSerializationControl.h
+	include/ImGui/ImGuiNavBar.h
 	include/Preset/Preset.h
 	include/Color.h
 	include/Preset/uuid.h

@@ -3,10 +3,10 @@
 
 namespace ImGui
 {
-	class ImGuiTabBarItemRemovable :
-		public ImGuiTabBarItem
+	class ImGuiTabBarItemRemovable
 	{
 	public:
+		virtual bool DrawTabItem(bool& isActive) = 0;
 		virtual void Remove() = 0;
 	};
 

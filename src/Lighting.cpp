@@ -16,6 +16,8 @@ Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::Lighti
 
 void Lighting::DrawControlPanel(preset::PresetDatabase& config)
 {
+	navBar.DrawNavBar();
+
 	if (colorPalette.DrawSelectionComboBox(config, "Color"))
 	{
 		UpdateLightColor();
