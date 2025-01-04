@@ -5,22 +5,22 @@ Prop::Prop(RE::TESObjectREFRPtr ref) :
 {
 }
 
-bool Prop::DrawTabItem(bool& active)
+bool Prop::DrawTabItem(bool& active) 
 {
-	bool open     = true;
-	bool selected = false;
-	if ((selected = ImGui::BeginTabItem(std::format("{} 0x{:X}", ref->GetFormEditorID(), ref->GetFormID()).c_str(), &open)))
+	bool isNotRemoved = true;
+	bool selected     = false;
+	if ((selected = ImGui::BeginTabItem(std::format("{} 0x{:X}", ref->GetFormEditorID(), ref->GetFormID()).c_str(), &isNotRemoved)))
 	{
 		active = selected;
 		ImGui::EndTabItem();
 	}
 
-	if (!open)
+	if (!isNotRemoved)
 	{
 		Remove();
 	}
 
-	return open;
+	return isNotRemoved;
 }
 
 void Prop::DrawControlPanel(preset::PresetDatabase&)
