@@ -3,6 +3,7 @@
 #include "ImGui/ImGuiRenderer.h"
 #include "Lighting.h"
 #include "LightingPreset.h"
+#include "ImGui/ImGuiTabBar.h"
 
 SceneCraft SceneCraft::singleton;
 

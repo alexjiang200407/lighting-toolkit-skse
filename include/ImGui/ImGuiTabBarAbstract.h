@@ -1,0 +1,53 @@
+#pragma once
+
+namespace ImGui
+{
+	class ImGuiTabBarItem
+	{
+	public:
+		virtual bool DrawTabItem(bool& isActive) = 0;
+	};
+
+	template <typename T, typename It>
+	class ImGuiTabBarAbstract
+	{
+	public:
+		ImGuiTabBarAbstract(const char* id, ImGuiTabBarFlags flags) :
+			tabBarID(id), flags(flags)
+		{
+		}
+
+	public:
+		void DrawTabBar()
+		{
+			ImGui::BeginTabBar(tabBarID.c_str(), flags);
+			{
+				DrawTabBarItems();
+			}
+			ImGui::EndTabBar();
+		}
+
+	protected:
+		virtual void DrawTabBarItems()
+		{
+			currentTab = nullptr;
+			for (auto it = begin(); it != end();)
+			{
+				T* newTab = DrawTabBarItem(it);
+				if (newTab)
+					currentTab = newTab;
+			}
+		}
+
+		virtual T* DrawTabBarItem(It& it) = 0;
+		virtual It begin()                = 0;
+		virtual It end()                  = 0;
+
+	protected:
+		T* currentTab = nullptr;
+
+	private:
+		const ImGuiTabBarFlags flags;
+		std::string            tabBarID;
+	};
+}

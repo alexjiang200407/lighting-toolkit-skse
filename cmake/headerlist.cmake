@@ -3,6 +3,8 @@ set(HEADERS ${HEADERS}
 	include/ImGui/ImGuiRenderer.h
 	include/ImGui/ImGuiComponent.h
 	include/ImGui/ImGuiInputAdapter.h
+	include/ImGui/ImGuiTabBar.h
+	include/ImGui/ImGuiTabBarAbstract.h
 	include/SceneCraft.h
 	include/ImGui/ImGuiWidgets.h
 	include/Prop.h
