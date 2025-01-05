@@ -16,18 +16,27 @@ Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::Preset
 
 void Lighting::DrawControlPanel()
 {
-	if (colorPalette.DrawEditor())
+	auto flags = ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding;
+	ImGui::BeginChild("##LightColorSelector", ImVec2(0, 0), flags);
 	{
-		UpdateLightColor();
+		if (colorPalette.DrawEditor())
+		{
+			UpdateLightColor();
+		}
 	}
+	ImGui::EndChild();
 
-	if (lightingPreset.DrawEditor())
+	ImGui::BeginChild("##LightSelector", ImVec2(0, 0), flags);
 	{
-		UpdateLightTemplate();
-	}
+		if (lightingPreset.DrawEditor())
+		{
+			UpdateLightTemplate();
+		}
 
-	ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
-	ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
+		ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
+		ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
+	}
+	ImGui::EndChild();
 }
 
 void Lighting::UpdateLightColor()

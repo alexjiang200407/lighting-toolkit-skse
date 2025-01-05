@@ -30,9 +30,15 @@ void SceneCraft::DoFrame()
 	if (!showWindow)
 		return;
 
-	if (ImGui::IsKeyPressed(ImGuiKey_F, false))
+	if (ImGui::IsAnyItemActive())
+	{
+
+	}
+
+
+	if (ImGui::IsKeyPressedA(ImGuiKey_F, false))
 		RE::Main::GetSingleton()->freezeTime = !RE::Main::GetSingleton()->freezeTime;
-	if (lookingAround != (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_LeftAlt)))
+	if (lookingAround != (ImGui::IsKeyDownA(ImGuiKey_LeftCtrl) || ImGui::IsKeyDownA(ImGuiKey_LeftAlt)))
 	{
 		lookingAround = !lookingAround;
 		UpdateLookingAround();
@@ -206,20 +212,17 @@ bool SceneCraft::DrawTabBarItems()
 
 void SceneCraft::DrawPropControlWindow()
 {
-	ImGui::BeginChild("###PropControlWindow", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
+	ImGui::PushID("###PropControlWindow");
+	if (currentTab)
 	{
-		ImGui::Text("Current Prop:");
-		if (currentTab)
-		{
-			if (ImGui::IsKeyDown(ImGuiKey_LeftAlt))
-				currentTab->MoveToCameraLookingAt(50.0f);
-			currentTab->DrawControlPanel();
+		if (ImGui::IsKeyDownA(ImGuiKey_LeftAlt))
+			currentTab->MoveToCameraLookingAt(50.0f);
+		currentTab->DrawControlPanel();
 
-			// Reset currentTab and wait for next draw cycle
-			currentTab = nullptr;
-		}
+		// Reset currentTab and wait for next draw cycle
+		currentTab = nullptr;
 	}
-	ImGui::EndChild();
+	ImGui::PopID();
 }
 
 void SceneCraft::DrawCameraControlWindow()

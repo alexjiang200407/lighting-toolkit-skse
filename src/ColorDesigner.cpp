@@ -1,7 +1,7 @@
 #include "ColorDesigner.h"
 
 ColorDesigner::ColorDesigner(preset::PresetDatabase* presetDB) :
-	ImGui::ImGuiSelector<preset::Color>("Advanced##ColorDesigner", {}), presetDB(presetDB)
+	ImGui::ImGuiSelector<preset::Color>("Color Designer##ColorDesigner", {}), presetDB(presetDB)
 {
 }
 
@@ -16,7 +16,7 @@ bool ColorDesigner::DrawValueEditor()
 	ImGui::InputText("Color Name", &color.GetName());
 
 	float rgb[3] = { color.red, color.green, color.blue };
-	if (ImGui::ColorEdit3("Advanced Edit", rgb))
+	if (ImGui::ColorEdit3("Color Picker", rgb))
 	{
 		color.red   = rgb[0];
 		color.green = rgb[1];
