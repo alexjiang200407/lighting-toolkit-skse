@@ -14,4 +14,6 @@ set(SOURCES ${SOURCES}
 	src/Preset/Preset.cpp
 	src/Color.cpp
 	src/Preset/PresetSerializationControl.cpp
+	src/ColorPalette.cpp
+	src/LightEditor.cpp
 )

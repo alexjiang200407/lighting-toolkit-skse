@@ -21,4 +21,6 @@ set(HEADERS ${HEADERS}
 	include/Preset/uuid.h
 	include/MyEnumSet.h
 	include/ImGui/ImGuiValueEditor.h
+	include/ColorPalette.h
+	include/LightEditor.h
 )

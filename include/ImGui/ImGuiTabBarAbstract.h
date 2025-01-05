@@ -21,6 +21,11 @@ namespace ImGui
 			ImGui::EndTabBar();
 		}
 
+		const char* GetLabel() const
+		{
+			return tabBarID.c_str();
+		}
+
 	protected:
 		virtual void DrawTabBarItems()
 		{

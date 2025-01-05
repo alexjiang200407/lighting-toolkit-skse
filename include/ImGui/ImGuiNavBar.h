@@ -42,6 +42,9 @@ namespace ImGui
 			ImGuiTabBarAbstract<T, It>::DrawTabBar();
 		}
 
+		using ImGuiTabBarAbstract<T, It>::GetLabel;
+
+
 	protected:
 		T* DrawTabBarItem(It& it) override
 		{
