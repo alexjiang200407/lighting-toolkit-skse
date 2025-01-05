@@ -5,6 +5,7 @@ set(SOURCES ${SOURCES}
 	src/ImGui/ImGuiComponent.cpp
 	src/ImGui/ImGuiInputAdapter.cpp
 	src/ImGui/ImGuiWidgets.cpp
+	src/ImGui/ImGuiNavBar.cpp
 	src/Prop.cpp
 	src/Lighting.cpp
 	src/LightingPreset.cpp
@@ -13,4 +14,6 @@ set(SOURCES ${SOURCES}
 	src/Preset/Preset.cpp
 	src/Color.cpp
 	src/Preset/PresetSerializationControl.cpp
+	src/ColorPalette.cpp
+	src/LightEditor.cpp
 )

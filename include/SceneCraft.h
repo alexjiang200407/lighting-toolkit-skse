@@ -6,7 +6,8 @@
 
 class SceneCraft :
 	ImGui::ImGuiComponent,
-	public RE::BSTEventSink<RE::BGSActorCellEvent>
+	public RE::BSTEventSink<RE::BGSActorCellEvent>,
+	public ImGui::ImGuiTabBar<Prop>
 {
 public:
 	void               Init();
@@ -16,7 +17,7 @@ public:
 	static SceneCraft* GetSingleton();
 
 private:
-	SceneCraft() = default;
+	SceneCraft();
 
 private:
 	void                     ToggleMenu();
@@ -25,8 +26,8 @@ private:
 	static float*            GetCameraMoveSpeed();
 	void                     SuppressDXInput();
 	void                     UpdateLookingAround();
-	int                      DrawTabBar();
-	void                     DrawPropControlWindow(int activePropIndex);
+	void                     DrawTabBarItems() override;
+	void                     DrawPropControlWindow();
 	void                     DrawCameraControlWindow();
 	void                     DrawSceneControlWindow();
 	RE::BSEventNotifyControl ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>* a_eventSource) override;
@@ -38,7 +39,7 @@ private:
 	bool                               previouslyInFreeCameraMode = false;
 	bool                               previouslyFreezeTime       = false;
 	bool                               showWindow                 = false;
-	std::vector<std::unique_ptr<Prop>> props;
+	//std::vector<std::unique_ptr<Prop>> props;
 	static SceneCraft                  singleton;
 	static constexpr ImGuiWindowFlags  windowFlags = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
 };

@@ -1,30 +1,37 @@
 #pragma once
 #include "Preset/Preset.h"
 #include "Preset/PresetDatabase.h"
+#include "ImGui/ImGuiValueEditor.h"
 #include <type_traits>
 
 namespace ImGui
 {
-	template <typename T, typename std::enable_if<std::is_base_of<preset::Preset, T>::value>::type* = nullptr>
-	class ImGuiSelector
+	template <
+		typename T,
+		typename std::enable_if<std::is_base_of<preset::Preset, T>::value>::type* = nullptr>
+	class ImGuiSelector :
+		public ImGuiValueEditorMode<T>
 	{
 	public:
-		ImGuiSelector() = default;
-		ImGuiSelector(T current) :
-			selection(current)
+		ImGuiSelector(const char* selectionID, preset::PresetDatabase* presetDB) :
+			ImGuiValueEditorMode<T>(selectionID), presetDB(presetDB){};
+		ImGuiSelector(const char* selectionID, preset::PresetDatabase* presetDB, T current) :
+			ImGuiValueEditorMode<T>(selectionID),
+			selection(current),
+			presetDB(presetDB)
 		{
 		}
 
 	public:
-		bool DrawSelectionComboBox(const preset::PresetDatabase& presetDB, const char* selectionID)
+		bool DrawValueEditor() override
 		{
-			ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(selectionID).x - ImGui::GetStyle().ItemSpacing.x);
+			ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(ImGuiNavBarItem::GetLabel()).x - ImGui::GetStyle().ItemSpacing.x);
 
-			auto [st, end] = presetDB.GetAllPresetsOfType(T::TID);
+			auto [st, end] = presetDB->GetAllPresetsOfType(T::TID);
 
 			if (st == end)
 			{
-				if (ImGui::BeginCombo(selectionID, "No Presets Found"))
+				if (ImGui::BeginCombo(ImGuiNavBarItem::GetLabel(), "No Presets Found"))
 				{
 					ImGui::EndCombo();
 				}
@@ -37,15 +44,15 @@ namespace ImGui
 			preset::PresetDatabase::iterator selectedIt;
 
 			if (selection.has_value())
-				selectedIt = presetDB.Find(selection.value().GetID());
-			if (!selection.has_value() || presetDB.IsEnd(selectedIt))
+				selectedIt = presetDB->Find(selection.value().GetID());
+			if (!selection.has_value() || presetDB->IsEnd(selectedIt))
 			{
 				doUpdate   = true;
 				selectedIt = st;
 			}
 
 			preset::Preset* selected = selectedIt->get();
-			if (ImGui::BeginCombo(selectionID, (*selectedIt)->GetSelectionName()))
+			if (ImGui::BeginCombo(ImGuiNavBarItem::GetLabel(), (*selectedIt)->GetSelectionName()))
 			{
 				while (st != end)
 				{
@@ -78,18 +85,13 @@ namespace ImGui
 
 			return doUpdate;
 		}
-
-		bool HasSelection() const
+		std::optional<T> GetSelection() const override
 		{
-			return selection.has_value();
-		}
-		T GetSelection() const
-		{
-			assert(selection.has_value());
-			return selection.value();
+			return selection;
 		}
 
 	protected:
-		std::optional<T> selection;
+		preset::PresetDatabase* presetDB;
+		std::optional<T>        selection;
 	};
 }

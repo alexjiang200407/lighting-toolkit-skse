@@ -1,23 +1,18 @@
 #pragma once
-#include "Color.h"
-#include "ImGui/ImGuiSelector.h"
-#include "LightingPreset.h"
+#include "ColorPalette.h"
+#include "LightEditor.h"
 #include "Preset/PresetDatabase.h"
 #include "Prop.h"
 
 class Lighting :
 	public Prop
 {
-private:
-	typedef ImGui::ImGuiSelector<preset::LightingPreset> LightPresetSelector;
-	typedef ImGui::ImGuiSelector<preset::Color>          ColorSelector;
+public:
+	Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB);
+	Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset);
 
 public:
-	Lighting(RE::TESObjectREFRPtr ref);
-	Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::LightingPreset lightPreset);
-
-public:
-	void DrawControlPanel(preset::PresetDatabase& config) override;
+	void DrawControlPanel() override;
 	void UpdateLightColor();
 	void UpdateLightTemplate();
 	void Remove() override;
@@ -30,6 +25,6 @@ private:
 private:
 	RE::NiPointer<RE::BSLight>      bsLight = nullptr;
 	RE::NiPointer<RE::NiPointLight> niLight = nullptr;
-	ColorSelector                   colorPalette;
-	LightPresetSelector             lightingPreset;
+	ColorPalette                    colorPalette;
+	LightEditor                     lightingPreset;
 };

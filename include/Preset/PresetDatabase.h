@@ -6,8 +6,16 @@ namespace preset
 	class PresetDatabase
 	{
 	public:
-		typedef std::set<PresetPtr>::iterator iterator;
+		typedef std::set<PresetPtr>::iterator       iterator;
 		typedef std::set<PresetPtr>::const_iterator const_iterator;
+
+	public:
+		PresetDatabase()                                  = default;
+		PresetDatabase(const PresetDatabase&&)            = delete;
+		PresetDatabase& operator=(const PresetDatabase&&) = delete;
+		PresetDatabase(const PresetDatabase&)             = delete;
+		PresetDatabase& operator=(const PresetDatabase&)  = delete;
+
 	private:
 		struct PresetPtrComparator
 		{

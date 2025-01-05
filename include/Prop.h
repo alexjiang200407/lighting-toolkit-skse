@@ -1,15 +1,17 @@
 #pragma once
+#include "ImGui/ImGuiTabBar.h"
 #include "Preset/PresetDatabase.h"
 
-class Prop
+class Prop :
+	ImGui::ImGuiTabBarItemRemovable
 {
 public:
 	Prop(RE::TESObjectREFRPtr ref);
 
 public:
-	virtual bool        DrawTabItem(bool& active);
-	virtual void        DrawControlPanel(preset::PresetDatabase& config);
-	virtual void        Remove();
+	virtual bool        DrawTabItem(bool& active) override;
+	virtual void        DrawControlPanel();
+	virtual void        Remove() override;
 	virtual void        MoveToCameraLookingAt(float distanceFromCamera);
 	virtual void        Hide();
 	virtual void        OnEnterCell();
