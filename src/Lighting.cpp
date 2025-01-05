@@ -1,29 +1,27 @@
 #include "Lighting.h"
 
-Lighting::Lighting(RE::TESObjectREFRPtr ref) :
-	Prop(ref)
+Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB) :
+	Prop(ref), colorPalette(presetDB), lightingPreset(presetDB)
+{
+	niLight.reset(RE::NiPointLight::Create());
+	FindOrCreateLight();
+}
+	
+Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
+	Prop(ref), colorPalette(presetDB, color), lightingPreset(presetDB, lightPreset)
 {
 	niLight.reset(RE::NiPointLight::Create());
 	FindOrCreateLight();
 }
 
-Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::LightingPreset lightPreset) :
-	Prop(ref), colorPalette(color), lightingPreset(lightPreset)
+void Lighting::DrawControlPanel()
 {
-	niLight.reset(RE::NiPointLight::Create());
-	FindOrCreateLight();
-}
-
-void Lighting::DrawControlPanel(preset::PresetDatabase& config)
-{
-	navBar.DrawNavBar();
-
-	if (colorPalette.DrawSelectionComboBox(config, "Color"))
+	if (colorPalette.DrawEditor())
 	{
 		UpdateLightColor();
 	}
 
-	if (lightingPreset.DrawSelectionComboBox(config, "Lighting"))
+	if (lightingPreset.DrawEditor())
 	{
 		UpdateLightTemplate();
 	}
@@ -34,22 +32,21 @@ void Lighting::DrawControlPanel(preset::PresetDatabase& config)
 
 void Lighting::UpdateLightColor()
 {
-	if (!colorPalette.HasSelection())
-		return;
-	niLight->diffuse = colorPalette.GetSelection();
+	if (auto selection = colorPalette.GetSelection())
+		niLight->diffuse = selection.value();
 }
 
 void Lighting::UpdateLightTemplate()
 {
-	if (!lightingPreset.HasSelection())
-		return;
+	if (auto selection = lightingPreset.GetSelection())
+	{
+		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 
-	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
+		if (bsLight.get())
+			shadowSceneNode->RemoveLight(bsLight);
 
-	if (bsLight.get())
-		shadowSceneNode->RemoveLight(bsLight);
-
-	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), lightingPreset.GetSelection()));
+		bsLight.reset(shadowSceneNode->AddLight(niLight.get(), selection.value()));
+	}
 }
 
 void Lighting::Remove()

@@ -23,7 +23,7 @@ bool Prop::DrawTabItem(bool& active)
 	return isNotRemoved;
 }
 
-void Prop::DrawControlPanel(preset::PresetDatabase&)
+void Prop::DrawControlPanel()
 {
 	ImGui::Text("This is a Prop");
 }

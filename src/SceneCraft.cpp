@@ -199,7 +199,7 @@ void SceneCraft::DrawTabBarItems()
 		const auto       dataHandler = RE::TESDataHandler::GetSingleton();
 		const RE::FormID id          = dataHandler->LookupFormID(0x801, "SceneCraft.esp");
 		const auto       ref         = dataHandler->CreateReferenceAtLocation(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), Prop::GetCameraLookingAt(50.0f), RE::NiPoint3(), RE::PlayerCharacter::GetSingleton()->GetParentCell(), RE::PlayerCharacter::GetSingleton()->GetWorldspace(), nullptr, nullptr, RE::ObjectRefHandle(), true, true).get();
-		AddItem(std::make_unique<Lighting>(ref));
+		AddItem(std::make_unique<Lighting>(ref, &config));
 	}
 }
 
@@ -212,7 +212,7 @@ void SceneCraft::DrawPropControlWindow()
 		{
 			if (ImGui::IsKeyDown(ImGuiKey_LeftAlt))
 				currentTab->MoveToCameraLookingAt(50.0f);
-			currentTab->DrawControlPanel(config);
+			currentTab->DrawControlPanel();
 
 			// Reset currentTab and wait for next draw cycle
 			currentTab = nullptr;

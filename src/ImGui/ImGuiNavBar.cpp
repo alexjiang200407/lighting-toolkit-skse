@@ -15,7 +15,7 @@ bool ImGui::ImGuiNavBarItem::DrawTabItem()
 	return false;
 }
 
-ImGui::ImGuiNavBarItem::operator ImGui::ImGuiNavBarItemPtr() const
+const char* ImGui::ImGuiNavBarItem::GetLabel() const
 {
-	return std::make_unique<ImGuiNavBarItem>(*this);
+	return label.c_str();
 }

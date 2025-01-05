@@ -1,5 +1,6 @@
 #pragma once
 #include "ImGuiTabBarAbstract.h"
+#include <type_traits>
 
 namespace ImGui
 {
@@ -11,35 +12,40 @@ namespace ImGui
 	public:
 		ImGuiNavBarItem(const char* label);
 		bool DrawTabItem();
-		operator ImGuiNavBarItemPtr() const; 
+		const char* GetLabel() const;
+
 	private:
 		std::string label;
 	};
 
-
-	template <size_t SZ, typename TPtr = std::unique_ptr<ImGuiNavBarItem>, typename It = std::array<TPtr, SZ>::iterator>
+	template <
+		typename T,
+		size_t SZ,
+		typename TPtr = typename std::unique_ptr<T>,
+		typename It   = typename std::array<TPtr, SZ>::iterator,
+		typename      = typename std::enable_if_t<std::is_base_of<ImGuiNavBarItem, T>::value>>
 	class ImGuiNavBar :
-		private ImGuiTabBarAbstract<ImGuiNavBarItem, It>
+		private ImGuiTabBarAbstract<T, It>
 	{
 	public:
-		ImGuiNavBar(const char* id, std::array<const char*, SZ> nav) :
-			ImGuiTabBarAbstract<ImGuiNavBarItem, It>(id, 0)
+		ImGuiNavBar(const char* id, std::array<T, SZ> nav) :
+			ImGuiTabBarAbstract<T, It>(id, 0)
 		{
 			for (size_t i = 0; i < SZ; i++)
 			{
-				navBarItems[i] = ImGuiNavBarItem(nav[i]);
+				navBarItems[i] = std::make_unique<T>(nav[i]);
 			}
 		}
 
 		void DrawNavBar()
 		{
-			ImGuiTabBarAbstract<ImGuiNavBarItem, It>::DrawTabBar();
+			ImGuiTabBarAbstract<T, It>::DrawTabBar();
 		}
 
 	protected:
-		ImGuiNavBarItem* DrawTabBarItem(It& it) override
+		T* DrawTabBarItem(It& it) override
 		{
-			ImGuiNavBarItem* ret = nullptr;
+			T* ret = nullptr;
 			if ((*it)->DrawTabItem())
 			{
 				ret = (*it).get();
@@ -52,7 +58,12 @@ namespace ImGui
 		It begin() { return navBarItems.begin(); }
 		It end() { return navBarItems.end(); }
 
-	private:
+		T* GetSelected() const
+		{
+			return ImGuiTabBarAbstract<T, It>::currentTab;
+		}
+
+	protected:
 		std::array<TPtr, SZ> navBarItems;
 	};
 

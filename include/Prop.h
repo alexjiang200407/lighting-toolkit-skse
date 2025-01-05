@@ -10,7 +10,7 @@ public:
 
 public:
 	virtual bool        DrawTabItem(bool& active) override;
-	virtual void        DrawControlPanel(preset::PresetDatabase& config);
+	virtual void        DrawControlPanel();
 	virtual void        Remove() override;
 	virtual void        MoveToCameraLookingAt(float distanceFromCamera);
 	virtual void        Hide();
