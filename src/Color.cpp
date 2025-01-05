@@ -2,6 +2,11 @@
 
 using namespace preset;
 
+preset::Color::Color() :
+	Color("Unnamed Color", {})
+{
+}
+
 Color::Color(PresetID id, std::string name, RE::NiColor color) :
 	Preset(id, name), RE::NiColor(color)
 {

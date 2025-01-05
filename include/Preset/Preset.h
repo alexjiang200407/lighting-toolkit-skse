@@ -1,7 +1,5 @@
 #pragma once
 
-#define UUID_SYSTEM_GENERATOR
-#include "uuid.h"
 #include <nlohmann/json.hpp>
 
 namespace preset
@@ -84,6 +82,7 @@ namespace preset
 		PresetTID    GetTID() const;
 		PresetID     GetID() const;
 		const char*  GetSelectionName() const;
+		std::string& GetName();
 		virtual json Serialize() const;
 
 	public:

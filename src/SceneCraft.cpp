@@ -190,9 +190,9 @@ void SceneCraft::UpdateLookingAround()
 	ImGui::ImGuiInputAdapter::GetSingleton()->SetSuppressMouseMove(true);
 }
 
-void SceneCraft::DrawTabBarItems()
+bool SceneCraft::DrawTabBarItems()
 {
-	ImGui::ImGuiTabBar<Prop>::DrawTabBarItems();
+	bool changed = ImGui::ImGuiTabBar<Prop>::DrawTabBarItems();
 	if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip))
 	{
 		// TODO Add a PropFactory creation method here
@@ -201,6 +201,7 @@ void SceneCraft::DrawTabBarItems()
 		const auto       ref         = dataHandler->CreateReferenceAtLocation(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), Prop::GetCameraLookingAt(50.0f), RE::NiPoint3(), RE::PlayerCharacter::GetSingleton()->GetParentCell(), RE::PlayerCharacter::GetSingleton()->GetWorldspace(), nullptr, nullptr, RE::ObjectRefHandle(), true, true).get();
 		AddItem(std::make_unique<Lighting>(ref, &config));
 	}
+	return changed;
 }
 
 void SceneCraft::DrawPropControlWindow()

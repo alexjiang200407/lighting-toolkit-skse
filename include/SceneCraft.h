@@ -26,7 +26,7 @@ private:
 	static float*            GetCameraMoveSpeed();
 	void                     SuppressDXInput();
 	void                     UpdateLookingAround();
-	void                     DrawTabBarItems() override;
+	bool                     DrawTabBarItems() override;
 	void                     DrawPropControlWindow();
 	void                     DrawCameraControlWindow();
 	void                     DrawSceneControlWindow();

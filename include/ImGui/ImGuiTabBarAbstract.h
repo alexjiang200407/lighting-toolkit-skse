@@ -2,7 +2,22 @@
 
 namespace ImGui
 {
-	template <typename T, typename It>
+	typedef uuids::uuid TabID;
+
+	class ImGuiTabBarItem
+	{
+	public:
+		bool  operator==(const ImGuiTabBarItem& rhs) const;
+		TabID GetTabID() const;
+
+	private:
+		TabID id = uuids::uuid_system_generator{}();
+	};
+
+	template <
+		typename T,
+		typename It,
+		typename = typename std::enable_if_t<std::is_base_of<ImGuiTabBarItem, T>::value>>
 	class ImGuiTabBarAbstract
 	{
 	public:
@@ -12,13 +27,15 @@ namespace ImGui
 		}
 
 	public:
-		void DrawTabBar()
+		bool DrawTabBar()
 		{
+			bool changed = false;
 			ImGui::BeginTabBar(tabBarID.c_str(), flags);
 			{
-				DrawTabBarItems();
+				changed = DrawTabBarItems();
 			}
 			ImGui::EndTabBar();
+			return changed;
 		}
 
 		const char* GetLabel() const
@@ -27,15 +44,25 @@ namespace ImGui
 		}
 
 	protected:
-		virtual void DrawTabBarItems()
+		virtual bool DrawTabBarItems()
 		{
-			currentTab = nullptr;
+			bool changed = false;
+			currentTab   = nullptr;
+
 			for (auto it = begin(); it != end();)
 			{
 				T* newTab = DrawTabBarItem(it);
 				if (newTab)
+				{
 					currentTab = newTab;
+					if (lastID != newTab->GetTabID())
+					{
+						lastID  = currentTab->GetTabID();
+						changed = true;
+					}
+				}
 			}
+			return changed;
 		}
 
 		virtual T* DrawTabBarItem(It& it) = 0;
@@ -46,6 +73,7 @@ namespace ImGui
 		T* currentTab = nullptr;
 
 	private:
+		uuids::uuid            lastID;
 		const ImGuiTabBarFlags flags;
 		std::string            tabBarID;
 	};

@@ -16,4 +16,6 @@ set(SOURCES ${SOURCES}
 	src/Preset/PresetSerializationControl.cpp
 	src/ColorPalette.cpp
 	src/LightEditor.cpp
+	src/ColorDesigner.cpp
+	src/ImGui/ImGuiTabBarAbstract.cpp
 )

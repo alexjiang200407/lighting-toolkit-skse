@@ -3,14 +3,19 @@
 
 namespace ImGui
 {
-	class ImGuiTabBarItemRemovable
+	class ImGuiTabBarItemRemovable :
+		public ImGuiTabBarItem
 	{
 	public:
 		virtual bool DrawTabItem(bool& isActive) = 0;
-		virtual void Remove() = 0;
+		virtual void Remove()                    = 0;
 	};
 
-	template <typename T, typename TPtr = std::unique_ptr<T>, typename It = std::vector<TPtr>::iterator>
+	template <
+		typename T,
+		typename TPtr = std::unique_ptr<T>,
+		typename It   = std::vector<TPtr>::iterator,
+		typename      = typename std::enable_if_t<std::is_base_of<ImGuiTabBarItemRemovable, T>::value>>
 	class ImGuiTabBar : public ImGuiTabBarAbstract<T, It>
 	{
 	public:
@@ -30,7 +35,7 @@ namespace ImGui
 		{
 			bool activeProp   = false;
 			bool isNotRemoved = (*it)->DrawTabItem(activeProp);
-			T*   currentTab = nullptr;
+			T*   currentTab   = nullptr;
 			if (isNotRemoved)
 			{
 				currentTab = (*it).get();

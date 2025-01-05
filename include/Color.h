@@ -18,6 +18,7 @@ namespace preset
 		};
 
 	public:
+		Color();
 		Color(PresetID a_id, std::string a_name, RE::NiColor color);
 		Color(std::string name, RE::NiColor color);
 
