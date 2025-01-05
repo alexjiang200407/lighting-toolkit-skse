@@ -33,7 +33,7 @@ void Lighting::DrawControlPanel()
 void Lighting::UpdateLightColor()
 {
 	if (auto selection = colorPalette.GetSelection())
-		niLight->diffuse = selection.value();
+		niLight->diffuse = *selection;
 }
 
 void Lighting::UpdateLightTemplate()
@@ -45,7 +45,7 @@ void Lighting::UpdateLightTemplate()
 		if (bsLight.get())
 			shadowSceneNode->RemoveLight(bsLight);
 
-		bsLight.reset(shadowSceneNode->AddLight(niLight.get(), selection.value()));
+		bsLight.reset(shadowSceneNode->AddLight(niLight.get(), *selection));
 	}
 }
 

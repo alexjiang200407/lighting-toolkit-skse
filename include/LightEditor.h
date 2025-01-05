@@ -4,14 +4,13 @@
 #include "LightingPreset.h"
 #include "Preset/PresetDatabase.h"
 
+typedef ImGui::ImGuiSelector<preset::LightingPreset>                                 ImGuiLightPresetSelector;
+typedef ImGui::ImGuiValueEditor<ImGuiLightPresetSelector, preset::LightingPreset, 1> ImGuiLightEditor;
+
 class LightEditor :
-	public ImGui::ImGuiValueEditor<ImGui::ImGuiSelector<preset::LightingPreset>, preset::LightingPreset, 1>
+	public ImGuiLightEditor
 {
 public:
 	LightEditor(preset::PresetDatabase* presetDB);
 	LightEditor(preset::PresetDatabase* presetDB, preset::LightingPreset lighting);
-
-private:
-	typedef ImGui::ImGuiSelector<preset::LightingPreset>                                 ImGuiLightPresetSelector;
-	typedef ImGui::ImGuiValueEditor<ImGuiLightPresetSelector, preset::LightingPreset, 1> ImGuiLightEditor;
 };

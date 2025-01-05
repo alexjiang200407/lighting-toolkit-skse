@@ -1,7 +1,7 @@
 #pragma once
+#include "ImGui/ImGuiValueEditor.h"
 #include "Preset/Preset.h"
 #include "Preset/PresetDatabase.h"
-#include "ImGui/ImGuiValueEditor.h"
 #include <type_traits>
 
 namespace ImGui
@@ -85,9 +85,13 @@ namespace ImGui
 
 			return doUpdate;
 		}
-		std::optional<T> GetSelection() const override
+		T* GetSelection() override
 		{
-			return selection;
+			if (selection.has_value())
+			{
+				return &selection.value();
+			}
+			return nullptr;
 		}
 
 	protected:

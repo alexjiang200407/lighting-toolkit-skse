@@ -23,4 +23,5 @@ set(HEADERS ${HEADERS}
 	include/ImGui/ImGuiValueEditor.h
 	include/ColorPalette.h
 	include/LightEditor.h
+	include/ColorTweaker.h
 )
