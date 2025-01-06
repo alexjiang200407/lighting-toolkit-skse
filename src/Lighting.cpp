@@ -57,16 +57,19 @@ void Lighting::UpdateLightTemplate()
 void Lighting::Remove()
 {
 	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
-	if (niLight && niLight->parent)
-	{
-		niLight->parent->DetachChild(niLight.get());
-	}
+
+	Prop::Remove();
+	niLight->SetAppCulled(true);
+
+	shadowSceneNode->allowLightRemoveQueues = false;
+
+	if (niLight.get())
+		shadowSceneNode->RemoveLight(niLight.get());
 
 	if (bsLight.get())
 		shadowSceneNode->RemoveLight(bsLight);
 
-
-	Prop::Remove();
+	shadowSceneNode->allowLightRemoveQueues = true;
 }
 
 void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
