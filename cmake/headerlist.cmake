@@ -25,4 +25,5 @@ set(HEADERS ${HEADERS}
 	include/LightEditor.h
 	include/ColorDesigner.h
 	include/ImGui/ImGuiSelector.h
+	include/LightDesigner.h
 )

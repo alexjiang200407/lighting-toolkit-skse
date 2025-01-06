@@ -4,8 +4,9 @@
 #include "LightingPreset.h"
 #include "Preset/PresetDatabase.h"
 
-typedef ImGui::ImGuiPresetSelector<preset::LightingPreset>                           ImGuiLightPresetSelector;
-typedef ImGui::ImGuiValueEditor<ImGuiLightPresetSelector, preset::LightingPreset, 1> ImGuiLightEditor;
+typedef ImGui::ImGuiSelector<preset::LightingPreset>                           ImGuiLightSelector;
+typedef ImGui::ImGuiPresetSelector<preset::LightingPreset>                     ImGuiLightPresetSelector;
+typedef ImGui::ImGuiValueEditor<ImGuiLightSelector, preset::LightingPreset, 2> ImGuiLightEditor;
 
 class LightEditor :
 	public ImGuiLightEditor

@@ -18,4 +18,5 @@ set(SOURCES ${SOURCES}
 	src/LightEditor.cpp
 	src/ColorDesigner.cpp
 	src/ImGui/ImGuiTabBarAbstract.cpp
+	src/LightDesigner.cpp
 )
