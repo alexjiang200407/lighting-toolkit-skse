@@ -15,9 +15,13 @@ public:
 	void DrawControlPanel() override;
 	void UpdateLightColor();
 	void UpdateLightTemplate();
-	void Remove() override;
 	void MoveToCameraLookingAt(float distanceFromCamera) override;
+	void MoveTo(RE::NiPoint3 newPos) override;
 	void OnEnterCell() override;
+	void Remove() override;
+	void Hide() override;
+	void Show() override;
+	void Rotate(float delta) override;
 
 private:
 	void FindOrCreateLight();

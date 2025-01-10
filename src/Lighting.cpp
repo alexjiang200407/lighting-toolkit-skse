@@ -3,39 +3,30 @@
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
 	Prop(ref), colorPalette(presetDB), lightCreateParams(lightPreset)
 {
-	niLight.reset(RE::NiPointLight::Create());
 	FindOrCreateLight();
 	UpdateLightColor();
 	UpdateLightTemplate();
+	MoveToCameraLookingAt(50.0f);
 }
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
 	Prop(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset)
 {
-	niLight.reset(RE::NiPointLight::Create());
 	FindOrCreateLight();
 	UpdateLightColor();
 	UpdateLightTemplate();
+	MoveToCameraLookingAt(50.0f);
 }
 
 void Lighting::DrawControlPanel()
 {
-	auto flags = ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding;
-	ImGui::BeginChild("##LightColorSelector", ImVec2(0, 0), flags);
+	if (colorPalette.DrawEditor())
 	{
-		if (colorPalette.DrawEditor())
-		{
-			UpdateLightColor();
-		}
+		UpdateLightColor();
 	}
-	ImGui::EndChild();
-
-	ImGui::BeginChild("##LightSelector", ImVec2(0, 0), flags);
-	{
-		ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
-		ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
-	}
-	ImGui::EndChild();
+	ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
+	ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
+	Prop::DrawControlPanel();
 }
 
 void Lighting::UpdateLightColor()
@@ -54,13 +45,39 @@ void Lighting::UpdateLightTemplate()
 	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), lightCreateParams));
 }
 
+void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
+{
+	assert(RE::PlayerCharacter::GetSingleton());
+	assert(RE::PlayerCharacter::GetSingleton()->GetParentCell());
+
+	if (GetCellID() != RE::PlayerCharacter::GetSingleton()->GetParentCell()->formID)
+	{
+		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
+		shadowSceneNode->RemoveLight(bsLight);
+		shadowSceneNode->RemoveLight(niLight.get());
+		FindOrCreateLight();
+	}
+	Prop::MoveToCameraLookingAt(distanceFromCamera);
+}
+
+void Lighting::MoveTo(RE::NiPoint3 point)
+{
+	niLight->world.translate = point;
+}
+
+void Lighting::OnEnterCell()
+{
+	// Skyrim creates a new niLight when we enter a cell
+	// so we have to update our state
+	FindOrCreateLight();
+	UpdateLightColor();
+	UpdateLightTemplate();
+	MoveToCurrentPosition();
+}
+
 void Lighting::Remove()
 {
-	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
-
-	Prop::Remove();
-	niLight->SetAppCulled(true);
-
+	auto* shadowSceneNode                   = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 	shadowSceneNode->allowLightRemoveQueues = false;
 
 	if (niLight.get())
@@ -70,29 +87,33 @@ void Lighting::Remove()
 		shadowSceneNode->RemoveLight(bsLight);
 
 	shadowSceneNode->allowLightRemoveQueues = true;
+	Prop::Remove();
 }
 
-void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
+void Lighting::Hide()
 {
-	assert(RE::PlayerCharacter::GetSingleton());
-	assert(RE::PlayerCharacter::GetSingleton()->GetParentCell());
+	Prop::Hide();
+	niLight->SetAppCulled(true);
+}
 
-	if (GetCellID() != RE::PlayerCharacter::GetSingleton()->GetParentCell()->formID)
+void Lighting::Show()
+{
+	niLight->SetAppCulled(false);
+	Prop::Show();
+}
+
+void Lighting::Rotate(float delta)
+{
+	RE::NiMatrix3 rotation = {
+		{ 1, 0, 0 },
+		{ 0, cos(delta), -sin(delta) },
+		{ 0, sin(delta), cos(delta) }
+	};
+
+	if (niLight)
 	{
-		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
-		ref->MoveTo(RE::PlayerCharacter::GetSingleton());
-		shadowSceneNode->RemoveLight(bsLight);
-		shadowSceneNode->RemoveLight(niLight.get());
-		FindOrCreateLight();
+		niLight->world.rotate = niLight->world.rotate * rotation;
 	}
-	niLight->world.translate = GetCameraLookingAt(distanceFromCamera);
-}
-
-void Lighting::OnEnterCell()
-{
-	// Skyrim creates a new niLight when we enter a cell
-	// so we have to update our state
-	FindOrCreateLight();
 }
 
 void Lighting::FindOrCreateLight()
@@ -113,13 +134,13 @@ void Lighting::FindOrCreateLight()
 		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 		shadowSceneNode->RemoveLight(niLight.get());
 		niLight.reset(skyrim_cast<RE::NiPointLight*>(newLight));
-		bsLight.reset(shadowSceneNode->GetLight(niLight.get()));
 	}
 	else
 	{
-		auto* niNode  = niRoot->GetObjectByName("AttachLight");
+		auto* niNode = niRoot->GetObjectByName("AttachLight")->AsNode();
+		niLight.reset(RE::NiPointLight::Create());
 		niLight->name = "SceneCraftLight";
-		RE::AttachNode(niNode->AsNode(), niLight.get());
+		RE::AttachNode(niNode, niLight.get());
 
 		// TODO put these into a settings class
 		niLight->ambient = RE::NiColor();

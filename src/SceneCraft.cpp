@@ -27,14 +27,11 @@ void SceneCraft::DoFrame()
 		ToggleMenu();
 	}
 
-	if (!showWindow)
+	if (ImGui::IsKeyPressed(ImGuiKey_H, false))
+		hidden = !hidden;
+
+	if (!doProcess || hidden)
 		return;
-
-	if (ImGui::IsAnyItemActive())
-	{
-
-	}
-
 
 	if (ImGui::IsKeyPressedA(ImGuiKey_F, false))
 		RE::Main::GetSingleton()->freezeTime = !RE::Main::GetSingleton()->freezeTime;
@@ -69,14 +66,14 @@ SceneCraft::SceneCraft() :
 
 void SceneCraft::ToggleMenu()
 {
-	showWindow = !showWindow;
+	doProcess = !doProcess;
 
-	if (showWindow)
+	if (doProcess)
 	{
 		if (!CanOpenWindow())
 		{
 			RE::DebugNotification("Cannot open SceneCraft menu at this time...", "UIMenuOK");
-			showWindow = false;
+			doProcess = false;
 			return;
 		}
 
@@ -146,7 +143,7 @@ bool SceneCraft::CanOpenWindow()
 
 bool SceneCraft::ShouldDrawCursor()
 {
-	return showWindow && !lookingAround;
+	return doProcess && !lookingAround && !hidden;
 }
 
 float* SceneCraft::GetCameraMoveSpeed()
@@ -203,7 +200,17 @@ void SceneCraft::DrawPropControlWindow()
 	{
 		if (ImGui::IsKeyDownA(ImGuiKey_LeftAlt))
 			currentTab->MoveToCameraLookingAt(50.0f);
-		currentTab->DrawControlPanel();
+		if (ImGui::IsKeyDownA(ImGuiKey_R))
+			currentTab->Rotate(-0.1f);
+		if (ImGui::IsKeyDownA(ImGuiKey_T))
+			currentTab->Rotate(0.1f);
+
+		auto flags = ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding;
+		ImGui::BeginChild("##PropControlPanel", ImVec2(0, 0), flags);
+		{
+			currentTab->DrawControlPanel();
+		}
+		ImGui::EndChild();
 
 		// Reset currentTab and wait for next draw cycle
 		currentTab = nullptr;

@@ -106,13 +106,15 @@ void ImGui::ImGuiRenderer::StopTimer::thunk(std::uint32_t timer)
 		io.DisplaySize.y             = static_cast<float>(screenSize.height);
 		io.MouseDrawCursor           = false;
 		io.WantCaptureMouse          = false;
+		io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
 
 		for (const auto& target : singleton.targets)
 		{
 			if (target->ShouldDrawCursor())
 			{
-				io.MouseDrawCursor = true;
+				io.MouseDrawCursor  = true;
 				io.WantCaptureMouse = true;
+				io.ConfigFlags ^= ImGuiConfigFlags_NoMouse;
 				break;
 			}
 		}

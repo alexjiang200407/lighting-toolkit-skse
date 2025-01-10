@@ -13,9 +13,14 @@ public:
 	virtual void        DrawControlPanel();
 	virtual void        Remove() override;
 	virtual void        MoveToCameraLookingAt(float distanceFromCamera);
+	virtual void        MoveTo(RE::NiPoint3 newPos);
 	virtual void        Hide();
+	bool                isHidden() const;
+	void                MoveToCurrentPosition();
+	virtual void        Show();
 	virtual void        OnEnterCell();
 	RE::FormID          GetCellID();
+	virtual void        Rotate(float delta);
 	static RE::NiPoint3 GetCameraLookingAt(float distanceFromCamera);
 
 private:
@@ -23,4 +28,8 @@ private:
 
 protected:
 	RE::TESObjectREFRPtr ref;
+
+private:
+	bool         hidden = false;
+	RE::NiPoint3 worldTranslate;
 };

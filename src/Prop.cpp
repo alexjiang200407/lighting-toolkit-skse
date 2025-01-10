@@ -1,11 +1,11 @@
 #include "Prop.h"
 
 Prop::Prop(RE::TESObjectREFRPtr ref) :
-	ref(ref)
+	ref(ref), worldTranslate(ref->GetPosition())
 {
 }
 
-bool Prop::DrawTabItem(bool& active) 
+bool Prop::DrawTabItem(bool& active)
 {
 	bool isNotRemoved = true;
 	bool selected     = false;
@@ -19,18 +19,39 @@ bool Prop::DrawTabItem(bool& active)
 
 void Prop::DrawControlPanel()
 {
-	ImGui::Text("This is a Prop");
+	if (ImGui::Checkbox("Hidden", &hidden))
+	{
+		if (hidden)
+			Hide();
+		else
+			Show();
+	}
 }
 
 void Prop::Remove()
 {
-	ref->Disable();
+	Hide();
 	ref->SetDelete(true);
 }
 
 void Prop::Hide()
 {
-	ref->Disable();
+	// TODO hide base prop
+}
+
+bool Prop::isHidden() const
+{
+	return hidden;
+}
+
+void Prop::MoveToCurrentPosition()
+{
+	MoveTo(worldTranslate);
+}
+
+void Prop::Show()
+{
+	MoveToCurrentPosition();
 }
 
 void Prop::OnEnterCell()
@@ -42,6 +63,11 @@ RE::FormID Prop::GetCellID()
 {
 	assert(ref->GetParentCell());
 	return ref->GetParentCell()->formID;
+}
+
+void Prop::Rotate(float delta)
+{
+	// TODO fill me out
 }
 
 RE::NiPoint3 Prop::GetCameraLookingAt(float distanceFromCamera)
@@ -61,7 +87,15 @@ void Prop::MoveToCameraLookingAt(float distanceFromCamera)
 	auto cameraNI   = reinterpret_cast<RE::NiCamera*>((cameraNode->children.size() == 0) ? nullptr : cameraNode->children[0].get());
 
 	if (cameraNI)
-		ref->SetPosition(GetCameraPosition() + (cameraNI->world.rotate * RE::NiPoint3{ distanceFromCamera, 0.0f, 0.0f }));
+	{
+		MoveTo(GetCameraPosition() + (cameraNI->world.rotate * RE::NiPoint3{ distanceFromCamera, 0.0f, 0.0f }));
+	}
+}
+
+void Prop::MoveTo(RE::NiPoint3 newPos)
+{
+	worldTranslate = newPos;
+	ref->SetPosition(worldTranslate);
 }
 
 RE::NiPoint3 Prop::GetCameraPosition()
