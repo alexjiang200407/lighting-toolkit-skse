@@ -39,7 +39,7 @@ namespace ImGui
 		template <size_t S>
 		static void UpdateInputList(std::bitset<S> keySet, InputList& list, InputList& removed, RE::ButtonEvent* const event)
 		{
-			if (!singleton.IsSuppressingButtons() || !keySet.test(event->GetIDCode()))
+			if (!singleton.IsSuppressingButtons() || !keySet.test(event->GetIDCode()) || event->IsUp())
 			{
 				AddToInputList(list, event);
 			}
