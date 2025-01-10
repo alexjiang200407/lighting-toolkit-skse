@@ -12,6 +12,11 @@ LightingPreset::LightingPreset(std::string name, LightFlags flags) :
 {
 }
 
+bool preset::LightingPreset::IsShadowLight() const
+{
+	return flags.all(Flags::kCastsShadow);
+}
+
 RE::ShadowSceneNode::LIGHT_CREATE_PARAMS LightingPreset::ToLightCreateParams() const
 {
 	using FLAGS = LightingPreset::Flags;

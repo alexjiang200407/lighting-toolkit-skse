@@ -10,7 +10,7 @@ set(HEADERS ${HEADERS}
 	include/Prop.h
 	include/Lighting.h
 	include/LightingPreset.h
-	include/ImGui/ImGuiSelector.h
+	include/ImGui/ImGuiPresetSelector.h
 	include/RE.h
 	include/Preset/PresetDatabase.h
 	include/Preset/SerializationStrategy.h
@@ -18,9 +18,12 @@ set(HEADERS ${HEADERS}
 	include/ImGui/ImGuiNavBar.h
 	include/Preset/Preset.h
 	include/Color.h
-	include/Preset/uuid.h
+	include/uuid.h
 	include/MyEnumSet.h
 	include/ImGui/ImGuiValueEditor.h
 	include/ColorPalette.h
 	include/LightEditor.h
+	include/ColorDesigner.h
+	include/ImGui/ImGuiSelector.h
+	include/LightDesigner.h
 )

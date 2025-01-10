@@ -3,7 +3,7 @@
 #include "Preset/PresetDatabase.h"
 
 class Prop :
-	ImGui::ImGuiTabBarItemRemovable
+	public ImGui::ImGuiTabBarItemRemovable
 {
 public:
 	Prop(RE::TESObjectREFRPtr ref);

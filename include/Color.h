@@ -6,7 +6,8 @@
 namespace preset
 {
 	class Color :
-		public Preset
+		public Preset,
+		public RE::NiColor
 	{
 	public:
 		class Deserializer :
@@ -17,6 +18,7 @@ namespace preset
 		};
 
 	public:
+		Color();
 		Color(PresetID a_id, std::string a_name, RE::NiColor color);
 		Color(std::string name, RE::NiColor color);
 
@@ -28,8 +30,5 @@ namespace preset
 
 	public:
 		static constexpr PresetTID TID = PresetTID::kColor;
-
-	private:
-		RE::NiColor color;
 	};
 }

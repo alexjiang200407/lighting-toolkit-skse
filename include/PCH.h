@@ -50,3 +50,7 @@ namespace stl
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+
+
+#define UUID_SYSTEM_GENERATOR
+#include "uuid.h"

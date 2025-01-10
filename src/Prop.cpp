@@ -14,12 +14,6 @@ bool Prop::DrawTabItem(bool& active)
 		active = selected;
 		ImGui::EndTabItem();
 	}
-
-	if (!isNotRemoved)
-	{
-		Remove();
-	}
-
 	return isNotRemoved;
 }
 

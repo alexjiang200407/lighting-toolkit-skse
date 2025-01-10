@@ -2,30 +2,29 @@
 
 using namespace preset;
 
+preset::Color::Color() :
+	Color("Unnamed Color", {})
+{
+}
+
 Color::Color(PresetID id, std::string name, RE::NiColor color) :
-	Preset(id, name), color(color)
+	Preset(id, name), RE::NiColor(color)
 {
 }
 
 Color::Color(std::string name, RE::NiColor color) :
-	Preset(PresetID::GenID<Color>(), name), color(color)
+	Preset(PresetID::GenID<Color>(), name), RE::NiColor(color)
 {}
-
-preset::Color::operator RE::NiColor() const
-{
-	return color;
-}
-
 
 RE::NiColor Color::GetColor() const
 {
-	return color;
+	return *this;
 }
 
 json preset::Color::Serialize() const
 {
 	json buf = Preset::Serialize();
-	buf["colorcode"] = color.ToInt();
+	buf["colorcode"] = ToInt();
 	return buf;
 }
 

@@ -30,9 +30,15 @@ void SceneCraft::DoFrame()
 	if (!showWindow)
 		return;
 
-	if (ImGui::IsKeyPressed(ImGuiKey_F, false))
+	if (ImGui::IsAnyItemActive())
+	{
+
+	}
+
+
+	if (ImGui::IsKeyPressedA(ImGuiKey_F, false))
 		RE::Main::GetSingleton()->freezeTime = !RE::Main::GetSingleton()->freezeTime;
-	if (lookingAround != (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_LeftAlt)))
+	if (lookingAround != (ImGui::IsKeyDownA(ImGuiKey_LeftCtrl) || ImGui::IsKeyDownA(ImGuiKey_LeftAlt)))
 	{
 		lookingAround = !lookingAround;
 		UpdateLookingAround();
@@ -190,35 +196,19 @@ void SceneCraft::UpdateLookingAround()
 	ImGui::ImGuiInputAdapter::GetSingleton()->SetSuppressMouseMove(true);
 }
 
-void SceneCraft::DrawTabBarItems()
-{
-	ImGui::ImGuiTabBar<Prop>::DrawTabBarItems();
-	if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip))
-	{
-		// TODO Add a PropFactory creation method here
-		const auto       dataHandler = RE::TESDataHandler::GetSingleton();
-		const RE::FormID id          = dataHandler->LookupFormID(0x801, "SceneCraft.esp");
-		const auto       ref         = dataHandler->CreateReferenceAtLocation(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), Prop::GetCameraLookingAt(50.0f), RE::NiPoint3(), RE::PlayerCharacter::GetSingleton()->GetParentCell(), RE::PlayerCharacter::GetSingleton()->GetWorldspace(), nullptr, nullptr, RE::ObjectRefHandle(), true, true).get();
-		AddItem(std::make_unique<Lighting>(ref, &config));
-	}
-}
-
 void SceneCraft::DrawPropControlWindow()
 {
-	ImGui::BeginChild("###PropControlWindow", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
+	ImGui::PushID("###PropControlWindow");
+	if (currentTab)
 	{
-		ImGui::Text("Current Prop:");
-		if (currentTab)
-		{
-			if (ImGui::IsKeyDown(ImGuiKey_LeftAlt))
-				currentTab->MoveToCameraLookingAt(50.0f);
-			currentTab->DrawControlPanel();
+		if (ImGui::IsKeyDownA(ImGuiKey_LeftAlt))
+			currentTab->MoveToCameraLookingAt(50.0f);
+		currentTab->DrawControlPanel();
 
-			// Reset currentTab and wait for next draw cycle
-			currentTab = nullptr;
-		}
+		// Reset currentTab and wait for next draw cycle
+		currentTab = nullptr;
 	}
-	ImGui::EndChild();
+	ImGui::PopID();
 }
 
 void SceneCraft::DrawCameraControlWindow()
@@ -240,6 +230,16 @@ void SceneCraft::DrawSceneControlWindow()
 		if (ImGui::Button("Save Presets"))
 		{
 			presetSerializationControl.Serialize(config);
+		}
+
+		lightSelector.DrawValueEditor();
+		if (ImGui::Button("Add Light"))
+		{
+			// TODO Add a PropFactory creation method here
+			const auto       dataHandler = RE::TESDataHandler::GetSingleton();
+			const RE::FormID id          = dataHandler->LookupFormID(0x801, "SceneCraft.esp");
+			const auto       ref         = dataHandler->CreateReferenceAtLocation(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), Prop::GetCameraLookingAt(50.0f), RE::NiPoint3(), RE::PlayerCharacter::GetSingleton()->GetParentCell(), RE::PlayerCharacter::GetSingleton()->GetWorldspace(), nullptr, nullptr, RE::ObjectRefHandle(), true, true).get();
+			AddItem(std::make_unique<Lighting>(ref, &config, *lightSelector.GetSelection()));
 		}
 	}
 	ImGui::EndChild();

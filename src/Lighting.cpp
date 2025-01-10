@@ -1,67 +1,75 @@
 #include "Lighting.h"
 
-Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB) :
-	Prop(ref), colorPalette(presetDB), lightingPreset(presetDB)
+Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
+	Prop(ref), colorPalette(presetDB), lightCreateParams(lightPreset)
 {
 	niLight.reset(RE::NiPointLight::Create());
 	FindOrCreateLight();
+	UpdateLightColor();
+	UpdateLightTemplate();
 }
-	
+
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
-	Prop(ref), colorPalette(presetDB, color), lightingPreset(presetDB, lightPreset)
+	Prop(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset)
 {
 	niLight.reset(RE::NiPointLight::Create());
 	FindOrCreateLight();
+	UpdateLightColor();
+	UpdateLightTemplate();
 }
 
 void Lighting::DrawControlPanel()
 {
-	if (colorPalette.DrawEditor())
+	auto flags = ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding;
+	ImGui::BeginChild("##LightColorSelector", ImVec2(0, 0), flags);
 	{
-		UpdateLightColor();
+		if (colorPalette.DrawEditor())
+		{
+			UpdateLightColor();
+		}
 	}
+	ImGui::EndChild();
 
-	if (lightingPreset.DrawEditor())
+	ImGui::BeginChild("##LightSelector", ImVec2(0, 0), flags);
 	{
-		UpdateLightTemplate();
+		ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
+		ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
 	}
-
-	ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
-	ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
+	ImGui::EndChild();
 }
 
 void Lighting::UpdateLightColor()
 {
 	if (auto selection = colorPalette.GetSelection())
-		niLight->diffuse = selection.value();
+		niLight->diffuse = *selection;
 }
 
 void Lighting::UpdateLightTemplate()
 {
-	if (auto selection = lightingPreset.GetSelection())
-	{
-		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
+	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 
-		if (bsLight.get())
-			shadowSceneNode->RemoveLight(bsLight);
+	if (bsLight.get())
+		shadowSceneNode->RemoveLight(bsLight);
 
-		bsLight.reset(shadowSceneNode->AddLight(niLight.get(), selection.value()));
-	}
+	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), lightCreateParams));
 }
 
 void Lighting::Remove()
 {
 	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
-	Prop::Remove();
 
-	if (bsLight.get())
-		shadowSceneNode->RemoveLight(bsLight);
+	Prop::Remove();
+	niLight->SetAppCulled(true);
+
+	shadowSceneNode->allowLightRemoveQueues = false;
 
 	if (niLight.get())
 		shadowSceneNode->RemoveLight(niLight.get());
 
-	niLight->parent->SetAppCulled(true);
-	niLight->SetAppCulled(true);
+	if (bsLight.get())
+		shadowSceneNode->RemoveLight(bsLight);
+
+	shadowSceneNode->allowLightRemoveQueues = true;
 }
 
 void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
@@ -104,22 +112,14 @@ void Lighting::FindOrCreateLight()
 	{
 		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 		shadowSceneNode->RemoveLight(niLight.get());
-		shadowSceneNode->RemoveLight(bsLight);
 		niLight.reset(skyrim_cast<RE::NiPointLight*>(newLight));
+		bsLight.reset(shadowSceneNode->GetLight(niLight.get()));
 	}
 	else
 	{
-		auto* niObj = niRoot->GetObjectByName("AttachLight");
-
-		if (!niObj)
-		{
-			logger::error("AttachLight node not found!");
-			return;
-		}
-
-		auto* niNode  = niObj->AsNode();
+		auto* niNode  = niRoot->GetObjectByName("AttachLight");
 		niLight->name = "SceneCraftLight";
-		RE::AttachNode(niNode, niLight.get());
+		RE::AttachNode(niNode->AsNode(), niLight.get());
 
 		// TODO put these into a settings class
 		niLight->ambient = RE::NiColor();
@@ -127,7 +127,4 @@ void Lighting::FindOrCreateLight()
 		niLight->SetLightAttenuation(500);
 		niLight->fade = 2;
 	}
-	UpdateLightColor();
-	UpdateLightTemplate();
-	//RE::UpdateNode(niLight.get());
 }

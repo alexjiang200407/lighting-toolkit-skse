@@ -7,7 +7,8 @@ namespace ImGui
 	class ImGuiNavBarItem;
 	typedef std::unique_ptr<ImGuiNavBarItem> ImGuiNavBarItemPtr;
 
-	class ImGuiNavBarItem
+	class ImGuiNavBarItem :
+		public ImGuiTabBarItem
 	{
 	public:
 		ImGuiNavBarItem(const char* label);
@@ -28,18 +29,18 @@ namespace ImGui
 		private ImGuiTabBarAbstract<T, It>
 	{
 	public:
-		ImGuiNavBar(const char* id, std::array<T, SZ> nav) :
+		ImGuiNavBar(const char* id, std::array<T*, SZ> nav) :
 			ImGuiTabBarAbstract<T, It>(id, 0)
 		{
 			for (size_t i = 0; i < SZ; i++)
 			{
-				navBarItems[i] = std::make_unique<T>(nav[i]);
+				navBarItems[i] = std::unique_ptr<T>(nav[i]);
 			}
 		}
 
-		void DrawNavBar()
+		bool DrawNavBar()
 		{
-			ImGuiTabBarAbstract<T, It>::DrawTabBar();
+			return ImGuiTabBarAbstract<T, It>::DrawTabBar();
 		}
 
 		using ImGuiTabBarAbstract<T, It>::GetLabel;

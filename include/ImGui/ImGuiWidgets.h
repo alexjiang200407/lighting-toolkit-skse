@@ -22,4 +22,7 @@ namespace ImGui
 		return retVal;
 	}
 
+	bool IsKeyDownA(ImGuiKey key);
+	bool IsKeyPressedA(ImGuiKey key, bool repeat = true);
+
 }

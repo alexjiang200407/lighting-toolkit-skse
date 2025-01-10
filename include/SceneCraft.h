@@ -1,5 +1,6 @@
 #pragma once
 #include "ImGui/ImGuiComponent.h"
+#include "LightEditor.h"
 #include "Preset/PresetDatabase.h"
 #include "Preset/PresetSerializationControl.h"
 #include "Prop.h"
@@ -26,7 +27,6 @@ private:
 	static float*            GetCameraMoveSpeed();
 	void                     SuppressDXInput();
 	void                     UpdateLookingAround();
-	void                     DrawTabBarItems() override;
 	void                     DrawPropControlWindow();
 	void                     DrawCameraControlWindow();
 	void                     DrawSceneControlWindow();
@@ -35,11 +35,12 @@ private:
 private:
 	preset::PresetSerializationControl presetSerializationControl;
 	preset::PresetDatabase             config;
+	ImGuiLightPresetSelector           lightSelector{ "Light Template", &config };
 	bool                               lookingAround              = false;
 	bool                               previouslyInFreeCameraMode = false;
 	bool                               previouslyFreezeTime       = false;
 	bool                               showWindow                 = false;
 	//std::vector<std::unique_ptr<Prop>> props;
-	static SceneCraft                  singleton;
-	static constexpr ImGuiWindowFlags  windowFlags = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
+	static SceneCraft                 singleton;
+	static constexpr ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
 };
