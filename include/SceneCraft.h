@@ -39,8 +39,9 @@ private:
 	bool                               lookingAround              = false;
 	bool                               previouslyInFreeCameraMode = false;
 	bool                               previouslyFreezeTime       = false;
-	bool                               showWindow                 = false;
+	bool                               doProcess                 = false;
 	//std::vector<std::unique_ptr<Prop>> props;
 	static SceneCraft                 singleton;
 	static constexpr ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
+	bool                              hidden      = false;
 };
