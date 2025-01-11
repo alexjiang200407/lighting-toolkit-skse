@@ -37,6 +37,7 @@ void Prop::Remove()
 void Prop::Hide()
 {
 	// TODO hide base prop
+	ref->Disable();
 }
 
 bool Prop::isHidden() const
@@ -93,6 +94,8 @@ RE::BSFadeNode* Prop::Attach3D()
 		logger::error("Base Root Node not found!");
 	}
 
+	prop3D.reset(niRoot);
+
 	return niRoot;
 }
 
@@ -116,6 +119,9 @@ void Prop::MoveToCameraLookingAt(float distanceFromCamera)
 void Prop::MoveTo(RE::NiPoint3 newPos)
 {
 	worldTranslate = newPos;
+
+	if (prop3D)
+		prop3D->world.translate = newPos;
 	ref->SetPosition(worldTranslate);
 }
 

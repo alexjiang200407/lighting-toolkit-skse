@@ -30,4 +30,5 @@ private:
 	RE::NiPointer<RE::NiPointLight>          niLight = nullptr;
 	ColorPalette                             colorPalette;
 	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightCreateParams;
+	RE::NiPoint3                             offset{ 0, 0, 0 };
 };

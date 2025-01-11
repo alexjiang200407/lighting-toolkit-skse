@@ -32,6 +32,7 @@ protected:
 	RE::TESObjectREFRPtr ref;
 
 private:
-	bool         hidden = false;
-	RE::NiPoint3 worldTranslate;
+	RE::NiPointer<RE::NiNode> prop3D;
+	bool                      hidden = false;
+	RE::NiPoint3              worldTranslate;
 };

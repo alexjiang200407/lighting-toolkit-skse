@@ -54,7 +54,7 @@ void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
 
 void Lighting::MoveTo(RE::NiPoint3 point)
 {
-	niLight->world.translate = point;
+	niLight->world.translate = point + offset;
 	Prop::MoveTo(point);
 }
 
@@ -128,6 +128,7 @@ RE::BSFadeNode* Lighting::Attach3D()
 		niLight.reset(RE::NiPointLight::Create());
 		niLight->name = "SceneCraftLight";
 		RE::AttachNode(niNode, niLight.get());
+		offset = niNode->local.translate;
 
 		// TODO put these into a settings class
 		niLight->ambient = RE::NiColor();
