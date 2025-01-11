@@ -3,19 +3,11 @@
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
 	Prop(ref), colorPalette(presetDB), lightCreateParams(lightPreset)
 {
-	FindOrCreateLight();
-	UpdateLightColor();
-	UpdateLightTemplate();
-	MoveToCameraLookingAt(50.0f);
 }
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
 	Prop(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset)
 {
-	FindOrCreateLight();
-	UpdateLightColor();
-	UpdateLightTemplate();
-	MoveToCameraLookingAt(50.0f);
 }
 
 void Lighting::DrawControlPanel()
@@ -55,7 +47,7 @@ void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
 		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 		shadowSceneNode->RemoveLight(bsLight);
 		shadowSceneNode->RemoveLight(niLight.get());
-		FindOrCreateLight();
+		Attach3D();
 	}
 	Prop::MoveToCameraLookingAt(distanceFromCamera);
 }
@@ -70,7 +62,7 @@ void Lighting::OnEnterCell()
 {
 	// Skyrim creates a new niLight when we enter a cell
 	// so we have to update our state
-	FindOrCreateLight();
+	Attach3D();
 	UpdateLightColor();
 	UpdateLightTemplate();
 	MoveToCurrentPosition();
@@ -117,19 +109,13 @@ void Lighting::Rotate(float delta)
 	}
 }
 
-void Lighting::FindOrCreateLight()
+RE::BSFadeNode* Lighting::Attach3D()
 {
-	if (!ref->Is3DLoaded())
-		ref->Load3D(false);
-
-	auto* niRoot = ref->Get3D()->AsFadeNode();
+	auto* niRoot = Prop::Attach3D();
 
 	if (!niRoot)
-	{
-		logger::error("Base Root Node not found!");
-		return;
-	}
-
+		return nullptr;
+	
 	if (auto* newLight = niRoot->GetObjectByName("SceneCraftLight"))
 	{
 		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
@@ -149,4 +135,13 @@ void Lighting::FindOrCreateLight()
 		niLight->SetLightAttenuation(500);
 		niLight->fade = 2;
 	}
+
+	return niRoot;
+}
+
+void Lighting::Init3D()
+{
+	Prop::Init3D();
+	UpdateLightColor();
+	UpdateLightTemplate();
 }

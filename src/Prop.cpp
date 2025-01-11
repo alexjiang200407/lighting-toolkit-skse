@@ -81,6 +81,27 @@ RE::NiPoint3 Prop::GetCameraLookingAt(float distanceFromCamera)
 	return RE::NiPoint3();
 }
 
+RE::BSFadeNode* Prop::Attach3D()
+{
+	if (!ref->Is3DLoaded())
+		ref->Load3D(false);
+
+	auto* niRoot = ref->Get3D()->AsFadeNode();
+
+	if (!niRoot)
+	{
+		logger::error("Base Root Node not found!");
+	}
+
+	return niRoot;
+}
+
+void Prop::Init3D()
+{
+	Attach3D();
+	MoveToCameraLookingAt(50.0f);
+}
+
 void Prop::MoveToCameraLookingAt(float distanceFromCamera)
 {
 	auto cameraNode = RE::PlayerCamera::GetSingleton()->cameraRoot.get()->AsNode();
