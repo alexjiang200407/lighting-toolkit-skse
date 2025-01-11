@@ -11,7 +11,8 @@ namespace preset
 		kUnassigned    = 0,
 		kLightTemplate = 1,
 		kColor         = 2,
-		kInvalid       = 3
+		kProp          = 3,
+		kInvalid       = 4
 	};
 
 	class Preset;
@@ -62,6 +63,8 @@ namespace preset
 
 		std::string GetSIDAsString() const;
 
+		std::string GetUniqueName() const;
+
 	private:
 		PresetTID tid = kUnassigned;
 		PresetSID sid;
@@ -82,6 +85,7 @@ namespace preset
 		PresetTID          GetTID() const;
 		PresetID           GetID() const;
 		const char*        GetSelectionName() const;
+		std::string        GetUniqueName() const;
 		std::string&       GetName();
 		const std::string& GetName() const;
 		virtual json       Serialize() const;

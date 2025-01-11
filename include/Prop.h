@@ -1,12 +1,17 @@
 #pragma once
 #include "ImGui/ImGuiTabBar.h"
 #include "Preset/PresetDatabase.h"
+#include "ModelPreset.h"
+#include "ImGui/ImGuiPresetSelector.h"
 
 class Prop :
 	public ImGui::ImGuiTabBarItemRemovable
 {
 public:
-	Prop(RE::TESObjectREFRPtr ref);
+	typedef ImGui::ImGuiPresetSelector<preset::ModelPreset> ModelSelector;
+
+public:
+	Prop(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB);
 
 public:
 	virtual bool            DrawTabItem(bool& active) override;
@@ -18,9 +23,12 @@ public:
 	bool                    isHidden() const;
 	void                    MoveToCurrentPosition();
 	virtual void            Show();
+	void                    Switch3D(preset::ModelPreset* preset);
+	void                    Switch3D(RE::TESBoundObject* modelBoundObj);
 	virtual void            OnEnterCell();
 	RE::FormID              GetCellID();
-	virtual void            Rotate(float delta);
+	void                    Rotate(float delta);
+	virtual void            Rotate(RE::NiMatrix3 rotation);
 	static RE::NiPoint3     GetCameraLookingAt(float distanceFromCamera);
 	virtual RE::BSFadeNode* Attach3D();
 	virtual void            Init3D();
@@ -32,6 +40,7 @@ protected:
 	RE::TESObjectREFRPtr ref;
 
 private:
+	ModelSelector             modelSelector;
 	RE::NiPointer<RE::NiNode> prop3D;
 	bool                      hidden = false;
 	RE::NiPoint3              worldTranslate;

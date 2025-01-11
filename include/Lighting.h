@@ -21,7 +21,7 @@ public:
 	void            Remove() override;
 	void            Hide() override;
 	void            Show() override;
-	void            Rotate(float delta) override;
+	void            Rotate(RE::NiMatrix3 rotation) override;
 	RE::BSFadeNode* Attach3D() override;
 	void            Init3D() override;
 

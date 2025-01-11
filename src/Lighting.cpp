@@ -1,12 +1,12 @@
 #include "Lighting.h"
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
-	Prop(ref), colorPalette(presetDB), lightCreateParams(lightPreset)
+	Prop(ref, presetDB), colorPalette(presetDB), lightCreateParams(lightPreset)
 {
 }
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
-	Prop(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset)
+	Prop(ref, presetDB), colorPalette(presetDB, color), lightCreateParams(lightPreset)
 {
 }
 
@@ -95,14 +95,9 @@ void Lighting::Show()
 	Prop::Show();
 }
 
-void Lighting::Rotate(float delta)
+void Lighting::Rotate(RE::NiMatrix3 rotation)
 {
-	RE::NiMatrix3 rotation = {
-		{ 1, 0, 0 },
-		{ 0, cos(delta), -sin(delta) },
-		{ 0, sin(delta), cos(delta) }
-	};
-
+	Prop::Rotate(rotation);
 	if (niLight)
 	{
 		niLight->world.rotate = niLight->world.rotate * rotation;

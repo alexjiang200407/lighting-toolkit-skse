@@ -1,7 +1,7 @@
 #include "Prop.h"
 
-Prop::Prop(RE::TESObjectREFRPtr ref) :
-	ref(ref), worldTranslate(ref->GetPosition())
+Prop::Prop(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB) :
+	ref(ref), worldTranslate(ref->GetPosition()), modelSelector("Prop Selector", presetDB)
 {
 }
 
@@ -19,6 +19,10 @@ bool Prop::DrawTabItem(bool& active)
 
 void Prop::DrawControlPanel()
 {
+	if (modelSelector.DrawValueEditor())
+	{
+		Switch3D(modelSelector.GetSelection());
+	}
 	if (ImGui::Checkbox("Hidden", &hidden))
 	{
 		if (hidden)
@@ -55,6 +59,19 @@ void Prop::Show()
 	MoveToCurrentPosition();
 }
 
+void Prop::Switch3D(preset::ModelPreset* preset)
+{
+	Switch3D(preset->ToBoundObj());
+}
+
+void Prop::Switch3D(RE::TESBoundObject* modelBoundObj)
+{
+	if (!modelBoundObj)
+		return;
+	ref->SetObjectReference(modelBoundObj);
+	Init3D();
+}
+
 void Prop::OnEnterCell()
 {
 	// TODO Add default behavior
@@ -68,7 +85,26 @@ RE::FormID Prop::GetCellID()
 
 void Prop::Rotate(float delta)
 {
-	// TODO fill me out
+	RE::NiMatrix3 rotation = {
+		{ 1, 0, 0 },
+		{ 0, cos(delta), -sin(delta) },
+		{ 0, sin(delta), cos(delta) }
+	};
+
+	Rotate(rotation);
+}
+
+void Prop::Rotate(RE::NiMatrix3 rotation)
+{
+	if (!ref->Is3DLoaded())
+		return;
+
+	RE::BSFadeNode* fadeNode = ref->Get3D()->AsFadeNode();
+
+	if (!fadeNode)
+		return;
+
+	fadeNode->world.rotate = fadeNode->world.rotate * rotation;
 }
 
 RE::NiPoint3 Prop::GetCameraLookingAt(float distanceFromCamera)
