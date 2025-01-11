@@ -26,6 +26,7 @@ namespace preset
 
 	public:
 		RE::NiColor GetColor() const;
+		Color       Clone() const;
 		json        Serialize() const override;
 
 	public:

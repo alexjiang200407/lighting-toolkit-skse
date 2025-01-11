@@ -42,6 +42,11 @@ std::string& preset::Preset::GetName()
 	return name;
 }
 
+const std::string& preset::Preset::GetName() const
+{
+	return name;
+}
+
 json preset::Preset::Serialize() const
 {
 	json buf = json::object();

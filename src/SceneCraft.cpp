@@ -27,10 +27,13 @@ void SceneCraft::DoFrame()
 		ToggleMenu();
 	}
 
+	if (!doProcess)
+		return;
+
 	if (ImGui::IsKeyPressed(ImGuiKey_H, false))
 		hidden = !hidden;
 
-	if (!doProcess || hidden)
+	if (hidden)
 		return;
 
 	if (ImGui::IsKeyPressedA(ImGuiKey_F, false))
@@ -101,6 +104,7 @@ void SceneCraft::ToggleMenu()
 			RE::ControlMap::GetSingleton()->PopInputContext(RE::ControlMap::InputContextID::kTFCMode);
 		}
 		lookingAround = false;
+		hidden        = false;
 	}
 }
 

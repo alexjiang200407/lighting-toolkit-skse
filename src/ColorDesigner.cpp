@@ -23,5 +23,11 @@ bool ColorDesigner::DrawValueEditor()
 		color.blue  = rgb[2];
 		changed     = true;
 	}
+
+	if (ImGui::Button("Save Color"))
+	{
+		presetDB->Insert(std::make_unique<preset::Color>(color.Clone()));
+	}
+
 	return changed;
 }

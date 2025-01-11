@@ -63,6 +63,7 @@ void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
 void Lighting::MoveTo(RE::NiPoint3 point)
 {
 	niLight->world.translate = point;
+	Prop::MoveTo(point);
 }
 
 void Lighting::OnEnterCell()

@@ -78,12 +78,13 @@ namespace preset
 	public:
 		bool operator<(const Preset& rhs) const;
 
-		std::string  GetSIDAsString() const;
-		PresetTID    GetTID() const;
-		PresetID     GetID() const;
-		const char*  GetSelectionName() const;
-		std::string& GetName();
-		virtual json Serialize() const;
+		std::string        GetSIDAsString() const;
+		PresetTID          GetTID() const;
+		PresetID           GetID() const;
+		const char*        GetSelectionName() const;
+		std::string&       GetName();
+		const std::string& GetName() const;
+		virtual json       Serialize() const;
 
 	public:
 		static constexpr PresetTID TID = PresetTID::kUnassigned;
