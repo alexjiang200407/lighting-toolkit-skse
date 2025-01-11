@@ -21,6 +21,11 @@ RE::NiColor Color::GetColor() const
 	return *this;
 }
 
+Color preset::Color::Clone() const
+{
+	return Color(GetName(), *this);
+}
+
 json preset::Color::Serialize() const
 {
 	json buf = Preset::Serialize();
