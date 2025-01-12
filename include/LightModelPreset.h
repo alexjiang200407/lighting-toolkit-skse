@@ -21,6 +21,8 @@ namespace preset
 
 	public:
 		RE::NiPoint3 GetOffset() const;
+		json         Serialize() const override;
+
 	public:
 		static constexpr PresetTID TID = PresetTID::kLightModel;
 

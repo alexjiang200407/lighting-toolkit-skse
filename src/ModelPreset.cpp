@@ -40,6 +40,14 @@ RE::TESBoundObject* preset::ModelPreset::ToBoundObj()
 	return form->As<RE::TESBoundObject>();
 }
 
+json preset::ModelPreset::Serialize() const
+{
+	json base = Preset::Serialize();
+	base["formID"] = modelSubID;
+	base["file"]   = file;
+	return base;
+}
+
 PresetPtr ModelPreset::Deserializer::operator()(PresetID id, std::string name, json json) const
 {
 	if (!json.contains("formID") || !json.contains("file"))

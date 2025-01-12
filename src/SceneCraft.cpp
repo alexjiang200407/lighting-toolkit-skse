@@ -41,7 +41,7 @@ void SceneCraft::DoFrame()
 	if (lookingAround != (ImGui::IsKeyDownA(ImGuiKey_LeftCtrl) || ImGui::IsKeyDownA(ImGuiKey_LeftAlt)))
 	{
 		lookingAround = !lookingAround;
-/*
+
 		if (lookingAround)
 		{
 			previouslyFreezeTimeLookingAround    = RE::Main::GetSingleton()->freezeTime;
@@ -51,7 +51,7 @@ void SceneCraft::DoFrame()
 		{
 			RE::Main::GetSingleton()->freezeTime = previouslyFreezeTimeLookingAround;
 		}
-	*/	
+		
 		UpdateLookingAround();
 	}
 	ImGui::Begin("##SCMain", nullptr, windowFlags);

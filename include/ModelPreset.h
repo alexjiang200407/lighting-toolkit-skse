@@ -21,7 +21,7 @@ namespace preset
 	public:
 		RE::FormID          GetFullFormID();
 		RE::TESBoundObject* ToBoundObj();
-
+		json                Serialize() const override;
 	public:
 		static constexpr PresetTID TID = PresetTID::kProp;
 
