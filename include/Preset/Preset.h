@@ -12,7 +12,8 @@ namespace preset
 		kLightTemplate = 1,
 		kColor         = 2,
 		kProp          = 3,
-		kInvalid       = 4
+		kLightModel    = 4,
+		kInvalid       = 5
 	};
 
 	class Preset;

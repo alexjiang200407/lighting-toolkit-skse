@@ -1,7 +1,7 @@
 #include "Prop.h"
 
-Prop::Prop(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB) :
-	ref(ref), worldTranslate(ref->GetPosition()), modelSelector("Prop Selector", presetDB)
+Prop::Prop(RE::TESObjectREFRPtr ref) :
+	ref(ref), worldTranslate(ref->GetPosition())
 {
 }
 
@@ -19,16 +19,16 @@ bool Prop::DrawTabItem(bool& active)
 
 void Prop::DrawControlPanel()
 {
-	if (modelSelector.DrawValueEditor())
-	{
-		Switch3D(modelSelector.GetSelection());
-	}
 	if (ImGui::Checkbox("Hidden", &hidden))
 	{
 		if (hidden)
 			Hide();
 		else
 			Show();
+	}
+	if (ImGui::SliderAutoFill("Prop Distance", &distanceFromCamera, 0.1f, 500.0f))
+	{
+		MoveToCameraLookingAt();
 	}
 }
 
@@ -56,6 +56,7 @@ void Prop::MoveToCurrentPosition()
 
 void Prop::Show()
 {
+	ref->Enable(true);
 	MoveToCurrentPosition();
 }
 
@@ -68,6 +69,10 @@ void Prop::Switch3D(RE::TESBoundObject* modelBoundObj)
 {
 	if (!modelBoundObj)
 		return;
+	
+	ref->Get3D()->CullNode(true);
+	ref->Get3D()->CullGeometry(true);
+
 	ref->SetObjectReference(modelBoundObj);
 	Init3D();
 }
@@ -138,10 +143,10 @@ RE::BSFadeNode* Prop::Attach3D()
 void Prop::Init3D()
 {
 	Attach3D();
-	MoveToCameraLookingAt(50.0f);
+	MoveTo(worldTranslate);
 }
 
-void Prop::MoveToCameraLookingAt(float distanceFromCamera)
+void Prop::MoveToCameraLookingAt()
 {
 	auto cameraNode = RE::PlayerCamera::GetSingleton()->cameraRoot.get()->AsNode();
 	auto cameraNI   = reinterpret_cast<RE::NiCamera*>((cameraNode->children.size() == 0) ? nullptr : cameraNode->children[0].get());
@@ -154,10 +159,7 @@ void Prop::MoveToCameraLookingAt(float distanceFromCamera)
 
 void Prop::MoveTo(RE::NiPoint3 newPos)
 {
-	worldTranslate = newPos;
-
-	if (prop3D)
-		prop3D->world.translate = newPos;
+	worldTranslate = newPos;	
 	ref->SetPosition(worldTranslate);
 }
 

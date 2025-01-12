@@ -12,7 +12,7 @@ RE::FormID preset::ModelPreset::GetFullFormID()
 	if (!modelFullID)
 	{
 		auto* dataHandler = RE::TESDataHandler::GetSingleton();
-		modelFullID = dataHandler->LookupFormID(modelSubID, file);
+		modelFullID       = dataHandler->LookupFormID(modelSubID, file);
 
 		if (!modelFullID)
 		{
@@ -45,7 +45,7 @@ PresetPtr ModelPreset::Deserializer::operator()(PresetID id, std::string name, j
 	if (!json.contains("formID") || !json.contains("file"))
 		throw std::runtime_error("ModelPreset must include formID and file field");
 
-	RE::FormID formID = json["formID"];
-	std::string file   = json["file"];
-	return std::make_unique<ModelPreset>(ModelPreset(id, name, formID, file));
+	RE::FormID  formID = json["formID"];
+	std::string fileStr   = json["file"];
+	return std::make_unique<ModelPreset>(ModelPreset(id, name, formID, fileStr));
 }

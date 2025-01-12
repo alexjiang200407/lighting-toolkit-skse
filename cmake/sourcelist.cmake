@@ -20,4 +20,5 @@ set(SOURCES ${SOURCES}
 	src/ImGui/ImGuiTabBarAbstract.cpp
 	src/LightDesigner.cpp
 	src/ModelPreset.cpp
+	src/LightModelPreset.cpp
 )

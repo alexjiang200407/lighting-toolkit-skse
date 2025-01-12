@@ -1,23 +1,34 @@
 #include "Lighting.h"
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
-	Prop(ref, presetDB), colorPalette(presetDB), lightCreateParams(lightPreset)
+	Prop(ref), colorPalette(presetDB), lightCreateParams(lightPreset), modelSelector("Light 3D Model", presetDB)
 {
 }
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
-	Prop(ref, presetDB), colorPalette(presetDB, color), lightCreateParams(lightPreset)
+	Prop(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset), modelSelector("Light 3D Model", presetDB)
 {
 }
 
 void Lighting::DrawControlPanel()
 {
-	if (colorPalette.DrawEditor())
+	ImGui::BeginDisabled(isHidden());
 	{
-		UpdateLightColor();
+		if (colorPalette.DrawEditor())
+		{
+			UpdateLightColor();
+		}
+		ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
+		ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
+
+		radius = niLight->radius;
+		fade   = niLight->fade;
+		if (modelSelector.DrawValueEditor())
+		{
+			Switch3D(modelSelector.GetSelection());
+		}
 	}
-	ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
-	ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
+	ImGui::EndDisabled();
 	Prop::DrawControlPanel();
 }
 
@@ -37,7 +48,7 @@ void Lighting::UpdateLightTemplate()
 	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), lightCreateParams));
 }
 
-void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
+void Lighting::MoveToCameraLookingAt()
 {
 	assert(RE::PlayerCharacter::GetSingleton());
 	assert(RE::PlayerCharacter::GetSingleton()->GetParentCell());
@@ -49,11 +60,17 @@ void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
 		shadowSceneNode->RemoveLight(niLight.get());
 		Attach3D();
 	}
-	Prop::MoveToCameraLookingAt(distanceFromCamera);
+	Prop::MoveToCameraLookingAt();
 }
 
 void Lighting::MoveTo(RE::NiPoint3 point)
 {
+	RE::NiPoint3 offset;
+	if (auto* selection = modelSelector.GetSelection())
+	{
+		offset = selection->GetOffset();
+	}
+
 	niLight->world.translate = point + offset;
 	Prop::MoveTo(point);
 }
@@ -110,7 +127,7 @@ RE::BSFadeNode* Lighting::Attach3D()
 
 	if (!niRoot)
 		return nullptr;
-	
+
 	if (auto* newLight = niRoot->GetObjectByName("SceneCraftLight"))
 	{
 		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
@@ -127,9 +144,9 @@ RE::BSFadeNode* Lighting::Attach3D()
 
 		// TODO put these into a settings class
 		niLight->ambient = RE::NiColor();
-		niLight->radius  = RE::NiPoint3(500, 500, 500);
+		niLight->radius  = radius;
 		niLight->SetLightAttenuation(500);
-		niLight->fade = 2;
+		niLight->fade = fade;
 	}
 
 	return niRoot;

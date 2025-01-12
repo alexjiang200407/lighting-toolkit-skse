@@ -36,11 +36,22 @@ void SceneCraft::DoFrame()
 	if (hidden)
 		return;
 
-	if (ImGui::IsKeyPressedA(ImGuiKey_F, false))
+	if (ImGui::IsKeyPressedA(ImGuiKey_F, false) && !lookingAround)
 		RE::Main::GetSingleton()->freezeTime = !RE::Main::GetSingleton()->freezeTime;
 	if (lookingAround != (ImGui::IsKeyDownA(ImGuiKey_LeftCtrl) || ImGui::IsKeyDownA(ImGuiKey_LeftAlt)))
 	{
 		lookingAround = !lookingAround;
+/*
+		if (lookingAround)
+		{
+			previouslyFreezeTimeLookingAround    = RE::Main::GetSingleton()->freezeTime;
+			RE::Main::GetSingleton()->freezeTime = true;
+		}
+		else
+		{
+			RE::Main::GetSingleton()->freezeTime = previouslyFreezeTimeLookingAround;
+		}
+	*/	
 		UpdateLookingAround();
 	}
 	ImGui::Begin("##SCMain", nullptr, windowFlags);
@@ -203,7 +214,7 @@ void SceneCraft::DrawPropControlWindow()
 	if (currentTab)
 	{
 		if (ImGui::IsKeyDownA(ImGuiKey_LeftAlt))
-			currentTab->MoveToCameraLookingAt(50.0f);
+			currentTab->MoveToCameraLookingAt();
 		if (ImGui::IsKeyDownA(ImGuiKey_R))
 			currentTab->Rotate(-0.1f);
 		if (ImGui::IsKeyDownA(ImGuiKey_T))

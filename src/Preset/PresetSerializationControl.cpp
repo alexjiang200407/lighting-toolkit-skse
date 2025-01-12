@@ -3,6 +3,7 @@
 #include "Color.h"
 #include "LightingPreset.h"
 #include "ModelPreset.h"
+#include "LightModelPreset.h"
 
 using namespace preset;
 
@@ -88,6 +89,9 @@ void PresetSerializationControl::RegisterPresets(PresetDatabase& a_presetDB, Pre
 			break;
 		case ModelPreset::TID:
 			a_presetDB.Insert(ModelPreset::Deserializer{}(presetID, preset["name"], preset));
+			break;
+		case LightModelPreset::TID:
+			a_presetDB.Insert(LightModelPreset::Deserializer{}(presetID, preset["name"], preset));
 			break;
 		default:
 			throw std::out_of_range("TypeID is invalid");
