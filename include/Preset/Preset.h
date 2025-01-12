@@ -22,15 +22,15 @@ namespace preset
 	{
 	public:
 		PresetID() = default;
-		PresetID(PresetTID tid, PresetSID sid);
+		PresetID(PresetTID tid, PresetSID sid, std::string name);
 
 		bool operator<(const PresetID& id) const;
 		bool operator<(const PresetTID& tid) const;
 
 		template <typename T, typename std::enable_if<std::is_base_of<Preset, T>::value>::type* = nullptr>
-		static PresetID GenID()
+		static PresetID GenID(const std::string& name)
 		{
-			return PresetID(T::TID, uuids::uuid_system_generator{}());
+			return PresetID(T::TID, uuids::uuid_system_generator{}(), name);
 		}
 
 		template <typename T, typename std::enable_if<std::is_base_of<Preset, T>::value>::type* = nullptr>
@@ -45,10 +45,10 @@ namespace preset
 			return SIDToID(T::TID, sid);
 		}
 
-		static PresetID SIDToID(PresetTID tid, std::string sid)
+		static PresetID SIDToID(PresetTID tid, std::string sid, std::string name)
 		{
 			if (const auto id = uuids::uuid::from_string(sid))
-				return PresetID(tid, id.value());
+				return PresetID(tid, id.value(), name);
 
 			return PresetID();
 		}
@@ -62,11 +62,16 @@ namespace preset
 
 		bool IsNull() const;
 
-		std::string GetSIDAsString() const;
+		const std::string& GetName() const;
+		std::string&       GetName();
+		std::string        GetSIDAsString() const;
+		const char*        GetUniqueName() const;
 
 	private:
-		PresetTID tid = kUnassigned;
-		PresetSID sid;
+		PresetTID   tid = kUnassigned;
+		PresetSID   sid;
+		std::string name;
+		std::string uniqueName;
 	};
 
 	class Preset
@@ -75,7 +80,7 @@ namespace preset
 		Preset()          = default;
 		virtual ~Preset() = default;
 		Preset(PresetTID type, std::string name);
-		Preset(PresetID id, std::string name);
+		Preset(PresetID id);
 
 	public:
 		bool operator<(const Preset& rhs) const;
@@ -93,10 +98,8 @@ namespace preset
 		static constexpr PresetTID TID = PresetTID::kUnassigned;
 
 	private:
-		std::string name;
-		PresetID    id;
-		int         refCount = 0;
-		std::string uniqueName;
+		PresetID id;
+		int      refCount = 0;
 	};
 	typedef std::unique_ptr<Preset> PresetPtr;
 }

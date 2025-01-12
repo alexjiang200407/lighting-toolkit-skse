@@ -11,12 +11,12 @@ namespace preset
 		class Deserializer : DeserializationStrategy
 		{
 		public:
-			PresetPtr operator()(PresetID id, std::string name, json json) const override;
+			PresetPtr operator()(PresetID id, json json) const override;
 		};
 
 	public:
 		ModelPreset() = default;
-		ModelPreset(PresetID id, std::string name, RE::FormID modelSubID, std::string file);
+		ModelPreset(PresetID id, RE::FormID modelSubID, std::string file);
 
 	public:
 		RE::FormID          GetFullFormID();

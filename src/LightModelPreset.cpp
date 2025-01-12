@@ -2,8 +2,8 @@
 
 using namespace preset;
 
-LightModelPreset::LightModelPreset(PresetID id, std::string name, RE::FormID modelSubID, std::string file, RE::NiPoint3 offset) :
-	ModelPreset(id, name, modelSubID, file), offset(offset)
+LightModelPreset::LightModelPreset(PresetID id, RE::FormID modelSubID, std::string file, RE::NiPoint3 offset) :
+	ModelPreset(id, modelSubID, file), offset(offset)
 {
 }
 
@@ -19,7 +19,7 @@ json preset::LightModelPreset::Serialize() const
 	return base;
 }
 
-PresetPtr LightModelPreset::Deserializer::operator()(PresetID id, std::string name, json json) const
+PresetPtr LightModelPreset::Deserializer::operator()(PresetID id, json json) const
 {
 	if (!json.contains("formID") || !json.contains("file") || !json.contains("offset"))
 		throw std::runtime_error("LightModelPreset must include formID, file and offset field");
@@ -35,5 +35,5 @@ PresetPtr LightModelPreset::Deserializer::operator()(PresetID id, std::string na
 	offset.y = json["offset"][1];
 	offset.z = json["offset"][2];
 
-	return std::make_unique<LightModelPreset>(LightModelPreset(id, name, formID, file, offset));
+	return std::make_unique<LightModelPreset>(LightModelPreset(id, formID, file, offset));
 }

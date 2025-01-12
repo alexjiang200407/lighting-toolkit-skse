@@ -14,12 +14,12 @@ namespace preset
 			public DeserializationStrategy
 		{
 		public:
-			PresetPtr operator()(PresetID a_id, std::string a_name, json json) const override;
+			PresetPtr operator()(PresetID a_id, json json) const override;
 		};
 
 	public:
 		Color();
-		Color(PresetID a_id, std::string a_name, RE::NiColor color);
+		Color(PresetID a_id, RE::NiColor color);
 		Color(std::string name, RE::NiColor color);
 
 		operator RE::NiColor() const;
@@ -27,6 +27,7 @@ namespace preset
 	public:
 		RE::NiColor GetColor() const;
 		Color       Clone() const;
+		Color       Clone(std::string newName) const;
 		json        Serialize() const override;
 
 	public:
