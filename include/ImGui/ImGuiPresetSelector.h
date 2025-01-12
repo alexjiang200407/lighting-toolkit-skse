@@ -1,8 +1,8 @@
 #pragma once
+#include "ImGui/ImGuiSelector.h"
 #include "Preset/Preset.h"
 #include "Preset/PresetDatabase.h"
 #include <type_traits>
-#include "ImGui/ImGuiSelector.h"
 
 namespace ImGui
 {
@@ -56,7 +56,7 @@ namespace ImGui
 				while (st != end)
 				{
 					bool isSelected = selectedIt == st;
-					if (ImGui::Selectable((*st)->GetSelectionName(), isSelected))
+					if (ImGui::Selectable((*st)->GetUniqueName(), isSelected))
 						selected = const_cast<preset::Preset*>(st->get());
 					if (isSelected)
 						ImGui::SetItemDefaultFocus();
@@ -84,6 +84,7 @@ namespace ImGui
 
 			return doUpdate;
 		}
+
 	protected:
 		preset::PresetDatabase* presetDB;
 	};

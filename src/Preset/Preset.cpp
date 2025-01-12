@@ -8,7 +8,7 @@ Preset::Preset(PresetTID type, std::string name) :
 }
 
 Preset::Preset(PresetID id, std::string name):
-	id(id), name(name)
+	id(id), name(name), uniqueName(name + "##" + id.GetSIDAsString())
 {
 }
 
@@ -37,9 +37,9 @@ const char* Preset::GetSelectionName() const
 	return name.c_str();
 }
 
-std::string preset::Preset::GetUniqueName() const
+const char* preset::Preset::GetUniqueName() const
 {
-	return name + "##" + GetSIDAsString();
+	return uniqueName.c_str();
 }
 
 std::string& preset::Preset::GetName()

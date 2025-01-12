@@ -64,8 +64,6 @@ namespace preset
 
 		std::string GetSIDAsString() const;
 
-		std::string GetUniqueName() const;
-
 	private:
 		PresetTID tid = kUnassigned;
 		PresetSID sid;
@@ -86,7 +84,7 @@ namespace preset
 		PresetTID          GetTID() const;
 		PresetID           GetID() const;
 		const char*        GetSelectionName() const;
-		std::string        GetUniqueName() const;
+		const char*        GetUniqueName() const;
 		std::string&       GetName();
 		const std::string& GetName() const;
 		virtual json       Serialize() const;
@@ -98,6 +96,7 @@ namespace preset
 		std::string name;
 		PresetID    id;
 		int         refCount = 0;
+		std::string uniqueName;
 	};
 	typedef std::unique_ptr<Preset> PresetPtr;
 }
