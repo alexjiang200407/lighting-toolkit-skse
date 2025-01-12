@@ -1,5 +1,3 @@
-#include "Color.h"
-#include "LightingPreset.h"
 #include "Preset.h"
 #include "PresetDatabase.h"
 #include <fstream>

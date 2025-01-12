@@ -1,31 +1,34 @@
 #include "Lighting.h"
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
-	Prop(ref), colorPalette(presetDB), lightCreateParams(lightPreset)
+	Prop(ref), colorPalette(presetDB), lightCreateParams(lightPreset), modelSelector("Light 3D Model", presetDB)
 {
-	FindOrCreateLight();
-	UpdateLightColor();
-	UpdateLightTemplate();
-	MoveToCameraLookingAt(50.0f);
 }
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
-	Prop(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset)
+	Prop(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset), modelSelector("Light 3D Model", presetDB)
 {
-	FindOrCreateLight();
-	UpdateLightColor();
-	UpdateLightTemplate();
-	MoveToCameraLookingAt(50.0f);
 }
 
 void Lighting::DrawControlPanel()
 {
-	if (colorPalette.DrawEditor())
+	ImGui::BeginDisabled(isHidden());
 	{
-		UpdateLightColor();
+		if (colorPalette.DrawEditor())
+		{
+			UpdateLightColor();
+		}
+		ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
+		ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
+
+		radius = niLight->radius;
+		fade   = niLight->fade;
+		if (modelSelector.DrawValueEditor())
+		{
+			Switch3D(modelSelector.GetSelection());
+		}
 	}
-	ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
-	ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
+	ImGui::EndDisabled();
 	Prop::DrawControlPanel();
 }
 
@@ -45,7 +48,7 @@ void Lighting::UpdateLightTemplate()
 	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), lightCreateParams));
 }
 
-void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
+void Lighting::MoveToCameraLookingAt()
 {
 	assert(RE::PlayerCharacter::GetSingleton());
 	assert(RE::PlayerCharacter::GetSingleton()->GetParentCell());
@@ -55,14 +58,20 @@ void Lighting::MoveToCameraLookingAt(float distanceFromCamera)
 		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 		shadowSceneNode->RemoveLight(bsLight);
 		shadowSceneNode->RemoveLight(niLight.get());
-		FindOrCreateLight();
+		Attach3D();
 	}
-	Prop::MoveToCameraLookingAt(distanceFromCamera);
+	Prop::MoveToCameraLookingAt();
 }
 
 void Lighting::MoveTo(RE::NiPoint3 point)
 {
-	niLight->world.translate = point;
+	RE::NiPoint3 offset;
+	if (auto* selection = modelSelector.GetSelection())
+	{
+		offset = selection->GetOffset();
+	}
+
+	niLight->world.translate = point + offset;
 	Prop::MoveTo(point);
 }
 
@@ -70,7 +79,7 @@ void Lighting::OnEnterCell()
 {
 	// Skyrim creates a new niLight when we enter a cell
 	// so we have to update our state
-	FindOrCreateLight();
+	Attach3D();
 	UpdateLightColor();
 	UpdateLightTemplate();
 	MoveToCurrentPosition();
@@ -103,32 +112,21 @@ void Lighting::Show()
 	Prop::Show();
 }
 
-void Lighting::Rotate(float delta)
+void Lighting::Rotate(RE::NiMatrix3 rotation)
 {
-	RE::NiMatrix3 rotation = {
-		{ 1, 0, 0 },
-		{ 0, cos(delta), -sin(delta) },
-		{ 0, sin(delta), cos(delta) }
-	};
-
+	Prop::Rotate(rotation);
 	if (niLight)
 	{
 		niLight->world.rotate = niLight->world.rotate * rotation;
 	}
 }
 
-void Lighting::FindOrCreateLight()
+RE::BSFadeNode* Lighting::Attach3D()
 {
-	if (!ref->Is3DLoaded())
-		ref->Load3D(false);
-
-	auto* niRoot = ref->Get3D()->AsFadeNode();
+	auto* niRoot = Prop::Attach3D();
 
 	if (!niRoot)
-	{
-		logger::error("Base Root Node not found!");
-		return;
-	}
+		return nullptr;
 
 	if (auto* newLight = niRoot->GetObjectByName("SceneCraftLight"))
 	{
@@ -142,11 +140,21 @@ void Lighting::FindOrCreateLight()
 		niLight.reset(RE::NiPointLight::Create());
 		niLight->name = "SceneCraftLight";
 		RE::AttachNode(niNode, niLight.get());
+		offset = niNode->local.translate;
 
 		// TODO put these into a settings class
 		niLight->ambient = RE::NiColor();
-		niLight->radius  = RE::NiPoint3(500, 500, 500);
+		niLight->radius  = radius;
 		niLight->SetLightAttenuation(500);
-		niLight->fade = 2;
+		niLight->fade = fade;
 	}
+
+	return niRoot;
+}
+
+void Lighting::Init3D()
+{
+	Prop::Init3D();
+	UpdateLightColor();
+	UpdateLightTemplate();
 }

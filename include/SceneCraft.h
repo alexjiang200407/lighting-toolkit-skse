@@ -36,10 +36,11 @@ private:
 	preset::PresetSerializationControl presetSerializationControl;
 	preset::PresetDatabase             config;
 	ImGuiLightPresetSelector           lightSelector{ "Light Template", &config };
-	bool                               lookingAround              = false;
-	bool                               previouslyInFreeCameraMode = false;
-	bool                               previouslyFreezeTime       = false;
-	bool                               doProcess                  = false;
+	bool                               lookingAround                     = false;
+	bool                               previouslyInFreeCameraMode        = false;
+	bool                               previouslyFreezeTime              = false;
+	bool                               previouslyFreezeTimeLookingAround = false;
+	bool                               doProcess                         = false;
 	static SceneCraft                  singleton;
 	static constexpr ImGuiWindowFlags  windowFlags = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
 	bool                               hidden      = false;

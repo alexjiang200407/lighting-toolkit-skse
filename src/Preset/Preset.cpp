@@ -37,6 +37,11 @@ const char* Preset::GetSelectionName() const
 	return name.c_str();
 }
 
+std::string preset::Preset::GetUniqueName() const
+{
+	return name + "##" + GetSIDAsString();
+}
+
 std::string& preset::Preset::GetName()
 {
 	return name;

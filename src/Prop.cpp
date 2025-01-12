@@ -26,6 +26,10 @@ void Prop::DrawControlPanel()
 		else
 			Show();
 	}
+	if (ImGui::SliderAutoFill("Prop Distance", &distanceFromCamera, 0.1f, 500.0f))
+	{
+		MoveToCameraLookingAt();
+	}
 }
 
 void Prop::Remove()
@@ -37,6 +41,7 @@ void Prop::Remove()
 void Prop::Hide()
 {
 	// TODO hide base prop
+	ref->Disable();
 }
 
 bool Prop::isHidden() const
@@ -51,7 +56,25 @@ void Prop::MoveToCurrentPosition()
 
 void Prop::Show()
 {
+	ref->Enable(true);
 	MoveToCurrentPosition();
+}
+
+void Prop::Switch3D(preset::ModelPreset* preset)
+{
+	Switch3D(preset->ToBoundObj());
+}
+
+void Prop::Switch3D(RE::TESBoundObject* modelBoundObj)
+{
+	if (!modelBoundObj)
+		return;
+	
+	ref->Get3D()->CullNode(true);
+	ref->Get3D()->CullGeometry(true);
+
+	ref->SetObjectReference(modelBoundObj);
+	Init3D();
 }
 
 void Prop::OnEnterCell()
@@ -67,7 +90,26 @@ RE::FormID Prop::GetCellID()
 
 void Prop::Rotate(float delta)
 {
-	// TODO fill me out
+	RE::NiMatrix3 rotation = {
+		{ 1, 0, 0 },
+		{ 0, cos(delta), -sin(delta) },
+		{ 0, sin(delta), cos(delta) }
+	};
+
+	Rotate(rotation);
+}
+
+void Prop::Rotate(RE::NiMatrix3 rotation)
+{
+	if (!ref->Is3DLoaded())
+		return;
+
+	RE::BSFadeNode* fadeNode = ref->Get3D()->AsFadeNode();
+
+	if (!fadeNode)
+		return;
+
+	fadeNode->world.rotate = fadeNode->world.rotate * rotation;
 }
 
 RE::NiPoint3 Prop::GetCameraLookingAt(float distanceFromCamera)
@@ -81,7 +123,30 @@ RE::NiPoint3 Prop::GetCameraLookingAt(float distanceFromCamera)
 	return RE::NiPoint3();
 }
 
-void Prop::MoveToCameraLookingAt(float distanceFromCamera)
+RE::BSFadeNode* Prop::Attach3D()
+{
+	if (!ref->Is3DLoaded())
+		ref->Load3D(false);
+
+	auto* niRoot = ref->Get3D()->AsFadeNode();
+
+	if (!niRoot)
+	{
+		logger::error("Base Root Node not found!");
+	}
+
+	prop3D.reset(niRoot);
+
+	return niRoot;
+}
+
+void Prop::Init3D()
+{
+	Attach3D();
+	MoveTo(worldTranslate);
+}
+
+void Prop::MoveToCameraLookingAt()
 {
 	auto cameraNode = RE::PlayerCamera::GetSingleton()->cameraRoot.get()->AsNode();
 	auto cameraNI   = reinterpret_cast<RE::NiCamera*>((cameraNode->children.size() == 0) ? nullptr : cameraNode->children[0].get());
@@ -94,7 +159,7 @@ void Prop::MoveToCameraLookingAt(float distanceFromCamera)
 
 void Prop::MoveTo(RE::NiPoint3 newPos)
 {
-	worldTranslate = newPos;
+	worldTranslate = newPos;	
 	ref->SetPosition(worldTranslate);
 }
 
