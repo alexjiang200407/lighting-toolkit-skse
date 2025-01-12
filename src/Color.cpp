@@ -28,7 +28,7 @@ Color preset::Color::Clone() const
 
 Color preset::Color::Clone(std::string newName) const
 {
-	return Color(GetName(), *this);
+	return Color(newName, *this);
 }
 
 json preset::Color::Serialize() const
