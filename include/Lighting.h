@@ -15,7 +15,7 @@ public:
 	void            DrawControlPanel() override;
 	void            UpdateLightColor();
 	void            UpdateLightTemplate();
-	void            MoveToCameraLookingAt() override;
+	void            MoveToCameraLookingAt(bool resetOffset) override;
 	void            MoveTo(RE::NiPoint3 newPos) override;
 	void            OnEnterCell() override;
 	void            Remove() override;
@@ -26,6 +26,8 @@ public:
 	void            Init3D() override;
 
 private:
+	bool                                     hideLight = false;
+	bool                                     hideMarker = false;
 	float                                    fade = 2.0f;
 	RE::NiPoint3                             radius{ 500, 500, 500 };
 	RE::NiPointer<RE::BSLight>               bsLight = nullptr;

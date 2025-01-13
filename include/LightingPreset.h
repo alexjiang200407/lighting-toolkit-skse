@@ -28,7 +28,7 @@ namespace preset
 
 		typedef lib::EnumSet<Flags, uint32_t> LightFlags;
 		LightingPreset() = default;
-		LightingPreset(PresetID id, LightFlags flags);
+		LightingPreset(PresetID id, LightFlags flags, float fov, float depthBias, float nearDistance, float intensity, float radius);
 		LightingPreset(std::string name, LightFlags flags);
 
 		bool                                     IsShadowLight() const;
@@ -42,6 +42,8 @@ namespace preset
 		float      falloff      = 1.0f;
 		float      depthBias    = 1.0f;
 		float      nearDistance = 6.0f;
+		float      intensity    = 1.0f;
+		float      radius       = 248.0f;
 
 		static constexpr PresetTID TID = PresetTID::kLightTemplate;
 	};

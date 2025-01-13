@@ -2,8 +2,8 @@
 
 using namespace preset;
 
-LightingPreset::LightingPreset(PresetID id, LightFlags flags) :
-	Preset(id), flags(flags)
+LightingPreset::LightingPreset(PresetID id, LightFlags flags, float fov, float depthBias, float nearDistance, float intensity, float radius) :
+	Preset(id), flags(flags), fov(fov * (RE::NI_PI / 180.0f)), depthBias(depthBias), nearDistance(nearDistance), intensity(intensity), radius(radius)
 {
 }
 
@@ -53,9 +53,30 @@ LightingPreset::operator RE::ShadowSceneNode::LIGHT_CREATE_PARAMS() const
 
 PresetPtr LightingPreset::Deserializer::operator()(PresetID id, json json) const
 {
-	if (!json.contains("flags"))
-		throw std::runtime_error("LightingPreset must include flags field");
+	static constexpr const char* requiredKeys[] = {
+		"flags",
+		"intensity",
+		"radius",
+		"fov",
+		"depthBias",
+		"falloff",
+		"nearDistance"
+	};
+
+	for (auto key : requiredKeys)
+	{
+		if (!json.contains(key))
+			throw std::runtime_error("LightingPreset has incorrect fields!!");
+	}
 
 	uint32_t lightFlags = json["flags"];
-	return std::make_unique<LightingPreset>(LightingPreset(id, LightFlags(lightFlags)));
+	return std::make_unique<LightingPreset>(
+		LightingPreset(
+			id,
+			LightFlags(lightFlags),
+			json["fov"],
+			json["depthBias"],
+			json["nearDistance"],
+			json["intensity"],
+			json["radius"]));
 }

@@ -17,21 +17,6 @@ bool Prop::DrawTabItem(bool& active)
 	return isNotRemoved;
 }
 
-void Prop::DrawControlPanel()
-{
-	if (ImGui::Checkbox("Hidden", &hidden))
-	{
-		if (hidden)
-			Hide();
-		else
-			Show();
-	}
-	if (ImGui::SliderAutoFill("Prop Distance", &distanceFromCamera, 0.1f, 500.0f))
-	{
-		MoveToCameraLookingAt();
-	}
-}
-
 void Prop::Remove()
 {
 	Hide();
@@ -118,8 +103,6 @@ RE::BSFadeNode* Prop::Attach3D()
 		logger::error("Base Root Node not found!");
 	}
 
-	prop3D.reset(niRoot);
-
 	return niRoot;
 }
 
@@ -129,14 +112,33 @@ void Prop::Init3D()
 	MoveTo(worldTranslate);
 }
 
-void Prop::MoveToCameraLookingAt()
+void Prop::DrawCameraOffsetSlider()
 {
+	bool changed = false;
+	changed      = ImGui::SliderAutoFill("Offset Forward/Backward", &cameraOffset.x, 0.1f, 500.0f);
+	changed      = ImGui::SliderAutoFill("Offset Up/Down", &cameraOffset.y, -50.0f, 50.0f) || changed;
+	changed      = ImGui::SliderAutoFill("Offset Left/Right", &cameraOffset.z, -50.0f, 50.0f) || changed;
+	
+	if (changed)
+	{
+		MoveToCameraLookingAt();
+	}
+}
+
+void Prop::MoveToCameraLookingAt(bool resetOffset)
+{
+	if (resetOffset)
+	{
+		cameraOffset.y = 0;
+		cameraOffset.z = 0;
+	}
+
 	auto cameraNode = RE::PlayerCamera::GetSingleton()->cameraRoot.get()->AsNode();
 	auto cameraNI   = reinterpret_cast<RE::NiCamera*>((cameraNode->children.size() == 0) ? nullptr : cameraNode->children[0].get());
 
 	if (cameraNI)
 	{
-		MoveTo(GetCameraPosition() + (cameraNI->world.rotate * RE::NiPoint3{ distanceFromCamera, 0.0f, 0.0f }));
+		MoveTo(GetCameraPosition() + (cameraNI->world.rotate * cameraOffset));
 	}
 }
 

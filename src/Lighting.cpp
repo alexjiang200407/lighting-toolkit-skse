@@ -1,12 +1,14 @@
 #include "Lighting.h"
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
-	Prop(ref), colorPalette(presetDB), lightCreateParams(lightPreset)
+	Prop(ref), colorPalette(presetDB), lightCreateParams(lightPreset),
+	fade(lightPreset.intensity), radius(lightPreset.radius, lightPreset.radius, lightPreset.radius)
 {
 }
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
-	Prop(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset)
+	Prop(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset),
+	fade(lightPreset.intensity), radius(lightPreset.radius, lightPreset.radius, lightPreset.radius)
 {
 }
 
@@ -23,9 +25,18 @@ void Lighting::DrawControlPanel()
 
 		radius = niLight->radius;
 		fade   = niLight->fade;
+		DrawCameraOffsetSlider();
 	}
 	ImGui::EndDisabled();
-	Prop::DrawControlPanel();
+	if (ImGui::ConditionalCheckbox("Hide Light", niLight.get(), &hideLight))
+	{
+		niLight->SetAppCulled(hideLight);
+	}
+	ImGui::SameLine();
+	if (auto* model = ref->Get3D(); ImGui::ConditionalCheckbox("Hide Marker", model, &hideMarker))
+	{
+		model->GetObjectByName("Marker")->SetAppCulled(hideMarker);
+	}
 }
 
 void Lighting::UpdateLightColor()
@@ -44,7 +55,7 @@ void Lighting::UpdateLightTemplate()
 	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), lightCreateParams));
 }
 
-void Lighting::MoveToCameraLookingAt()
+void Lighting::MoveToCameraLookingAt(bool resetOffset)
 {
 	assert(RE::PlayerCharacter::GetSingleton());
 	assert(RE::PlayerCharacter::GetSingleton()->GetParentCell());
@@ -56,7 +67,7 @@ void Lighting::MoveToCameraLookingAt()
 		shadowSceneNode->RemoveLight(niLight.get());
 		Attach3D();
 	}
-	Prop::MoveToCameraLookingAt();
+	Prop::MoveToCameraLookingAt(resetOffset);
 }
 
 void Lighting::MoveTo(RE::NiPoint3 point)
