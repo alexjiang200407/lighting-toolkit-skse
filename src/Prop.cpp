@@ -19,30 +19,13 @@ bool Prop::DrawTabItem(bool& active)
 
 void Prop::Remove()
 {
-	Hide();
-	ref->SetDelete(true);
-}
-
-void Prop::Hide()
-{
-	// TODO hide base prop
 	ref->Disable();
-}
-
-bool Prop::isHidden() const
-{
-	return hidden;
+	ref->SetDelete(true);
 }
 
 void Prop::MoveToCurrentPosition()
 {
 	MoveTo(worldTranslate);
-}
-
-void Prop::Show()
-{
-	ref->Enable(true);
-	MoveToCurrentPosition();
 }
 
 void Prop::OnEnterCell()

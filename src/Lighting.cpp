@@ -14,7 +14,7 @@ Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::Preset
 
 void Lighting::DrawControlPanel()
 {
-	ImGui::BeginDisabled(isHidden());
+	ImGui::BeginDisabled(!ref->Is3DLoaded() || !niLight || hideLight);
 	{
 		if (colorPalette.DrawEditor())
 		{
@@ -99,18 +99,6 @@ void Lighting::Remove()
 
 	shadowSceneNode->allowLightRemoveQueues = true;
 	Prop::Remove();
-}
-
-void Lighting::Hide()
-{
-	Prop::Hide();
-	niLight->SetAppCulled(true);
-}
-
-void Lighting::Show()
-{
-	niLight->SetAppCulled(false);
-	Prop::Show();
 }
 
 void Lighting::Rotate(RE::NiMatrix3 rotation)

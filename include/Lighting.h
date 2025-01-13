@@ -19,8 +19,6 @@ public:
 	void            MoveTo(RE::NiPoint3 newPos) override;
 	void            OnEnterCell() override;
 	void            Remove() override;
-	void            Hide() override;
-	void            Show() override;
 	void            Rotate(RE::NiMatrix3 rotation) override;
 	RE::BSFadeNode* Attach3D() override;
 	void            Init3D() override;

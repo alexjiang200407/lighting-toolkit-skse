@@ -15,10 +15,7 @@ public:
 	virtual void            Remove() override;
 	virtual void            MoveToCameraLookingAt(bool resetOffset = false);
 	virtual void            MoveTo(RE::NiPoint3 newPos);
-	virtual void            Hide();
-	bool                    isHidden() const;
 	void                    MoveToCurrentPosition();
-	virtual void            Show();
 	virtual void            OnEnterCell();
 	RE::FormID              GetCellID();
 	void                    Rotate(float delta);
