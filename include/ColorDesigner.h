@@ -14,4 +14,5 @@ public:
 
 private:
 	preset::PresetDatabase* presetDB;
+	std::string             nameInput = "Unknown Color";
 };

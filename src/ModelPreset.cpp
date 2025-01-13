@@ -2,8 +2,8 @@
 
 using namespace preset;
 
-ModelPreset::ModelPreset(PresetID id, std::string name, RE::FormID modelSubID, std::string file) :
-	Preset(id, name), modelSubID(modelSubID), file(file)
+ModelPreset::ModelPreset(PresetID id, RE::FormID modelSubID, std::string file) :
+	Preset(id), modelSubID(modelSubID), file(file)
 {
 }
 
@@ -48,12 +48,12 @@ json preset::ModelPreset::Serialize() const
 	return base;
 }
 
-PresetPtr ModelPreset::Deserializer::operator()(PresetID id, std::string name, json json) const
+PresetPtr ModelPreset::Deserializer::operator()(PresetID id, json json) const
 {
 	if (!json.contains("formID") || !json.contains("file"))
 		throw std::runtime_error("ModelPreset must include formID and file field");
 
 	RE::FormID  formID = json["formID"];
 	std::string fileStr   = json["file"];
-	return std::make_unique<ModelPreset>(ModelPreset(id, name, formID, fileStr));
+	return std::make_unique<ModelPreset>(ModelPreset(id, formID, fileStr));
 }

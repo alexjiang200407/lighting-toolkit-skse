@@ -74,7 +74,7 @@ void PresetSerializationControl::RegisterPresets(PresetDatabase& a_presetDB, Pre
 		if (!preset.contains("sid") || !preset.contains("name"))
 			throw std::runtime_error("Must include SID and Name fields");
 
-		const auto presetID = PresetID::SIDToID(tid, std::string(preset["sid"]));
+		const auto presetID = PresetID::SIDToID(tid, std::string(preset["sid"]), std::string(preset["name"]));
 
 		if (presetID.IsNull())
 			throw std::runtime_error("invalid sid");
@@ -82,16 +82,16 @@ void PresetSerializationControl::RegisterPresets(PresetDatabase& a_presetDB, Pre
 		switch (tid)
 		{
 		case LightingPreset::TID:
-			a_presetDB.Insert(LightingPreset::Deserializer{}(presetID, preset["name"], preset));
+			a_presetDB.Insert(LightingPreset::Deserializer{}(presetID, preset));
 			break;
 		case Color::TID:
-			a_presetDB.Insert(Color::Deserializer{}(presetID, preset["name"], preset));
+			a_presetDB.Insert(Color::Deserializer{}(presetID, preset));
 			break;
 		case ModelPreset::TID:
-			a_presetDB.Insert(ModelPreset::Deserializer{}(presetID, preset["name"], preset));
+			a_presetDB.Insert(ModelPreset::Deserializer{}(presetID, preset));
 			break;
 		case LightModelPreset::TID:
-			a_presetDB.Insert(LightModelPreset::Deserializer{}(presetID, preset["name"], preset));
+			a_presetDB.Insert(LightModelPreset::Deserializer{}(presetID, preset));
 			break;
 		default:
 			throw std::out_of_range("TypeID is invalid");

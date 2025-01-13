@@ -3,12 +3,12 @@
 using namespace preset;
 
 Preset::Preset(PresetTID type, std::string name) :
-	Preset(PresetID(type, uuids::uuid_system_generator{}()), name)
+	Preset(PresetID(type, uuids::uuid_system_generator{}(), name))
 {
 }
 
-Preset::Preset(PresetID id, std::string name):
-	id(id), name(name)
+Preset::Preset(PresetID id):
+	id(id)
 {
 }
 
@@ -34,38 +34,44 @@ PresetID Preset::GetID() const
 
 const char* Preset::GetSelectionName() const
 {
-	return name.c_str();
+	return GetName().c_str();
 }
 
-std::string preset::Preset::GetUniqueName() const
+const char* preset::Preset::GetUniqueName() const
 {
-	return name + "##" + GetSIDAsString();
+	return id.GetUniqueName();
 }
 
 std::string& preset::Preset::GetName()
 {
-	return name;
+	return id.GetName();
 }
 
 const std::string& preset::Preset::GetName() const
 {
-	return name;
+	return id.GetName();
 }
 
 json preset::Preset::Serialize() const
 {
 	json buf = json::object();
 	buf["sid"] = GetSIDAsString();
-	buf["name"] = name;
+	buf["name"] = GetName();
 	return buf;
 }
 
-PresetID::PresetID(PresetTID tid, PresetSID sid) :
-	tid(tid), sid(sid) {}
+PresetID::PresetID(PresetTID tid, PresetSID sid, std::string name) :
+	tid(tid), sid(sid), name(name), uniqueName(name + "##" + uuids::to_string(sid)) {}
 
 bool PresetID::operator<(const PresetID& id) const
 {
-	return tid < id.tid || (tid == id.tid && sid < id.sid);
+	if (tid != id.tid)
+		return tid < id.tid;
+	
+	if (name != id.name)
+		return name < id.name;
+
+	return sid < id.sid;
 }
 
 bool PresetID::operator<(const PresetTID& tid) const
@@ -83,7 +89,22 @@ bool PresetID::IsNull() const
 	return sid.is_nil() || tid == kUnassigned;
 }
 
+const std::string& preset::PresetID::GetName() const
+{
+	return name;
+}
+
+std::string& preset::PresetID::GetName()
+{
+	return name;
+}
+
 std::string preset::PresetID::GetSIDAsString() const
 {
 	return uuids::to_string(sid);
+}
+
+const char* preset::PresetID::GetUniqueName() const
+{
+	return uniqueName.c_str();
 }

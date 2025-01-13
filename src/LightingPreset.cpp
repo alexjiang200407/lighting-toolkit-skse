@@ -2,13 +2,13 @@
 
 using namespace preset;
 
-LightingPreset::LightingPreset(PresetID id, std::string name, LightFlags flags) :
-	Preset(id, name), flags(flags)
+LightingPreset::LightingPreset(PresetID id, LightFlags flags) :
+	Preset(id), flags(flags)
 {
 }
 
 LightingPreset::LightingPreset(std::string name, LightFlags flags) :
-	Preset(PresetID::GenID<LightingPreset>(), name), flags(flags)
+	Preset(PresetID::GenID<LightingPreset>(name)), flags(flags)
 {
 }
 
@@ -51,11 +51,11 @@ LightingPreset::operator RE::ShadowSceneNode::LIGHT_CREATE_PARAMS() const
 	return ToLightCreateParams();
 }
 
-PresetPtr LightingPreset::Deserializer::operator()(PresetID id, std::string name, json json) const
+PresetPtr LightingPreset::Deserializer::operator()(PresetID id, json json) const
 {
 	if (!json.contains("flags"))
 		throw std::runtime_error("LightingPreset must include flags field");
 
 	uint32_t lightFlags = json["flags"];
-	return std::make_unique<LightingPreset>(LightingPreset(id, name, LightFlags(lightFlags)));
+	return std::make_unique<LightingPreset>(LightingPreset(id, LightFlags(lightFlags)));
 }

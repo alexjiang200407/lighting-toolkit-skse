@@ -7,6 +7,6 @@ namespace preset
 	class DeserializationStrategy
 	{
 	public:
-		virtual PresetPtr operator()(PresetID id, std::string name, json json) const = 0;
+		virtual PresetPtr operator()(PresetID id, json json) const = 0;
 	};
 }

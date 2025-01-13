@@ -13,7 +13,7 @@ bool ColorDesigner::DrawValueEditor()
 	bool           changed = false;
 	preset::Color& color   = ImGui::ImGuiSelector<preset::Color>::selection.value();
 
-	ImGui::InputText("Color Name", &color.GetName());
+	ImGui::InputText("Color Name", &nameInput);
 
 	float rgb[3] = { color.red, color.green, color.blue };
 	if (ImGui::ColorEdit3("Color Picker", rgb))
@@ -26,7 +26,7 @@ bool ColorDesigner::DrawValueEditor()
 
 	if (ImGui::Button("Save Color"))
 	{
-		presetDB->Insert(std::make_unique<preset::Color>(color.Clone()));
+		presetDB->Insert(std::make_unique<preset::Color>(color.Clone(nameInput)));
 	}
 
 	return changed;

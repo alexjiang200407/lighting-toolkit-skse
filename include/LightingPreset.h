@@ -12,7 +12,7 @@ namespace preset
 		class Deserializer : public DeserializationStrategy
 		{
 		public:
-			PresetPtr operator()(PresetID id, std::string name, json json) const override;
+			PresetPtr operator()(PresetID id, json json) const override;
 		};
 
 		enum class Flags
@@ -28,7 +28,7 @@ namespace preset
 
 		typedef lib::EnumSet<Flags, uint32_t> LightFlags;
 		LightingPreset() = default;
-		LightingPreset(PresetID id, std::string name, LightFlags flags);
+		LightingPreset(PresetID id, LightFlags flags);
 		LightingPreset(std::string name, LightFlags flags);
 
 		bool                                     IsShadowLight() const;

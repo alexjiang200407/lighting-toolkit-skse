@@ -12,12 +12,12 @@ namespace preset
 		class Deserializer : DeserializationStrategy
 		{
 		public:
-			PresetPtr operator()(PresetID id, std::string name, json json) const override;
+			PresetPtr operator()(PresetID id, json json) const override;
 		};
 
 	public:
 		LightModelPreset() = default;
-		LightModelPreset(PresetID id, std::string name, RE::FormID modelSubID, std::string file, RE::NiPoint3 offset);
+		LightModelPreset(PresetID id, RE::FormID modelSubID, std::string file, RE::NiPoint3 offset);
 
 	public:
 		RE::NiPoint3 GetOffset() const;
