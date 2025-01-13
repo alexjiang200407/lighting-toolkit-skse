@@ -26,6 +26,4 @@ set(HEADERS ${HEADERS}
 	include/ColorDesigner.h
 	include/ImGui/ImGuiSelector.h
 	include/LightDesigner.h
-	include/ModelPreset.h
-	include/LightModelPreset.h
 )

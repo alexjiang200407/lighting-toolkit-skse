@@ -1,12 +1,12 @@
 #include "Lighting.h"
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
-	Prop(ref), colorPalette(presetDB), lightCreateParams(lightPreset), modelSelector("Light 3D Model", presetDB)
+	Prop(ref), colorPalette(presetDB), lightCreateParams(lightPreset)
 {
 }
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
-	Prop(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset), modelSelector("Light 3D Model", presetDB)
+	Prop(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset)
 {
 }
 
@@ -23,10 +23,6 @@ void Lighting::DrawControlPanel()
 
 		radius = niLight->radius;
 		fade   = niLight->fade;
-		if (modelSelector.DrawValueEditor())
-		{
-			Switch3D(modelSelector.GetSelection());
-		}
 	}
 	ImGui::EndDisabled();
 	Prop::DrawControlPanel();
@@ -65,12 +61,6 @@ void Lighting::MoveToCameraLookingAt()
 
 void Lighting::MoveTo(RE::NiPoint3 point)
 {
-	RE::NiPoint3 offset;
-	if (auto* selection = modelSelector.GetSelection())
-	{
-		offset = selection->GetOffset();
-	}
-
 	niLight->world.translate = point + offset;
 	Prop::MoveTo(point);
 }

@@ -2,7 +2,6 @@
 #include "ImGui/ImGuiTabBar.h"
 #include "Preset/PresetDatabase.h"
 #include "ImGui/ImGuiPresetSelector.h"
-#include "ModelPreset.h"
 
 class Prop :
 	public ImGui::ImGuiTabBarItemRemovable
@@ -20,8 +19,6 @@ public:
 	bool                    isHidden() const;
 	void                    MoveToCurrentPosition();
 	virtual void            Show();
-	void                    Switch3D(preset::ModelPreset* preset);
-	void                    Switch3D(RE::TESBoundObject* modelBoundObj);
 	virtual void            OnEnterCell();
 	RE::FormID              GetCellID();
 	void                    Rotate(float delta);

@@ -60,23 +60,6 @@ void Prop::Show()
 	MoveToCurrentPosition();
 }
 
-void Prop::Switch3D(preset::ModelPreset* preset)
-{
-	Switch3D(preset->ToBoundObj());
-}
-
-void Prop::Switch3D(RE::TESBoundObject* modelBoundObj)
-{
-	if (!modelBoundObj)
-		return;
-	
-	ref->Get3D()->CullNode(true);
-	ref->Get3D()->CullGeometry(true);
-
-	ref->SetObjectReference(modelBoundObj);
-	Init3D();
-}
-
 void Prop::OnEnterCell()
 {
 	// TODO Add default behavior

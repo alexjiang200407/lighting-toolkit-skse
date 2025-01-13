@@ -30,7 +30,7 @@ void SceneCraft::DoFrame()
 	if (!doProcess)
 		return;
 
-	if (ImGui::IsKeyPressed(ImGuiKey_H, false))
+	if (ImGui::IsKeyPressedA(ImGuiKey_H, false))
 		hidden = !hidden;
 
 	if (hidden)
