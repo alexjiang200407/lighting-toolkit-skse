@@ -30,7 +30,7 @@ void SceneCraft::DoFrame()
 	if (!doProcess)
 		return;
 
-	if (ImGui::IsKeyPressed(ImGuiKey_H, false))
+	if (ImGui::IsKeyPressedA(ImGuiKey_H, false))
 		hidden = !hidden;
 
 	if (hidden)
@@ -214,7 +214,7 @@ void SceneCraft::DrawPropControlWindow()
 	if (currentTab)
 	{
 		if (ImGui::IsKeyDownA(ImGuiKey_LeftAlt))
-			currentTab->MoveToCameraLookingAt();
+			currentTab->MoveToCameraLookingAt(true);
 		if (ImGui::IsKeyDownA(ImGuiKey_R))
 			currentTab->Rotate(-0.1f);
 		if (ImGui::IsKeyDownA(ImGuiKey_T))
