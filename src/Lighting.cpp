@@ -185,7 +185,7 @@ RE::BSFadeNode* Lighting::Attach3D()
 	if (!niRoot)
 		return nullptr;
 
-	if (auto* newLight = niRoot->GetObjectByName("SceneCraftLight"))
+	if (auto* newLight = niRoot->GetObjectByName("ChiaroscuroLight"))
 	{
 		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 		shadowSceneNode->RemoveLight(niLight.get());
@@ -195,7 +195,7 @@ RE::BSFadeNode* Lighting::Attach3D()
 	{
 		auto* niNode = niRoot->GetObjectByName("AttachLight")->AsNode();
 		niLight.reset(RE::NiPointLight::Create());
-		niLight->name = "SceneCraftLight";
+		niLight->name = "ChiaroscuroLight";
 		RE::AttachNode(niNode, niLight.get());
 		offset = niNode->local.translate;
 

@@ -1,13 +1,13 @@
-#include "SceneCraft.h"
+#include "Chiaroscuro.h"
 #include "ImGui/ImGuiInputAdapter.h"
 #include "ImGui/ImGuiRenderer.h"
 #include "ImGui/ImGuiTabBar.h"
 #include "Lighting.h"
 #include "LightingPreset.h"
 
-SceneCraft SceneCraft::singleton;
+Chiaroscuro Chiaroscuro::singleton;
 
-void SceneCraft::Init()
+void Chiaroscuro::Init()
 {
 	ImGui::ImGuiRenderer::GetSingleton()->Init(Style());
 	ImGui::ImGuiInputAdapter::GetSingleton()->Init();
@@ -15,12 +15,12 @@ void SceneCraft::Init()
 	presetSerializationControl.Deserialize(config);
 }
 
-void SceneCraft::OnDataLoaded()
+void Chiaroscuro::OnDataLoaded()
 {
 	RE::PlayerCharacter::GetSingleton()->AddEventSink(this);
 }
 
-void SceneCraft::DoFrame()
+void Chiaroscuro::DoFrame()
 {
 	if (ImGui::IsKeyPressed(ImGuiKey_End, false))
 	{
@@ -68,17 +68,17 @@ void SceneCraft::DoFrame()
 	ImGui::End();
 }
 
-SceneCraft* SceneCraft::GetSingleton()
+Chiaroscuro* Chiaroscuro::GetSingleton()
 {
 	return &singleton;
 }
 
-SceneCraft::SceneCraft() :
+Chiaroscuro::Chiaroscuro() :
 	ImGuiTabBar<Lighting>("##propstabbar")
 {
 }
 
-void SceneCraft::ToggleMenu()
+void Chiaroscuro::ToggleMenu()
 {
 	doProcess = !doProcess;
 
@@ -86,7 +86,7 @@ void SceneCraft::ToggleMenu()
 	{
 		if (!CanOpenWindow())
 		{
-			RE::DebugNotification("Cannot open SceneCraft menu at this time...", "UIMenuOK");
+			RE::DebugNotification("Cannot open Chiaroscuro menu at this time...", "UIMenuOK");
 			doProcess = false;
 			return;
 		}
@@ -119,7 +119,7 @@ void SceneCraft::ToggleMenu()
 	}
 }
 
-bool SceneCraft::CanOpenWindow()
+bool Chiaroscuro::CanOpenWindow()
 {
 	static constexpr std::array badMenus{
 		RE::MainMenu::MENU_NAME,
@@ -156,17 +156,17 @@ bool SceneCraft::CanOpenWindow()
 	return true;
 }
 
-bool SceneCraft::ShouldDrawCursor()
+bool Chiaroscuro::ShouldDrawCursor()
 {
 	return doProcess && !lookingAround && !hidden;
 }
 
-float* SceneCraft::GetCameraMoveSpeed()
+float* Chiaroscuro::GetCameraMoveSpeed()
 {
 	return REL::Relocation<float*>{ RELOCATION_ID(509808, 382522) }.get();
 }
 
-void SceneCraft::SuppressDXInput()
+void Chiaroscuro::SuppressDXInput()
 {
 	using INPUT_CONTEXT = RE::UserEvents::INPUT_CONTEXT_IDS;
 	ImGui::ImGuiInputAdapter::KeyboardSupressionMask kbd;
@@ -192,7 +192,7 @@ void SceneCraft::SuppressDXInput()
 	ImGui::ImGuiInputAdapter::GetSingleton()->EnableSupression(kbd, mouse, gamepad, true, true);
 }
 
-void SceneCraft::UpdateLookingAround()
+void Chiaroscuro::UpdateLookingAround()
 {
 	if (lookingAround)
 	{
@@ -208,7 +208,7 @@ void SceneCraft::UpdateLookingAround()
 	ImGui::ImGuiInputAdapter::GetSingleton()->SetSuppressMouseMove(true);
 }
 
-void SceneCraft::DrawPropControlWindow()
+void Chiaroscuro::DrawPropControlWindow()
 {
 	ImGui::PushID("###PropControlWindow");
 	if (currentTab)
@@ -233,7 +233,7 @@ void SceneCraft::DrawPropControlWindow()
 	ImGui::PopID();
 }
 
-void SceneCraft::DrawCameraControlWindow()
+void Chiaroscuro::DrawCameraControlWindow()
 {
 	ImGui::BeginChild("###CameraControlWindow", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
 	{
@@ -244,7 +244,7 @@ void SceneCraft::DrawCameraControlWindow()
 	ImGui::EndChild();
 }
 
-void SceneCraft::DrawSceneControlWindow()
+void Chiaroscuro::DrawSceneControlWindow()
 {
 	ImGui::BeginChild("###SceneControlWindow", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
 	{
@@ -259,7 +259,7 @@ void SceneCraft::DrawSceneControlWindow()
 		{
 			// TODO Add a PropFactory creation method here
 			const auto            dataHandler = RE::TESDataHandler::GetSingleton();
-			const RE::FormID      id          = dataHandler->LookupFormID(0x800, "SceneCraft.esp");
+			const RE::FormID      id          = dataHandler->LookupFormID(0x800, "Chiaroscuro.esp");
 			const auto            ref         = dataHandler->CreateReferenceAtLocation(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), Lighting::GetCameraLookingAt(50.0f), RE::NiPoint3(), RE::PlayerCharacter::GetSingleton()->GetParentCell(), RE::PlayerCharacter::GetSingleton()->GetWorldspace(), nullptr, nullptr, RE::ObjectRefHandle(), true, true).get();
 			std::unique_ptr<Lighting> newProp     = std::make_unique<Lighting>(ref, &config, *lightSelector.GetSelection());
 
@@ -270,7 +270,7 @@ void SceneCraft::DrawSceneControlWindow()
 	ImGui::EndChild();
 }
 
-RE::BSEventNotifyControl SceneCraft::ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>*)
+RE::BSEventNotifyControl Chiaroscuro::ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>*)
 {
 	if (!a_event || a_event->flags == RE::BGSActorCellEvent::CellFlag::kLeave)
 	{
@@ -293,7 +293,7 @@ RE::BSEventNotifyControl SceneCraft::ProcessEvent(const RE::BGSActorCellEvent* a
 	return RE::BSEventNotifyControl::kContinue;
 }
 
-ImGuiStyle SceneCraft::Style()
+ImGuiStyle Chiaroscuro::Style()
 {
 	ImGuiStyle style;
 

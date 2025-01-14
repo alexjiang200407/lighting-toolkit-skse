@@ -5,7 +5,7 @@ set(HEADERS ${HEADERS}
 	include/ImGui/ImGuiInputAdapter.h
 	include/ImGui/ImGuiTabBar.h
 	include/ImGui/ImGuiTabBarAbstract.h
-	include/SceneCraft.h
+	include/Chiaroscuro.h
 	include/ImGui/ImGuiWidgets.h
 	include/Lighting.h
 	include/LightingPreset.h

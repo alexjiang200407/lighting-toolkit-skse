@@ -5,7 +5,7 @@
 #include "Preset/PresetSerializationControl.h"
 #include "Lighting.h"
 
-class SceneCraft :
+class Chiaroscuro :
 	ImGui::ImGuiComponent,
 	public RE::BSTEventSink<RE::BGSActorCellEvent>,
 	public ImGui::ImGuiTabBar<Lighting>
@@ -15,10 +15,10 @@ public:
 	void               OnDataLoaded();
 	void               DoFrame();
 	ImGuiStyle         Style();
-	static SceneCraft* GetSingleton();
+	static Chiaroscuro* GetSingleton();
 
 private:
-	SceneCraft();
+	Chiaroscuro();
 
 private:
 	void                     ToggleMenu();
@@ -41,7 +41,7 @@ private:
 	bool                               previouslyFreezeTime              = false;
 	bool                               previouslyFreezeTimeLookingAround = false;
 	bool                               doProcess                         = false;
-	static SceneCraft                  singleton;
+	static Chiaroscuro                  singleton;
 	static constexpr ImGuiWindowFlags  windowFlags = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
 	bool                               hidden      = false;
 };
