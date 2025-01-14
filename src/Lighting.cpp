@@ -98,6 +98,8 @@ void Lighting::Remove()
 		shadowSceneNode->RemoveLight(bsLight);
 
 	shadowSceneNode->allowLightRemoveQueues = true;
+	
+	niLight->SetAppCulled(true);
 	Prop::Remove();
 }
 
