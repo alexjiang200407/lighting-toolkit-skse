@@ -220,8 +220,7 @@ void Chiaroscuro::DrawPropControlWindow()
 		if (ImGui::IsKeyDownA(ImGuiKey_T))
 			currentTab->Rotate(0.1f);
 
-		auto flags = ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding;
-		ImGui::BeginChild("##PropControlPanel", ImVec2(0, 0), flags);
+		ImGui::BeginChild("##PropControlPanel", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
 		{
 			currentTab->DrawControlPanel();
 		}

@@ -51,7 +51,7 @@ LightingPreset::operator RE::ShadowSceneNode::LIGHT_CREATE_PARAMS() const
 	return ToLightCreateParams();
 }
 
-PresetPtr LightingPreset::Deserializer::operator()(PresetID id, json json) const
+PresetPtr LightingPreset::Deserializer::operator()(PresetID a_id, json json) const
 {
 	static constexpr const char* requiredKeys[] = {
 		"flags",
@@ -72,7 +72,7 @@ PresetPtr LightingPreset::Deserializer::operator()(PresetID id, json json) const
 	uint32_t lightFlags = json["flags"];
 	return std::make_unique<LightingPreset>(
 		LightingPreset(
-			id,
+			a_id,
 			LightFlags(lightFlags),
 			json["fov"],
 			json["depthBias"],

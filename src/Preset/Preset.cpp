@@ -74,9 +74,9 @@ bool PresetID::operator<(const PresetID& id) const
 	return sid < id.sid;
 }
 
-bool PresetID::operator<(const PresetTID& tid) const
+bool PresetID::operator<(const PresetTID& a_tid) const
 {
-	return this->tid < tid;
+	return this->tid < a_tid;
 }
 
 PresetTID PresetID::GetTID() const
