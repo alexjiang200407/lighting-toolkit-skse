@@ -79,6 +79,6 @@ namespace preset
 
 	private:
 		std::set<PresetPtr, PresetPtrComparator> presets;
-		static constexpr std::string_view        filePath = "./Data/SKSE/Plugins/SceneCraft.json"sv;
+		static constexpr std::string_view        filePath = "./Data/SKSE/Plugins/Chiaroscuro.json"sv;
 	};
 }

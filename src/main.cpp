@@ -1,4 +1,4 @@
-#include "SceneCraft.h"
+#include "Chiaroscuro.h"
 
 void InitializeLog()
 {
@@ -29,7 +29,7 @@ void InitializeLog()
 extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
 	SKSE::PluginVersionData v;
 	v.PluginVersion(Version::MAJOR);
-	v.PluginName("SceneCraft");
+	v.PluginName("Chiaroscuro");
 	v.AuthorName("shdowraithe101");
 	v.UsesAddressLibrary();
 	v.UsesUpdatedStructs();
@@ -41,7 +41,7 @@ extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 {
 	a_info->infoVersion = SKSE::PluginInfo::kVersion;
-	a_info->name        = "SceneCraft";
+	a_info->name        = "Chiaroscuro";
 	a_info->version     = Version::MAJOR;
 
 	if (a_skse->IsEditor())
@@ -73,13 +73,13 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	InitializeLog();
 
 	logger::info("Game version : {}", a_skse->RuntimeVersion().string());
-	SceneCraft::GetSingleton()->Init();
+	Chiaroscuro::GetSingleton()->Init();
 
 	SKSE::GetMessagingInterface()->RegisterListener([](SKSE::MessagingInterface::Message* message) {
 		if (message->type == SKSE::MessagingInterface::kDataLoaded)
 		{
-			RE::ConsoleLog::GetSingleton()->Print("SceneCraft has been loaded");
-			SceneCraft::GetSingleton()->OnDataLoaded();
+			RE::ConsoleLog::GetSingleton()->Print("Chiaroscuro has been loaded");
+			Chiaroscuro::GetSingleton()->OnDataLoaded();
 		}
 	});
 
