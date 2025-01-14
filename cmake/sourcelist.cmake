@@ -6,7 +6,6 @@ set(SOURCES ${SOURCES}
 	src/ImGui/ImGuiInputAdapter.cpp
 	src/ImGui/ImGuiWidgets.cpp
 	src/ImGui/ImGuiNavBar.cpp
-	src/Prop.cpp
 	src/Lighting.cpp
 	src/LightingPreset.cpp
 	src/RE.cpp

@@ -7,7 +7,6 @@ set(HEADERS ${HEADERS}
 	include/ImGui/ImGuiTabBarAbstract.h
 	include/SceneCraft.h
 	include/ImGui/ImGuiWidgets.h
-	include/Prop.h
 	include/Lighting.h
 	include/LightingPreset.h
 	include/ImGui/ImGuiPresetSelector.h

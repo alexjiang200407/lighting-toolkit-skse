@@ -3,12 +3,12 @@
 #include "LightEditor.h"
 #include "Preset/PresetDatabase.h"
 #include "Preset/PresetSerializationControl.h"
-#include "Prop.h"
+#include "Lighting.h"
 
 class SceneCraft :
 	ImGui::ImGuiComponent,
 	public RE::BSTEventSink<RE::BGSActorCellEvent>,
-	public ImGui::ImGuiTabBar<Prop>
+	public ImGui::ImGuiTabBar<Lighting>
 {
 public:
 	void               Init();
