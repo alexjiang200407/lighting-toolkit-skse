@@ -211,6 +211,8 @@ RE::BSFadeNode* Lighting::Attach3D()
 
 void Lighting::Init3D()
 {
+	hideLight = false;
+	hideMarker = false;
 	Attach3D();
 	MoveTo(worldTranslate);
 	UpdateLightColor();
