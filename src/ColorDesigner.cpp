@@ -5,6 +5,11 @@ ColorDesigner::ColorDesigner(preset::PresetDatabase* presetDB) :
 {
 }
 
+ColorDesigner::ColorDesigner(preset::PresetDatabase* presetDB, preset::Color color) :
+	ImGui::ImGuiSelector<preset::Color>("Color Designer##ColorDesigner", color), presetDB(presetDB)
+{
+}
+
 bool ColorDesigner::DrawValueEditor()
 {
 	if (!ImGui::ImGuiSelector<preset::Color>::selection.has_value())

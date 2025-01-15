@@ -43,6 +43,11 @@ json preset::Color::Serialize() const
 	return buf;
 }
 
+bool preset::Color::IsCustom() const
+{
+	return isCustom;
+}
+
 PresetPtr Color::Deserializer::operator()(PresetID a_id, nlohmann::json json) const
 {
 	if (!json.contains("colorcode"))

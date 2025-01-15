@@ -1,5 +1,6 @@
 #pragma once
 #include "Color.h"
+#include "ColorDesigner.h"
 #include "ImGui/ImGuiPresetSelector.h"
 #include "ImGui/ImGuiValueEditor.h"
 #include "Preset/PresetDatabase.h"
@@ -15,6 +16,9 @@ class ColorPalette :
 public:
 	ColorPalette(preset::PresetDatabase* presetDB);
 	ColorPalette(preset::PresetDatabase* presetDB, preset::Color color);
+
+private:
+	ColorPalette(ImGuiColorPresetSelector* presetSelector, ColorDesigner* color);
 
 public:
 	void                 Serialize(SKSE::CoSaveIO io) const;

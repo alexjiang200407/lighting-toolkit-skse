@@ -30,7 +30,7 @@ namespace preset
 		Color       Clone(bool isCustom) const;
 		Color       Clone(std::string newName, bool isCustom) const;
 		json        Serialize() const override;
-
+		bool        IsCustom() const;
 	public:
 		static constexpr PresetTID TID = PresetTID::kColor;
 

@@ -44,5 +44,8 @@ namespace ImGui
 
 			return nullptr;
 		}
+	
+	protected:
+		using ImGuiNavBar<T, SZ>::SetSelected;
 	};
 }

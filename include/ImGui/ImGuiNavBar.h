@@ -28,6 +28,7 @@ namespace ImGui
 	class ImGuiNavBar :
 		private ImGuiTabBarAbstract<T, It>
 	{
+		static_assert(SZ >= 1);
 	public:
 		ImGuiNavBar(const char* id, std::array<T*, SZ> nav) :
 			ImGuiTabBarAbstract<T, It>(id, 0)
@@ -36,6 +37,7 @@ namespace ImGui
 			{
 				navBarItems[i] = std::unique_ptr<T>(nav[i]);
 			}
+			ImGuiTabBarAbstract<T, It>::currentTab = navBarItems[0].get();
 		}
 
 		bool DrawNavBar()
@@ -65,6 +67,12 @@ namespace ImGui
 		T* GetSelected() const
 		{
 			return ImGuiTabBarAbstract<T, It>::currentTab;
+		}
+
+		void SetSelected(int idx)
+		{
+			ImGuiTabBarAbstract<T, It>::currentTab = navBarItems[idx].get();
+			navBarItems[idx]->SetActive();
 		}
 
 	protected:

@@ -9,7 +9,10 @@ namespace ImGui
 	public:
 		bool  operator==(const ImGuiTabBarItem& rhs) const;
 		TabID GetTabID() const;
+		void  SetActive();
 
+	protected:
+		bool  setActive = false;
 	private:
 		TabID id = uuids::uuid_system_generator{}();
 	};

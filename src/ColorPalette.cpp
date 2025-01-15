@@ -2,16 +2,22 @@
 #include "ColorDesigner.h"
 
 ColorPalette::ColorPalette(preset::PresetDatabase* presetDB) :
-	ImGuiColorEditor(
-		"Color",
-		{ new ImGuiColorPresetSelector("Color Presets##ColorPresetSelector", presetDB), new ColorDesigner(presetDB) })
+	ColorPalette(new ImGuiColorPresetSelector("Color Presets##ColorPresetSelector", presetDB), new ColorDesigner(presetDB))
 {
 }
 
 ColorPalette::ColorPalette(preset::PresetDatabase* presetDB, preset::Color color) :
-	ImGuiColorEditor(
-		"Color",
-		{ new ImGuiColorPresetSelector("Color Presets##ColorPresetSelector", presetDB, color), new ColorDesigner(presetDB) })
+	ColorPalette(
+		color.IsCustom() ?
+			ColorPalette(new ImGuiColorPresetSelector("Color Presets##ColorPresetSelector", presetDB), new ColorDesigner(presetDB, color)) :
+			ColorPalette(new ImGuiColorPresetSelector("Color Presets##ColorPresetSelector", presetDB, color), new ColorDesigner(presetDB)))
+{
+	if (color.IsCustom())
+		SetSelected(1);
+}
+
+ColorPalette::ColorPalette(ImGuiColorPresetSelector* presetSelector, ColorDesigner* color) :
+	ImGuiColorEditor("Color", { presetSelector, color })
 {
 }
 
@@ -20,15 +26,15 @@ void ColorPalette::Serialize(SKSE::CoSaveIO io) const
 	io.Write(GetSelection()->GetSID());
 	io.Write(static_cast<RE::NiColor>(*GetSelection()));
 
-	size_t strLen = GetSelection()->GetName().size();
+	size_t strLen = GetSelection()->GetName().size() + 1;
 	io.Write(strLen);
 	io.Write(GetSelection()->GetName().c_str(), strLen);
 }
 
 preset::Color ColorPalette::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB)
 {
-	preset::PresetSID       sid;
-	RE::NiColor             color;
+	preset::PresetSID sid;
+	RE::NiColor       color;
 
 	io.Read(sid);
 	logger::info("{}", uuids::to_string(sid));
@@ -45,5 +51,5 @@ preset::Color ColorPalette::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabas
 		return *dynamic_cast<preset::Color*>(existing->get());
 	}
 
-	return preset::Color(color, true);
+	return preset::Color(buf.get(), color, true);
 }
