@@ -25,4 +25,6 @@ set(HEADERS ${HEADERS}
 	include/ColorDesigner.h
 	include/ImGui/ImGuiSelector.h
 	include/LightDesigner.h
+	include/SKSE/SerializableCollection.h
+	include/SKSE/SerializationControl.h
 )

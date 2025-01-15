@@ -4,6 +4,7 @@
 #include "ImGui/ImGuiTabBar.h"
 #include "Lighting.h"
 #include "LightingPreset.h"
+#include "SKSE/SerializationControl.h"
 
 Chiaroscuro Chiaroscuro::singleton;
 
@@ -13,11 +14,20 @@ void Chiaroscuro::Init()
 	ImGui::ImGuiInputAdapter::GetSingleton()->Init();
 	ImGui::ImGuiRenderer::GetSingleton()->RegisterRenderTarget(&singleton);
 	presetSerializationControl.Deserialize(config);
+	SKSE::SerializationControl::GetSingleton()->RegisterSerializer(this);
 }
 
 void Chiaroscuro::OnDataLoaded()
 {
 	RE::PlayerCharacter::GetSingleton()->AddEventSink(this);
+}
+
+void Chiaroscuro::OnSavePostLoaded()
+{
+	for (const auto& light : items)
+	{
+		light->Init3D();
+	}
 }
 
 void Chiaroscuro::DoFrame()
@@ -51,7 +61,7 @@ void Chiaroscuro::DoFrame()
 		{
 			RE::Main::GetSingleton()->freezeTime = previouslyFreezeTimeLookingAround;
 		}
-		
+
 		UpdateLookingAround();
 	}
 	ImGui::Begin("##SCMain", nullptr, windowFlags);
@@ -257,9 +267,9 @@ void Chiaroscuro::DrawSceneControlWindow()
 		if (ImGui::Button("Add Light"))
 		{
 			// TODO Add a PropFactory creation method here
-			const auto            dataHandler = RE::TESDataHandler::GetSingleton();
-			const RE::FormID      id          = dataHandler->LookupFormID(0x800, "Chiaroscuro.esp");
-			const auto            ref         = dataHandler->CreateReferenceAtLocation(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), Lighting::GetCameraLookingAt(50.0f), RE::NiPoint3(), RE::PlayerCharacter::GetSingleton()->GetParentCell(), RE::PlayerCharacter::GetSingleton()->GetWorldspace(), nullptr, nullptr, RE::ObjectRefHandle(), true, true).get();
+			const auto                dataHandler = RE::TESDataHandler::GetSingleton();
+			const RE::FormID          id          = dataHandler->LookupFormID(0x800, "Chiaroscuro.esp");
+			const auto                ref         = dataHandler->CreateReferenceAtLocation(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), Lighting::GetCameraLookingAt(50.0f), RE::NiPoint3(), RE::PlayerCharacter::GetSingleton()->GetParentCell(), RE::PlayerCharacter::GetSingleton()->GetWorldspace(), nullptr, nullptr, RE::ObjectRefHandle(), true, true).get();
 			std::unique_ptr<Lighting> newProp     = std::make_unique<Lighting>(ref, &config, *lightSelector.GetSelection());
 
 			newProp->Init3D();
@@ -290,6 +300,38 @@ RE::BSEventNotifyControl Chiaroscuro::ProcessEvent(const RE::BGSActorCellEvent* 
 		}
 	}
 	return RE::BSEventNotifyControl::kContinue;
+}
+
+void Chiaroscuro::SerializeItems(SKSE::SerializationInterface* a_intfc) const
+{
+	a_intfc->WriteRecordData(items.size());
+	for (const auto& light : items)
+	{
+		light->Serialize(a_intfc);
+	}
+}
+
+void Chiaroscuro::DeserializeItems(SKSE::SerializationInterface* a_intfc)
+{
+	size_t itemsCount;
+	if (!a_intfc->ReadRecordData(itemsCount))
+		return;
+
+	for (size_t i = 0; i < itemsCount; i++)
+	{
+		auto light = Lighting::Deserialize(a_intfc, &config);
+		AddItem(std::move(light));
+	}
+}
+
+void Chiaroscuro::Revert(SKSE::SerializationInterface* a_intfc)
+{
+	items.clear();
+}
+
+constexpr uint32_t Chiaroscuro::GetKey()
+{
+	return serializationKey;
 }
 
 ImGuiStyle Chiaroscuro::Style()

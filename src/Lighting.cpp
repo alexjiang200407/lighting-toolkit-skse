@@ -1,14 +1,23 @@
 #include "Lighting.h"
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
-	ref(ref), colorPalette(presetDB), lightCreateParams(lightPreset),
-	fade(lightPreset.intensity), radius(lightPreset.radius, lightPreset.radius, lightPreset.radius), worldTranslate(ref->GetPosition())
+	Lighting(ref, presetDB, lightPreset, lightPreset.intensity, lightPreset.radius)
 {
 }
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
+	Lighting(ref, color, presetDB, lightPreset, lightPreset.intensity, lightPreset.radius)
+{
+}
+
+Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset, float fade, float radius) :
+	ref(ref), colorPalette(presetDB), lightCreateParams(lightPreset), fade(fade), radius(radius, radius, radius), worldTranslate(ref->GetPosition())
+{
+}
+
+Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset, float fade, float radius):
 	ref(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset),
-	fade(lightPreset.intensity), radius(lightPreset.radius, lightPreset.radius, lightPreset.radius), worldTranslate(ref->GetPosition())
+	fade(fade), radius(radius, radius, radius), worldTranslate(ref->GetPosition())
 {
 }
 
@@ -98,7 +107,7 @@ void Lighting::MoveTo(RE::NiPoint3 point)
 {
 	worldTranslate = point;
 	ref->SetPosition(worldTranslate);
-	niLight->world.translate = point + offset;
+	niLight->world.translate = point;
 }
 
 void Lighting::MoveToCurrentPosition()
@@ -145,7 +154,7 @@ void Lighting::Remove()
 		shadowSceneNode->RemoveLight(bsLight);
 
 	shadowSceneNode->allowLightRemoveQueues = true;
-	
+
 	niLight->SetAppCulled(true);
 	ref->Disable();
 	ref->SetDelete(true);
@@ -197,7 +206,6 @@ RE::BSFadeNode* Lighting::Attach3D()
 		niLight.reset(RE::NiPointLight::Create());
 		niLight->name = "ChiaroscuroLight";
 		RE::AttachNode(niNode, niLight.get());
-		offset = niNode->local.translate;
 
 		// TODO put these into a settings class
 		niLight->ambient = RE::NiColor();
@@ -211,12 +219,36 @@ RE::BSFadeNode* Lighting::Attach3D()
 
 void Lighting::Init3D()
 {
-	hideLight = false;
+	hideLight  = false;
 	hideMarker = false;
 	Attach3D();
 	MoveTo(worldTranslate);
 	UpdateLightColor();
 	UpdateLightTemplate();
+}
+
+LightingPtr Lighting::Deserialize(SKSE::SerializationInterface* a_intfc, preset::PresetDatabase* presetDB)
+{
+	RE::FormID                               formID;
+	float                                    fade, radius;
+	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightCreateParams;
+	a_intfc->ReadRecordData(fade);
+	a_intfc->ReadRecordData(radius);
+	preset::Color color = ColorPalette::Deserialize(a_intfc, presetDB);
+	a_intfc->ReadRecordData(lightCreateParams);
+	a_intfc->ReadRecordData(formID);
+
+	auto* tesForm = RE::TESObjectREFR::LookupByID(formID);
+
+	if (!tesForm)
+		return LightingPtr();
+
+	auto* tesObjectREFR = tesForm->As<RE::TESObjectREFR>();
+
+	if (!tesObjectREFR)
+		return LightingPtr();	
+
+	return std::make_unique<Lighting>(Lighting(tesObjectREFR->CreateRefHandle().get(), color, presetDB, lightCreateParams, fade, radius));
 }
 
 void Lighting::DrawCameraOffsetSlider()
@@ -230,6 +262,15 @@ void Lighting::DrawCameraOffsetSlider()
 	{
 		MoveToCameraLookingAt();
 	}
+}
+
+void Lighting::Serialize(SKSE::SerializationInterface* a_intfc) const
+{
+	a_intfc->WriteRecordData(fade);
+	a_intfc->WriteRecordData(radius.x);
+	colorPalette.Serialize(a_intfc);
+	a_intfc->WriteRecordData(lightCreateParams);
+	a_intfc->WriteRecordData(ref->GetFormID());
 }
 
 RE::NiPoint3 Lighting::GetCameraPosition()

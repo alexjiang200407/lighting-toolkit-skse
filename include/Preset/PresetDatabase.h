@@ -48,12 +48,12 @@ namespace preset
 
 			bool operator()(const PresetTID& lhs, const PresetPtr& rhs) const
 			{
-				return lhs < rhs->GetID().GetTID();
+				return lhs < rhs->GetTID();
 			}
 
 			bool operator()(const PresetPtr& lhs, const PresetTID& rhs) const
 			{
-				return lhs->GetID().GetTID() < rhs;
+				return lhs->GetTID() < rhs;
 			}
 		};
 

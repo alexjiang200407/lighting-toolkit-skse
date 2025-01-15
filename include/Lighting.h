@@ -4,12 +4,17 @@
 #include "Preset/PresetDatabase.h"
 #include "ImGui/ImGuiTabBar.h"
 
+class Lighting;
+typedef std::unique_ptr<Lighting> LightingPtr;
+
 class Lighting :
 	public ImGui::ImGuiTabBarItemRemovable
 {
 public:
 	Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset);
 	Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset);
+	Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset, float fade, float radius);
+	Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset, float fade, float radius);
 
 public:
 	virtual bool            DrawTabItem(bool& active) override;
@@ -27,7 +32,9 @@ public:
 	static RE::NiPoint3     GetCameraLookingAt(float distanceFromCamera);
 	virtual RE::BSFadeNode* Attach3D();
 	virtual void            Init3D();
+	static LightingPtr      Deserialize(SKSE::SerializationInterface* a_intfc, preset::PresetDatabase* presetDB);
 	void                    DrawCameraOffsetSlider();
+	void                    Serialize(SKSE::SerializationInterface* a_intfc) const;
 
 private:
 	static RE::NiPoint3 GetCameraPosition();
@@ -41,7 +48,6 @@ private:
 	RE::NiPointer<RE::NiPointLight>          niLight = nullptr;
 	ColorPalette                             colorPalette;
 	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightCreateParams;
-	RE::NiPoint3                             offset{ 0, 0, 0 };
 	RE::TESObjectREFRPtr                     ref;
 	RE::NiPoint3                             cameraOffset = { 50.0f, 0.0f, 0.0f };
 	RE::NiPoint3                             worldTranslate;

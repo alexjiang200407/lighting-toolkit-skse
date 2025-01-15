@@ -1,4 +1,5 @@
 #include "Chiaroscuro.h"
+#include "SKSE/SerializationControl.h"
 
 void InitializeLog()
 {
@@ -79,8 +80,11 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 		if (message->type == SKSE::MessagingInterface::kDataLoaded)
 		{
 			RE::ConsoleLog::GetSingleton()->Print("Chiaroscuro has been loaded");
+			SKSE::SerializationControl::GetSingleton()->Init();
 			Chiaroscuro::GetSingleton()->OnDataLoaded();
 		}
+		else if (message->type == SKSE::MessagingInterface::kPostLoadGame)
+			Chiaroscuro::GetSingleton()->OnSavePostLoaded();
 	});
 
 	return true;

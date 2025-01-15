@@ -18,19 +18,23 @@ namespace preset
 		};
 
 	public:
-		Color();
-		Color(PresetID a_id, RE::NiColor color);
-		Color(std::string name, RE::NiColor color);
+		Color(bool isCustom);
+		Color(RE::NiColor color, bool isCustom);
+		Color(PresetID a_id, RE::NiColor color, bool isCustom);
+		Color(std::string name, RE::NiColor color, bool isCustom);
 
 		operator RE::NiColor() const;
 
 	public:
 		RE::NiColor GetColor() const;
-		Color       Clone() const;
-		Color       Clone(std::string newName) const;
+		Color       Clone(bool isCustom) const;
+		Color       Clone(std::string newName, bool isCustom) const;
 		json        Serialize() const override;
 
 	public:
 		static constexpr PresetTID TID = PresetTID::kColor;
+
+	private:
+		bool isCustom;
 	};
 }

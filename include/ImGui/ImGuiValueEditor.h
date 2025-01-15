@@ -37,7 +37,7 @@ namespace ImGui
 			return tabChanged || valueChanged;
 		}
 
-		V* GetSelection()
+		V* GetSelection() const
 		{
 			if (auto* selectedTab = ImGuiNavBar<T, SZ>::GetSelected())
 				return selectedTab->GetSelection();

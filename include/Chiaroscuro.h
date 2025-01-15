@@ -1,20 +1,23 @@
 #pragma once
 #include "ImGui/ImGuiComponent.h"
 #include "LightEditor.h"
+#include "Lighting.h"
 #include "Preset/PresetDatabase.h"
 #include "Preset/PresetSerializationControl.h"
-#include "Lighting.h"
+#include "SKSE/SerializableCollection.h"
 
 class Chiaroscuro :
 	ImGui::ImGuiComponent,
 	public RE::BSTEventSink<RE::BGSActorCellEvent>,
-	public ImGui::ImGuiTabBar<Lighting>
+	public ImGui::ImGuiTabBar<Lighting>,
+	public SKSE::SerializableCollection
 {
 public:
-	void               Init();
-	void               OnDataLoaded();
-	void               DoFrame();
-	ImGuiStyle         Style();
+	void                Init();
+	void                OnDataLoaded();
+	void                OnSavePostLoaded();
+	void                DoFrame();
+	ImGuiStyle          Style();
 	static Chiaroscuro* GetSingleton();
 
 private:
@@ -31,6 +34,10 @@ private:
 	void                     DrawCameraControlWindow();
 	void                     DrawSceneControlWindow();
 	RE::BSEventNotifyControl ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>* a_eventSource) override;
+	void                     SerializeItems(SKSE::SerializationInterface* a_intfc) const override;
+	void                     DeserializeItems(SKSE::SerializationInterface* a_intfc) override;
+	void                     Revert(SKSE::SerializationInterface* a_intfc) override;
+	constexpr uint32_t       GetKey() override;
 
 private:
 	preset::PresetSerializationControl presetSerializationControl;
@@ -41,7 +48,8 @@ private:
 	bool                               previouslyFreezeTime              = false;
 	bool                               previouslyFreezeTimeLookingAround = false;
 	bool                               doProcess                         = false;
-	static Chiaroscuro                  singleton;
-	static constexpr ImGuiWindowFlags  windowFlags = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
-	bool                               hidden      = false;
+	static Chiaroscuro                 singleton;
+	static constexpr ImGuiWindowFlags  windowFlags      = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
+	bool                               hidden           = false;
+	static constexpr uint32_t          serializationKey = 'CHIA';
 };
