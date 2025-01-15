@@ -48,7 +48,14 @@ void SKSE::SerializationControl::Load(SerializationInterface* a_intfc)
 			continue;
 		if (const auto& it = singleton.serializables.find(type); it != singleton.serializables.end())
 		{
-			it->second->DeserializeItems(a_intfc);
+			try
+			{
+				it->second->DeserializeItems(a_intfc);
+			}
+			catch (const std::exception& e)
+			{
+				logger::error("Failed to deserialize, reason {}", e.what());
+			}
 		}
 	}
 }

@@ -34,9 +34,9 @@ private:
 	void                     DrawCameraControlWindow();
 	void                     DrawSceneControlWindow();
 	RE::BSEventNotifyControl ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>* a_eventSource) override;
-	void                     SerializeItems(SKSE::SerializationInterface* a_intfc) const override;
-	void                     DeserializeItems(SKSE::SerializationInterface* a_intfc) override;
-	void                     Revert(SKSE::SerializationInterface* a_intfc) override;
+	void                     SerializeItems(SKSE::CoSaveIO io) const override;
+	void                     DeserializeItems(SKSE::CoSaveIO io) override;
+	void                     Revert(SKSE::CoSaveIO io) override;
 	constexpr uint32_t       GetKey() override;
 
 private:

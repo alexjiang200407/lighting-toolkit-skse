@@ -3,6 +3,7 @@
 #include "LightingPreset.h"
 #include "Preset/PresetDatabase.h"
 #include "ImGui/ImGuiTabBar.h"
+#include "SKSE/CoSaveIO.h"
 
 class Lighting;
 typedef std::unique_ptr<Lighting> LightingPtr;
@@ -32,9 +33,9 @@ public:
 	static RE::NiPoint3     GetCameraLookingAt(float distanceFromCamera);
 	virtual RE::BSFadeNode* Attach3D();
 	virtual void            Init3D();
-	static LightingPtr      Deserialize(SKSE::SerializationInterface* a_intfc, preset::PresetDatabase* presetDB);
+	static LightingPtr      Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB);
 	void                    DrawCameraOffsetSlider();
-	void                    Serialize(SKSE::SerializationInterface* a_intfc) const;
+	void                    Serialize(SKSE::CoSaveIO io) const;
 
 private:
 	static RE::NiPoint3 GetCameraPosition();

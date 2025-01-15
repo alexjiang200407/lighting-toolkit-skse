@@ -15,30 +15,30 @@ ColorPalette::ColorPalette(preset::PresetDatabase* presetDB, preset::Color color
 {
 }
 
-void ColorPalette::Serialize(SKSE::SerializationInterface* a_intfc) const
+void ColorPalette::Serialize(SKSE::CoSaveIO io) const
 {
-	a_intfc->WriteRecordData(GetSelection()->GetSID());
-	a_intfc->WriteRecordData(static_cast<RE::NiColor>(*GetSelection()));
+	io.Write(GetSelection()->GetSID());
+	io.Write(static_cast<RE::NiColor>(*GetSelection()));
 
 	size_t strLen = GetSelection()->GetName().size();
-	a_intfc->WriteRecordData(strLen);
-	a_intfc->WriteRecordData(GetSelection()->GetName().c_str(), strLen);
+	io.Write(strLen);
+	io.Write(GetSelection()->GetName().c_str(), strLen);
 }
 
-preset::Color ColorPalette::Deserialize(SKSE::SerializationInterface* a_intfc, preset::PresetDatabase* presetDB)
+preset::Color ColorPalette::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB)
 {
 	preset::PresetSID       sid;
 	RE::NiColor             color;
 
-	a_intfc->ReadRecordData(sid);
+	io.Read(sid);
 	logger::info("{}", uuids::to_string(sid));
 
-	a_intfc->ReadRecordData(color);
+	io.Read(color);
 
 	size_t nameSz;
-	a_intfc->ReadRecordData(nameSz);
+	io.Read(nameSz);
 	auto buf = std::unique_ptr<char[]>(new char[nameSz]);
-	a_intfc->ReadRecordData(buf.get(), nameSz);
+	io.Read(buf.get(), nameSz);
 
 	if (const auto existing = presetDB->Find({ preset::Color::TID, sid, std::string(buf.get()) }); !presetDB->IsEnd(existing))
 	{

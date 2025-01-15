@@ -233,16 +233,17 @@ void Lighting::Init3D()
 	UpdateLightTemplate();
 }
 
-LightingPtr Lighting::Deserialize(SKSE::SerializationInterface* a_intfc, preset::PresetDatabase* presetDB)
+LightingPtr Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB)
 {
 	RE::FormID                               formID;
 	float                                    fade, radius;
 	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightCreateParams;
-	a_intfc->ReadRecordData(fade);
-	a_intfc->ReadRecordData(radius);
-	preset::Color color = ColorPalette::Deserialize(a_intfc, presetDB);
-	a_intfc->ReadRecordData(lightCreateParams);
-	a_intfc->ReadRecordData(formID);
+
+	io.Read(fade);
+	io.Read(radius);
+	preset::Color color = ColorPalette::Deserialize(io, presetDB);
+	io.Read(lightCreateParams);
+	io.Read(formID);
 
 	auto* tesForm = RE::TESObjectREFR::LookupByID(formID);
 
@@ -270,13 +271,13 @@ void Lighting::DrawCameraOffsetSlider()
 	}
 }
 
-void Lighting::Serialize(SKSE::SerializationInterface* a_intfc) const
+void Lighting::Serialize(SKSE::CoSaveIO io) const
 {
-	a_intfc->WriteRecordData(fade);
-	a_intfc->WriteRecordData(radius.x);
-	colorPalette.Serialize(a_intfc);
-	a_intfc->WriteRecordData(lightCreateParams);
-	a_intfc->WriteRecordData(ref->GetFormID());
+	io.Write(fade);
+	io.Write(radius.x);
+	colorPalette.Serialize(io);
+	io.Write(lightCreateParams);
+	io.Write(ref->GetFormID());
 }
 
 RE::NiPoint3 Lighting::GetCameraPosition()

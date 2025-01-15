@@ -302,29 +302,28 @@ RE::BSEventNotifyControl Chiaroscuro::ProcessEvent(const RE::BGSActorCellEvent* 
 	return RE::BSEventNotifyControl::kContinue;
 }
 
-void Chiaroscuro::SerializeItems(SKSE::SerializationInterface* a_intfc) const
+void Chiaroscuro::SerializeItems(SKSE::CoSaveIO io) const
 {
-	a_intfc->WriteRecordData(items.size());
+	io.Write(items.size());
 	for (const auto& light : items)
 	{
-		light->Serialize(a_intfc);
+		light->Serialize(io);
 	}
 }
 
-void Chiaroscuro::DeserializeItems(SKSE::SerializationInterface* a_intfc)
+void Chiaroscuro::DeserializeItems(SKSE::CoSaveIO io)
 {
 	size_t itemsCount;
-	if (!a_intfc->ReadRecordData(itemsCount))
-		return;
+	io.Read(itemsCount);
 
 	for (size_t i = 0; i < itemsCount; i++)
 	{
-		auto light = Lighting::Deserialize(a_intfc, &config);
+		auto light = Lighting::Deserialize(io, &config);
 		AddItem(std::move(light));
 	}
 }
 
-void Chiaroscuro::Revert(SKSE::SerializationInterface* a_intfc)
+void Chiaroscuro::Revert(SKSE::CoSaveIO)
 {
 	items.clear();
 }

@@ -19,4 +19,5 @@ set(SOURCES ${SOURCES}
 	src/ImGui/ImGuiTabBarAbstract.cpp
 	src/LightDesigner.cpp
 	src/SKSE/SerializationControl.cpp
+	src/SKSE/CoSaveIO.cpp
 )

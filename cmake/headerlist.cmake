@@ -27,4 +27,5 @@ set(HEADERS ${HEADERS}
 	include/LightDesigner.h
 	include/SKSE/SerializableCollection.h
 	include/SKSE/SerializationControl.h
+	include/SKSE/CoSaveIO.h
 )

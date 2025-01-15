@@ -3,6 +3,7 @@
 #include "ImGui/ImGuiPresetSelector.h"
 #include "ImGui/ImGuiValueEditor.h"
 #include "Preset/PresetDatabase.h"
+#include "SKSE/CoSaveIO.h"
 
 typedef ImGui::ImGuiSelector<preset::Color>                           ImGuiColorSelector;
 typedef ImGui::ImGuiPresetSelector<preset::Color>                     ImGuiColorPresetSelector;
@@ -16,6 +17,6 @@ public:
 	ColorPalette(preset::PresetDatabase* presetDB, preset::Color color);
 
 public:
-	void                 Serialize(SKSE::SerializationInterface* a_intfc) const;
-	static preset::Color Deserialize(SKSE::SerializationInterface* a_intfc, preset::PresetDatabase* presetDB);
+	void                 Serialize(SKSE::CoSaveIO io) const;
+	static preset::Color Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB);
 };
