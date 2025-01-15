@@ -84,9 +84,11 @@ void Lighting::MoveToCameraLookingAt(bool resetOffset)
 	if (GetCellID() != RE::PlayerCharacter::GetSingleton()->GetParentCell()->formID)
 	{
 		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
+		ref->SetParentCell(RE::PlayerCharacter::GetSingleton()->GetParentCell());
 		shadowSceneNode->RemoveLight(bsLight);
 		shadowSceneNode->RemoveLight(niLight.get());
 		Attach3D();
+		UpdateLightTemplate();
 	}
 	if (resetOffset)
 	{
@@ -214,13 +216,17 @@ RE::BSFadeNode* Lighting::Attach3D()
 		niLight->fade = fade;
 	}
 
+	if (hideLight)
+		niLight->SetAppCulled(true);
+	
+	if (hideMarker)
+		niRoot->GetObjectByName("Marker")->SetAppCulled(true);
+
 	return niRoot;
 }
 
 void Lighting::Init3D()
 {
-	hideLight  = false;
-	hideMarker = false;
 	Attach3D();
 	MoveTo(worldTranslate);
 	UpdateLightColor();
