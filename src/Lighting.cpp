@@ -10,14 +10,14 @@ Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::Preset
 {
 }
 
-Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset, float fade, float radius) :
+Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset, float fade, float radius, bool hideLight, bool hideMarker) :
 	ref(ref), colorPalette(presetDB), lightCreateParams(lightPreset), fade(fade), radius(radius, radius, radius), worldTranslate(ref->GetPosition())
 {
 }
 
-Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset, float fade, float radius):
+Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset, float fade, float radius, bool hideLight, bool hideMarker) :
 	ref(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset),
-	fade(fade), radius(radius, radius, radius), worldTranslate(ref->GetPosition())
+	fade(fade), radius(radius, radius, radius), worldTranslate(ref->GetPosition()), hideLight(hideLight), hideMarker(hideMarker)
 {
 }
 
@@ -107,6 +107,7 @@ void Lighting::MoveToCameraLookingAt(bool resetOffset)
 
 void Lighting::MoveTo(RE::NiPoint3 point)
 {
+	hideMarker     = false;
 	worldTranslate = point;
 	ref->SetPosition(worldTranslate);
 	niLight->world.translate = point;
@@ -238,7 +239,10 @@ LightingPtr Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* pre
 	RE::FormID                               formID;
 	float                                    fade, radius;
 	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightCreateParams;
+	bool                                     hideLight, hideMarker;
 
+	io.Read(hideLight);
+	io.Read(hideMarker);
 	io.Read(fade);
 	io.Read(radius);
 	preset::Color color = ColorPalette::Deserialize(io, presetDB);
@@ -255,7 +259,7 @@ LightingPtr Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* pre
 	if (!tesObjectREFR)
 		return LightingPtr();	
 
-	return std::make_unique<Lighting>(Lighting(tesObjectREFR->CreateRefHandle().get(), color, presetDB, lightCreateParams, fade, radius));
+	return std::make_unique<Lighting>(Lighting(tesObjectREFR->CreateRefHandle().get(), color, presetDB, lightCreateParams, fade, radius, hideLight, hideMarker));
 }
 
 void Lighting::DrawCameraOffsetSlider()
@@ -273,6 +277,8 @@ void Lighting::DrawCameraOffsetSlider()
 
 void Lighting::Serialize(SKSE::CoSaveIO io) const
 {
+	io.Write(hideLight);
+	io.Write(hideMarker);
 	io.Write(fade);
 	io.Write(radius.x);
 	colorPalette.Serialize(io);
