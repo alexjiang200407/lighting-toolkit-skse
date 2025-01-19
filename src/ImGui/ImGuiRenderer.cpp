@@ -1,4 +1,5 @@
 #include "ImGui/ImGuiRenderer.h"
+#include "ImGui/ImGuiInputAdapter.h"
 #include <dxgi.h>
 
 ImGui::ImGuiRenderer ImGui::ImGuiRenderer::singleton;
@@ -120,6 +121,7 @@ void ImGui::ImGuiRenderer::StopTimer::thunk(std::uint32_t timer)
 		}
 	}
 
+	ImGuiInputAdapter::GetSingleton()->DispatchImGuiInputEvents();
 	ImGui::NewFrame();
 	{
 		for (const auto& target : singleton.targets)

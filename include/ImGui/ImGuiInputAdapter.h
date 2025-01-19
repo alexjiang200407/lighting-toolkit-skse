@@ -27,6 +27,7 @@ namespace ImGui
 		void                      DisableSupression();
 		static ImGuiInputAdapter* GetSingleton();
 		bool                      IsSuppressingButtons();
+		void                      DispatchImGuiInputEvents();
 
 	private:
 		ImGuiInputAdapter() = default;
@@ -56,18 +57,20 @@ namespace ImGui
 		}
 
 		void HandleButtonEvent(RE::ButtonEvent* const event, InputList& list, InputList& removed);
-		void HandleKeyboardButtonEvent(uint32_t key, bool isPressed) const;
-		void HandleMouseButtonEvent(uint32_t key, float value, bool isPressed) const;
-		void HandleGamepadButtonEvent(uint32_t key, bool isPressed) const;
-		void HandleCharEvent(RE::CharEvent* const charEvt) const;
+		void HandleKeyboardButtonEvent(uint32_t key, bool isPressed);
+		void HandleMouseButtonEvent(uint32_t key, float value, bool isPressed);
+		void HandleGamepadButtonEvent(uint32_t key, bool isPressed);
+		void HandleCharEvent(RE::CharEvent* const charEvt);
 
 	private:
-		KeyboardSupressionMask   kbdSuppress          = 0;
-		MouseSupressionMask      mouseSuppress        = 0;
-		GamePadSupressionMask    gamepadSuppress      = 0;
-		bool                     blockCharEvents      = false;
-		bool                     blockMouseMoveEvents = false;
-		static ImGuiInputAdapter singleton;
+		KeyboardSupressionMask                  kbdSuppress          = 0;
+		MouseSupressionMask                     mouseSuppress        = 0;
+		GamePadSupressionMask                   gamepadSuppress      = 0;
+		bool                                    blockCharEvents      = false;
+		bool                                    blockMouseMoveEvents = false;
+		static ImGuiInputAdapter                singleton;
+		std::list<std::function<void(ImGuiIO)>> inputEvtCallbacks;
+		std::mutex                              inputEvtCallbacksLock;
 	};
 
 }
