@@ -13,11 +13,17 @@ namespace ImGui
 
 	template <
 		typename T,
-		typename TPtr = std::unique_ptr<T>,
-		typename It   = std::vector<TPtr>::iterator,
-		typename      = typename std::enable_if_t<std::is_base_of<ImGuiTabBarItemRemovable, T>::value>>
-	class ImGuiTabBar : public ImGuiTabBarAbstract<T, It>
+		typename TPtr  = std::unique_ptr<T>,
+		typename It    = std::vector<TPtr>::iterator,
+		typename CIt   = std::vector<TPtr>::const_iterator,
+		typename Valid = typename std::enable_if_t<std::is_base_of<ImGuiTabBarItemRemovable, T>::value>>
+	class ImGuiTabBar :
+		public ImGuiTabBarAbstract<T, It>
 	{
+	public:
+		typedef It  iterator;
+		typedef CIt const_iterator;
+
 	public:
 		ImGuiTabBar(const char* id) :
 			ImGuiTabBarAbstract<T, It>(id, (ImGuiTabBarFlags_AutoSelectNewTabs | ImGuiTabBarFlags_FittingPolicyScroll))
@@ -50,8 +56,10 @@ namespace ImGui
 			return ((activeProp && isNotRemoved) ? currentTab : nullptr);
 		}
 
-		It begin() { return items.begin(); }
-		It end() { return items.end(); };
+		It  begin() override { return items.begin(); }
+		CIt cbegin() const { return items.cbegin(); }
+		It  end() override { return items.end(); };
+		CIt cend() const { return items.cend(); }
 
 	protected:
 		std::vector<TPtr> items;

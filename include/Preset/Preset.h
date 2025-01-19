@@ -51,12 +51,10 @@ namespace preset
 			return PresetID();
 		}
 
-		explicit operator bool() const
-		{
-			return IsNull();
-		}
+		explicit operator bool() const;
 
 		PresetTID GetTID() const;
+		PresetSID GetSID() const;
 
 		bool IsNull() const;
 
@@ -86,6 +84,7 @@ namespace preset
 		std::string        GetSIDAsString() const;
 		PresetTID          GetTID() const;
 		PresetID           GetID() const;
+		PresetSID          GetSID() const;
 		const char*        GetSelectionName() const;
 		const char*        GetUniqueName() const;
 		std::string&       GetName();

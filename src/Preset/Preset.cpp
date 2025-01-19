@@ -32,6 +32,11 @@ PresetID Preset::GetID() const
 	return id;
 }
 
+PresetSID preset::Preset::GetSID() const
+{
+	return id.GetSID();
+}
+
 const char* Preset::GetSelectionName() const
 {
 	return GetName().c_str();
@@ -79,9 +84,19 @@ bool PresetID::operator<(const PresetTID& a_tid) const
 	return this->tid < a_tid;
 }
 
+preset::PresetID::operator bool() const
+{
+	return IsNull();
+}
+
 PresetTID PresetID::GetTID() const
 {
 	return tid;
+}
+
+PresetSID preset::PresetID::GetSID() const
+{
+	return sid;
 }
 
 bool PresetID::IsNull() const

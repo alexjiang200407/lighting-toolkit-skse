@@ -1,14 +1,23 @@
 #include "Lighting.h"
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
-	ref(ref), colorPalette(presetDB), lightCreateParams(lightPreset),
-	fade(lightPreset.intensity), radius(lightPreset.radius, lightPreset.radius, lightPreset.radius), worldTranslate(ref->GetPosition())
+	Lighting(ref, presetDB, lightPreset, lightPreset.intensity, lightPreset.radius)
 {
 }
 
 Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
+	Lighting(ref, color, presetDB, lightPreset, lightPreset.intensity, lightPreset.radius)
+{
+}
+
+Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset, float fade, float radius, bool hideLight, bool hideMarker) :
+	ref(ref), colorPalette(presetDB), lightCreateParams(lightPreset), fade(fade), radius(radius, radius, radius), worldTranslate(ref->GetPosition())
+{
+}
+
+Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset, float fade, float radius, bool hideLight, bool hideMarker) :
 	ref(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset),
-	fade(lightPreset.intensity), radius(lightPreset.radius, lightPreset.radius, lightPreset.radius), worldTranslate(ref->GetPosition())
+	fade(fade), radius(radius, radius, radius), worldTranslate(ref->GetPosition()), hideLight(hideLight), hideMarker(hideMarker)
 {
 }
 
@@ -75,9 +84,11 @@ void Lighting::MoveToCameraLookingAt(bool resetOffset)
 	if (GetCellID() != RE::PlayerCharacter::GetSingleton()->GetParentCell()->formID)
 	{
 		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
+		ref->SetParentCell(RE::PlayerCharacter::GetSingleton()->GetParentCell());
 		shadowSceneNode->RemoveLight(bsLight);
 		shadowSceneNode->RemoveLight(niLight.get());
 		Attach3D();
+		UpdateLightTemplate();
 	}
 	if (resetOffset)
 	{
@@ -96,9 +107,10 @@ void Lighting::MoveToCameraLookingAt(bool resetOffset)
 
 void Lighting::MoveTo(RE::NiPoint3 point)
 {
+	hideMarker     = false;
 	worldTranslate = point;
 	ref->SetPosition(worldTranslate);
-	niLight->world.translate = point + offset;
+	niLight->world.translate = point;
 }
 
 void Lighting::MoveToCurrentPosition()
@@ -145,7 +157,7 @@ void Lighting::Remove()
 		shadowSceneNode->RemoveLight(bsLight);
 
 	shadowSceneNode->allowLightRemoveQueues = true;
-	
+
 	niLight->SetAppCulled(true);
 	ref->Disable();
 	ref->SetDelete(true);
@@ -197,7 +209,6 @@ RE::BSFadeNode* Lighting::Attach3D()
 		niLight.reset(RE::NiPointLight::Create());
 		niLight->name = "ChiaroscuroLight";
 		RE::AttachNode(niNode, niLight.get());
-		offset = niNode->local.translate;
 
 		// TODO put these into a settings class
 		niLight->ambient = RE::NiColor();
@@ -206,17 +217,49 @@ RE::BSFadeNode* Lighting::Attach3D()
 		niLight->fade = fade;
 	}
 
+	if (hideLight)
+		niLight->SetAppCulled(true);
+	
+	if (hideMarker)
+		niRoot->GetObjectByName("Marker")->SetAppCulled(true);
+
 	return niRoot;
 }
 
 void Lighting::Init3D()
 {
-	hideLight = false;
-	hideMarker = false;
 	Attach3D();
 	MoveTo(worldTranslate);
 	UpdateLightColor();
 	UpdateLightTemplate();
+}
+
+LightingPtr Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB)
+{
+	RE::FormID                               formID;
+	float                                    fade, radius;
+	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightCreateParams;
+	bool                                     hideLight, hideMarker;
+
+	io.Read(hideLight);
+	io.Read(hideMarker);
+	io.Read(fade);
+	io.Read(radius);
+	preset::Color color = ColorPalette::Deserialize(io, presetDB);
+	io.Read(lightCreateParams);
+	io.Read(formID);
+
+	auto* tesForm = RE::TESObjectREFR::LookupByID(formID);
+
+	if (!tesForm)
+		return LightingPtr();
+
+	auto* tesObjectREFR = tesForm->As<RE::TESObjectREFR>();
+
+	if (!tesObjectREFR)
+		return LightingPtr();	
+
+	return std::make_unique<Lighting>(Lighting(tesObjectREFR->CreateRefHandle().get(), color, presetDB, lightCreateParams, fade, radius, hideLight, hideMarker));
 }
 
 void Lighting::DrawCameraOffsetSlider()
@@ -230,6 +273,17 @@ void Lighting::DrawCameraOffsetSlider()
 	{
 		MoveToCameraLookingAt();
 	}
+}
+
+void Lighting::Serialize(SKSE::CoSaveIO io) const
+{
+	io.Write(hideLight);
+	io.Write(hideMarker);
+	io.Write(fade);
+	io.Write(radius.x);
+	colorPalette.Serialize(io);
+	io.Write(lightCreateParams);
+	io.Write(ref->GetFormID());
 }
 
 RE::NiPoint3 Lighting::GetCameraPosition()

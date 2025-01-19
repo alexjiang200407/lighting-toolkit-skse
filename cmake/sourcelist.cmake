@@ -18,4 +18,6 @@ set(SOURCES ${SOURCES}
 	src/ColorDesigner.cpp
 	src/ImGui/ImGuiTabBarAbstract.cpp
 	src/LightDesigner.cpp
+	src/SKSE/SerializationControl.cpp
+	src/SKSE/CoSaveIO.cpp
 )

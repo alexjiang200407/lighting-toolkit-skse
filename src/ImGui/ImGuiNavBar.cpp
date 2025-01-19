@@ -7,7 +7,13 @@ ImGui::ImGuiNavBarItem::ImGuiNavBarItem(const char* label) :
 
 bool ImGui::ImGuiNavBarItem::DrawTabItem()
 {
-	if (ImGui::BeginTabItem(label.c_str()))
+	ImGuiTabItemFlags flags = 0;
+	if (setActive)
+	{
+		flags |= ImGuiTabItemFlags_SetSelected;
+		setActive = false;
+	}
+	if (ImGui::BeginTabItem(label.c_str(), nullptr, flags))
 	{
 		ImGui::EndTabItem();
 		return true;

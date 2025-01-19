@@ -8,6 +8,7 @@ class ColorDesigner :
 {
 public:
 	ColorDesigner(preset::PresetDatabase* presetDB);
+	ColorDesigner(preset::PresetDatabase* presetDB, preset::Color color);
 
 public:
 	bool DrawValueEditor() override;

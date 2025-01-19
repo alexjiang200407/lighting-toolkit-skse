@@ -9,3 +9,8 @@ ImGui::TabID ImGui::ImGuiTabBarItem::GetTabID() const
 {
 	return id;
 }
+
+void ImGui::ImGuiTabBarItem::SetActive()
+{
+	setActive = true;
+}
