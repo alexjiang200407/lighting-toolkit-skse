@@ -41,8 +41,14 @@ RE::ShadowSceneNode::LIGHT_CREATE_PARAMS LightingPreset::ToLightCreateParams() c
 
 json preset::LightingPreset::Serialize() const
 {
-	json buf     = Preset::Serialize();
-	buf["flags"] = flags.underlying();
+	json buf            = Preset::Serialize();
+	buf["flags"]        = flags.underlying();
+	buf["intensity"]    = intensity;
+	buf["radius"]       = radius;
+	buf["fov"]          = fov;
+	buf["depthBias"]    = depthBias;
+	buf["falloff"]      = falloff;
+	buf["nearDistance"] = nearDistance;
 	return buf;
 }
 
@@ -66,7 +72,10 @@ PresetPtr LightingPreset::Deserializer::operator()(PresetID a_id, json json) con
 	for (auto key : requiredKeys)
 	{
 		if (!json.contains(key))
+		{
+			logger::error("field {} missing", key);
 			throw std::runtime_error("LightingPreset has incorrect fields!!");
+		}
 	}
 
 	uint32_t lightFlags = json["flags"];
