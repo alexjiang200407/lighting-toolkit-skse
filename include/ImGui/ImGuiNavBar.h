@@ -23,11 +23,11 @@ namespace ImGui
 		typename T,
 		size_t SZ,
 		typename TPtr = typename std::unique_ptr<T>,
-		typename It   = typename std::array<TPtr, SZ>::iterator,
-		typename      = typename std::enable_if_t<std::is_base_of<ImGuiNavBarItem, T>::value>>
+		typename It   = typename std::array<TPtr, SZ>::iterator>
 	class ImGuiNavBar :
 		private ImGuiTabBarAbstract<T, It>
 	{
+		ASSERT_BASE(T, ImGuiNavBarItem);
 		static_assert(SZ >= 1);
 	public:
 		ImGuiNavBar(const char* id, std::array<T*, SZ> nav) :

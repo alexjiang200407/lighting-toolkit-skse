@@ -15,11 +15,11 @@ namespace ImGui
 		typename T,
 		typename TPtr  = std::unique_ptr<T>,
 		typename It    = std::vector<TPtr>::iterator,
-		typename CIt   = std::vector<TPtr>::const_iterator,
-		typename Valid = typename std::enable_if_t<std::is_base_of<ImGuiTabBarItemRemovable, T>::value>>
+		typename CIt   = std::vector<TPtr>::const_iterator>
 	class ImGuiTabBar :
 		public ImGuiTabBarAbstract<T, It>
 	{
+		ASSERT_BASE(T, ImGuiTabBarItemRemovable);
 	public:
 		typedef It  iterator;
 		typedef CIt const_iterator;

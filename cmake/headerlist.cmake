@@ -1,7 +1,7 @@
 set(HEADERS ${HEADERS}
 	include/PCH.h
 	include/ImGui/ImGuiRenderer.h
-	include/ImGui/ImGuiComponent.h
+	include/ImGui/ImGuiRenderTarget.h
 	include/ImGui/ImGuiInputAdapter.h
 	include/ImGui/ImGuiTabBar.h
 	include/ImGui/ImGuiTabBarAbstract.h
@@ -17,7 +17,7 @@ set(HEADERS ${HEADERS}
 	include/ImGui/ImGuiNavBar.h
 	include/Preset/Preset.h
 	include/Color.h
-	include/uuid.h
+	include/common/uuid.h
 	include/MyEnumSet.h
 	include/ImGui/ImGuiValueEditor.h
 	include/ColorPalette.h
@@ -28,4 +28,5 @@ set(HEADERS ${HEADERS}
 	include/SKSE/SerializableCollection.h
 	include/SKSE/SerializationControl.h
 	include/SKSE/CoSaveIO.h
+	include/common/util.h
 )

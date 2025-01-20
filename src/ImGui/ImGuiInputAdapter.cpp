@@ -58,7 +58,6 @@ void ImGui::ImGuiInputAdapter::Init()
 
 ImGuiKey ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32KeyboardDevice::Key key)
 {
-	ImGuiKey_Tab;
 	using KEY = RE::BSWin32KeyboardDevice::Key;
 	switch (key)
 	{
@@ -344,42 +343,47 @@ void ImGui::ImGuiInputAdapter::HandleButtonEvent(RE::ButtonEvent* const buttonEv
 	}
 }
 
-void ImGui::ImGuiInputAdapter::HandleKeyboardButtonEvent(uint32_t key, bool isPressed) const
+void ImGui::ImGuiInputAdapter::HandleKeyboardButtonEvent(uint32_t key, bool isPressed)
 {
-	auto& io       = ImGui::GetIO();
-	auto  imguiKey = ToImGuiKey(static_cast<RE::BSWin32KeyboardDevice::Key>(key));
+	std::lock_guard guard{ inputEvtCallbacksLock };
+	auto            imguiKey = ToImGuiKey(static_cast<RE::BSWin32KeyboardDevice::Key>(key));
 	if (imguiKey != ImGuiKey_None)
-		io.AddKeyEvent(imguiKey, isPressed);
+		inputEvtCallbacks.push_back([=](auto io) { io.AddKeyEvent(imguiKey, isPressed); });
 }
 
-void ImGui::ImGuiInputAdapter::HandleMouseButtonEvent(uint32_t key, float value, bool isPressed) const
+void ImGui::ImGuiInputAdapter::HandleMouseButtonEvent(uint32_t key, float value, bool isPressed)
 {
 	using MouseKey = RE::BSWin32MouseDevice::Key;
+	std::lock_guard guard{ inputEvtCallbacksLock };
 
-	auto& io = ImGui::GetIO();
 	if (key >= MouseKey::kWheelUp)
 	{
-		io.AddMouseWheelEvent(0, value * (key == MouseKey::kWheelUp ? 1 : -1));
+		inputEvtCallbacks.push_back([=](auto io) {
+			io.AddMouseWheelEvent(0, value * (key == MouseKey::kWheelUp ? 1 : -1));
+		});
 		return;
 	}
 
 	if (key > MouseKey::kButton5)
 		key = ImGuiMouseButton_::ImGuiMouseButton_COUNT;
-	io.AddMouseButtonEvent(key, isPressed);
+
+	inputEvtCallbacks.push_back([=](auto io) {
+		io.AddMouseButtonEvent(key, isPressed);
+	});
 }
 
-void ImGui::ImGuiInputAdapter::HandleGamepadButtonEvent(uint32_t key, bool isPressed) const
+void ImGui::ImGuiInputAdapter::HandleGamepadButtonEvent(uint32_t key, bool isPressed)
 {
-	auto& io       = ImGui::GetIO();
-	auto  imguiKey = ToImGuiKey(static_cast<RE::BSWin32GamepadDevice::Key>(key));
+	std::lock_guard guard{ inputEvtCallbacksLock };
+	auto            imguiKey = ToImGuiKey(static_cast<RE::BSWin32GamepadDevice::Key>(key));
 	if (imguiKey != ImGuiKey_None)
-		io.AddKeyEvent(imguiKey, isPressed);
+		inputEvtCallbacks.push_back([=](auto io) { io.AddKeyEvent(imguiKey, isPressed); });
 }
 
-void ImGui::ImGuiInputAdapter::HandleCharEvent(RE::CharEvent* const charEvt) const
+void ImGui::ImGuiInputAdapter::HandleCharEvent(RE::CharEvent* const charEvt)
 {
-	auto& io = ImGui::GetIO();
-	io.AddInputCharacter(charEvt->keycode);
+	std::lock_guard guard{ inputEvtCallbacksLock };
+	inputEvtCallbacks.push_back([=](auto io) { io.AddInputCharacter(charEvt->keycode); });
 }
 
 void ImGui::ImGuiInputAdapter::EnableSupression(KeyboardSupressionMask kbd, MouseSupressionMask mouse, GamePadSupressionMask gamepad, bool suppressChar, bool suppressMouseMove)
@@ -429,4 +433,16 @@ ImGui::ImGuiInputAdapter* ImGui::ImGuiInputAdapter::GetSingleton()
 bool ImGui::ImGuiInputAdapter::IsSuppressingButtons()
 {
 	return !(kbdSuppress == 0 && mouseSuppress == 0 && gamepadSuppress == 0);
+}
+
+void ImGui::ImGuiInputAdapter::DispatchImGuiInputEvents()
+{
+	std::lock_guard guard{ inputEvtCallbacksLock };
+	auto&           io = GetIO();
+
+	while (!inputEvtCallbacks.empty())
+	{
+		inputEvtCallbacks.front()(io);
+		inputEvtCallbacks.pop_front();
+	}
 }

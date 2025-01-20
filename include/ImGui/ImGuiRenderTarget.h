@@ -2,7 +2,7 @@
 
 namespace ImGui
 {
-	class ImGuiComponent
+	class ImGuiRenderTarget
 	{
 	public:
 		virtual void DoFrame() = 0;
