@@ -29,7 +29,6 @@ private:
 	bool                     CanOpenWindow();
 	bool                     ShouldDrawCursor() override;
 	static float*            GetCameraMoveSpeed();
-	void                     SuppressDXInput();
 	void                     UpdateLookingAround();
 	void                     DrawPropControlWindow();
 	void                     DrawCameraControlWindow();

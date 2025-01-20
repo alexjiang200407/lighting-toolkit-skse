@@ -102,7 +102,6 @@ void Chiaroscuro::ToggleMenu()
 		}
 
 		RE::PlaySound("UIMenuOK");
-		//SuppressDXInput();
 		inputCtx.MenuOpen();
 		previouslyInFreeCameraMode = RE::PlayerCamera::GetSingleton()->IsInFreeCameraMode();
 		if (!previouslyInFreeCameraMode)
@@ -117,7 +116,6 @@ void Chiaroscuro::ToggleMenu()
 	else
 	{
 		RE::PlaySound("UIMenuCancel");
-		//ImGui::ImGuiInputAdapter::GetSingleton()->DisableSupression();
 		inputCtx.MenuClose();
 		RE::UI::GetSingleton()->ShowMenus(true);
 		RE::Main::GetSingleton()->freezeTime = previouslyFreezeTime;
@@ -176,32 +174,6 @@ bool Chiaroscuro::ShouldDrawCursor()
 float* Chiaroscuro::GetCameraMoveSpeed()
 {
 	return REL::Relocation<float*>{ RELOCATION_ID(509808, 382522) }.get();
-}
-
-void Chiaroscuro::SuppressDXInput()
-{
-	using INPUT_CONTEXT = RE::UserEvents::INPUT_CONTEXT_IDS;
-	ImGui::ImGuiInputAdapter::KeyboardSupressionMask kbd;
-	ImGui::ImGuiInputAdapter::MouseSupressionMask    mouse;
-	ImGui::ImGuiInputAdapter::GamePadSupressionMask  gamepad;
-
-	const auto* controlMap = RE::ControlMap::GetSingleton();
-	kbd.set();
-
-	kbd.flip(controlMap->GetMappedKey("Forward", RE::INPUT_DEVICE::kKeyboard, INPUT_CONTEXT::kGameplay));
-	kbd.flip(controlMap->GetMappedKey("Back", RE::INPUT_DEVICE::kKeyboard, INPUT_CONTEXT::kGameplay));
-	kbd.flip(controlMap->GetMappedKey("Strafe Left", RE::INPUT_DEVICE::kKeyboard, INPUT_CONTEXT::kGameplay));
-	kbd.flip(controlMap->GetMappedKey("Strafe Right", RE::INPUT_DEVICE::kKeyboard, INPUT_CONTEXT::kGameplay));
-
-	mouse.set();
-
-	gamepad.set();
-	gamepad.flip(controlMap->GetMappedKey("Forward", RE::INPUT_DEVICE::kGamepad, INPUT_CONTEXT::kGameplay));
-	gamepad.flip(controlMap->GetMappedKey("Back", RE::INPUT_DEVICE::kGamepad, INPUT_CONTEXT::kGameplay));
-	gamepad.flip(controlMap->GetMappedKey("Strafe Left", RE::INPUT_DEVICE::kGamepad, INPUT_CONTEXT::kGameplay));
-	gamepad.flip(controlMap->GetMappedKey("Strafe Right", RE::INPUT_DEVICE::kGamepad, INPUT_CONTEXT::kGameplay));
-
-	ImGui::ImGuiInputAdapter::GetSingleton()->EnableSupression(kbd, mouse, gamepad, true, true);
 }
 
 void Chiaroscuro::UpdateLookingAround()

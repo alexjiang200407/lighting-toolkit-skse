@@ -11,42 +11,7 @@ void ImGui::ImGuiInputAdapter::SendInputEvent::thunk(RE::BSTEventSource<RE::Inpu
 		return;
 	}
 
-	InputList list{ nullptr, nullptr };
-	InputList removed{ nullptr, nullptr };
-
-	RE::InputEvent* nxt = nullptr;
-	for (auto* event = *ppEvents; event; event = nxt)
-	{
-		nxt          = event->next;
-		bool handled = false;
-		if (const auto buttonEvt = event->AsButtonEvent())
-		{
-			singleton.HandleButtonEvent(buttonEvt, list, removed);
-			handled = true;
-		}
-		if (const auto charEvt = event->AsCharEvent())
-		{
-			singleton.HandleCharEvent(charEvt);
-			if (!singleton.blockCharEvents)
-				AddToInputList(list, charEvt);
-			else
-				AddToInputList(removed, charEvt);
-			handled = true;
-		}
-		if (const auto mouseMoveEvt = event->AsMouseMoveEvent())
-		{
-			if (!singleton.blockMouseMoveEvents)
-				AddToInputList(list, mouseMoveEvt);
-			else
-				AddToInputList(removed, mouseMoveEvt);
-			handled = true;
-		}
-
-		if (!handled)
-			AddToInputList(list, event);
-	}
-
-	*ppEvents = list.first;
+	singleton.Adapt(dispatcher, ppEvents);
 	func(dispatcher, ppEvents);
 }
 
@@ -319,20 +284,20 @@ void ImGui::ImGuiInputAdapter::HandleButtonEvent(RE::ButtonEvent* const buttonEv
 	case RE::INPUT_DEVICE::kKeyboard:
 	case RE::INPUT_DEVICE::kVirtualKeyboard:
 		{
-			singleton.HandleKeyboardButtonEvent(buttonEvt->GetIDCode(), buttonEvt->IsPressed());
-			UpdateInputList(singleton.kbdSuppress, list, removed, buttonEvt);
+			HandleKeyboardButtonEvent(buttonEvt->GetIDCode(), buttonEvt->IsPressed());
+			UpdateInputList(filter.kbdSuppress, list, removed, buttonEvt);
 		}
 		break;
 	case RE::INPUT_DEVICE::kMouse:
 		{
-			singleton.HandleMouseButtonEvent(buttonEvt->GetIDCode(), buttonEvt->Value(), buttonEvt->IsPressed());
-			UpdateInputList(singleton.mouseSuppress, list, removed, buttonEvt);
+			HandleMouseButtonEvent(buttonEvt->GetIDCode(), buttonEvt->Value(), buttonEvt->IsPressed());
+			UpdateInputList(filter.mouseSuppress, list, removed, buttonEvt);
 		}
 		break;
 	case RE::INPUT_DEVICE::kGamepad:
 		{
-			singleton.HandleGamepadButtonEvent(buttonEvt->GetIDCode(), buttonEvt->IsPressed());
-			UpdateInputList(singleton.gamepadSuppress, list, removed, buttonEvt);
+			HandleGamepadButtonEvent(buttonEvt->GetIDCode(), buttonEvt->IsPressed());
+			UpdateInputList(filter.gamepadSuppress, list, removed, buttonEvt);
 		}
 		break;
 	default:
@@ -386,48 +351,14 @@ void ImGui::ImGuiInputAdapter::HandleCharEvent(RE::CharEvent* const charEvt)
 	inputEvtCallbacks.push_back([=](auto io) { io.AddInputCharacter(charEvt->keycode); });
 }
 
-void ImGui::ImGuiInputAdapter::EnableSupression(KeyboardSupressionMask kbd, MouseSupressionMask mouse, GamePadSupressionMask gamepad, bool suppressChar, bool suppressMouseMove)
-{
-	kbdSuppress          = kbd;
-	mouseSuppress        = mouse;
-	gamepadSuppress      = gamepad;
-	blockCharEvents      = suppressChar;
-	blockMouseMoveEvents = suppressMouseMove;
-}
-
 void ImGui::ImGuiInputAdapter::EnableSupression(Input::InputFilter filter)
 {
-	EnableSupression(filter.kbdSuppress, filter.mouseSuppress, filter.gamepadSuppress, filter.blockCharEvents, filter.blockMouseMoveEvents);
-}
-
-void ImGui::ImGuiInputAdapter::SetSuppressKbd(KeyboardSupressionMask kbd)
-{
-	kbdSuppress = kbd;
-}
-
-void ImGui::ImGuiInputAdapter::SetSuppressMouse(MouseSupressionMask mouse)
-{
-	mouseSuppress = mouse;
-}
-
-void ImGui::ImGuiInputAdapter::SetSuppressGamepad(GamePadSupressionMask gamepad)
-{
-	gamepadSuppress = gamepad;
-}
-
-void ImGui::ImGuiInputAdapter::SetSuppressMouseMove(bool suppress)
-{
-	blockMouseMoveEvents = suppress;
-}
-
-void ImGui::ImGuiInputAdapter::SetSuppressChar(bool suppress)
-{
-	blockCharEvents = suppress;
+	this->filter = filter;
 }
 
 void ImGui::ImGuiInputAdapter::DisableSupression()
 {
-	kbdSuppress = mouseSuppress = gamepadSuppress = blockMouseMoveEvents = blockCharEvents = 0;
+	memset(&filter, 0, sizeof(filter));
 }
 
 ImGui::ImGuiInputAdapter* ImGui::ImGuiInputAdapter::GetSingleton()
@@ -437,7 +368,7 @@ ImGui::ImGuiInputAdapter* ImGui::ImGuiInputAdapter::GetSingleton()
 
 bool ImGui::ImGuiInputAdapter::IsSuppressingButtons()
 {
-	return !(kbdSuppress == 0 && mouseSuppress == 0 && gamepadSuppress == 0);
+	return !(filter.kbdSuppress == 0 && filter.mouseSuppress == 0 && filter.gamepadSuppress == 0);
 }
 
 void ImGui::ImGuiInputAdapter::DispatchImGuiInputEvents()
@@ -450,4 +381,44 @@ void ImGui::ImGuiInputAdapter::DispatchImGuiInputEvents()
 		inputEvtCallbacks.front()(io);
 		inputEvtCallbacks.pop_front();
 	}
+}
+
+void ImGui::ImGuiInputAdapter::Adapt(RE::BSTEventSource<RE::InputEvent*>* dispatcher, RE::InputEvent** ppEvents)
+{
+	InputList list{ nullptr, nullptr };
+	InputList removed{ nullptr, nullptr };
+
+	RE::InputEvent* nxt = nullptr;
+	for (auto* event = *ppEvents; event; event = nxt)
+	{
+		nxt          = event->next;
+		bool handled = false;
+		if (const auto buttonEvt = event->AsButtonEvent())
+		{
+			HandleButtonEvent(buttonEvt, list, removed);
+			handled = true;
+		}
+		if (const auto charEvt = event->AsCharEvent())
+		{
+			HandleCharEvent(charEvt);
+			if (!filter.blockCharEvents)
+				AddToInputList(list, charEvt);
+			else
+				AddToInputList(removed, charEvt);
+			handled = true;
+		}
+		if (const auto mouseMoveEvt = event->AsMouseMoveEvent())
+		{
+			if (!filter.blockMouseMoveEvents)
+				AddToInputList(list, mouseMoveEvt);
+			else
+				AddToInputList(removed, mouseMoveEvt);
+			handled = true;
+		}
+
+		if (!handled)
+			AddToInputList(list, event);
+	}
+
+	*ppEvents = list.first;
 }

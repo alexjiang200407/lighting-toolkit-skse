@@ -19,17 +19,12 @@ namespace ImGui
 
 	public:
 		void                      Init();
-		void                      EnableSupression(KeyboardSupressionMask kbd, MouseSupressionMask mouse, GamePadSupressionMask gamepad, bool suppressChar, bool suppressMouseMove);
 		void                      EnableSupression(Input::InputFilter filter);
-		void                      SetSuppressKbd(KeyboardSupressionMask kbd);
-		void                      SetSuppressMouse(MouseSupressionMask mouse);
-		void                      SetSuppressGamepad(GamePadSupressionMask mouse);
-		void                      SetSuppressMouseMove(bool suppress);
-		void                      SetSuppressChar(bool suppress);
 		void                      DisableSupression();
 		static ImGuiInputAdapter* GetSingleton();
 		bool                      IsSuppressingButtons();
 		void                      DispatchImGuiInputEvents();
+		void                      Adapt(RE::BSTEventSource<RE::InputEvent*>* dispatcher, RE::InputEvent** ppEvents);
 
 	private:
 		ImGuiInputAdapter() = default;
@@ -65,15 +60,10 @@ namespace ImGui
 		void HandleCharEvent(RE::CharEvent* const charEvt);
 
 	private:
-		Input::InputFilter                      filter;
-		KeyboardSupressionMask                  kbdSuppress          = 0;
-		MouseSupressionMask                     mouseSuppress        = 0;
-		GamePadSupressionMask                   gamepadSuppress      = 0;
-		bool                                    blockCharEvents      = false;
-		bool                                    blockMouseMoveEvents = false;
-		static ImGuiInputAdapter                singleton;
-		std::list<std::function<void(ImGuiIO)>> inputEvtCallbacks;
-		std::mutex                              inputEvtCallbacksLock;
+		Input::InputFilter                       filter;
+		static ImGuiInputAdapter                 singleton;
+		std::list<std::function<void(ImGuiIO&)>> inputEvtCallbacks;
+		std::mutex                               inputEvtCallbacksLock;
 	};
 
 }
