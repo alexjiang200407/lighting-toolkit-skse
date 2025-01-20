@@ -6,12 +6,11 @@
 
 namespace ImGui
 {
-	template <
-		typename T,
-		typename std::enable_if<std::is_base_of<preset::Preset, T>::value>::type* = nullptr>
+	template <typename T>
 	class ImGuiPresetSelector :
 		public ImGuiSelector<T>
 	{
+		ASSERT_BASE(T, preset::Preset);
 	public:
 		ImGuiPresetSelector(const char* selectionID, preset::PresetDatabase* presetDB) :
 			ImGuiSelector<T>(selectionID), presetDB(presetDB){};

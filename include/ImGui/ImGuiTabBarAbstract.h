@@ -12,17 +12,17 @@ namespace ImGui
 		void  SetActive();
 
 	protected:
-		bool  setActive = false;
+		bool setActive = false;
+
 	private:
 		TabID id = uuids::uuid_system_generator{}();
 	};
 
-	template <
-		typename T,
-		typename It,
-		typename = typename std::enable_if_t<std::is_base_of<ImGuiTabBarItem, T>::value>>
+	template <class T, typename It>
 	class ImGuiTabBarAbstract
 	{
+		ASSERT_BASE(T, ImGuiTabBarItem);
+
 	public:
 		ImGuiTabBarAbstract(const char* id, ImGuiTabBarFlags flags) :
 			tabBarID(id), flags(flags)

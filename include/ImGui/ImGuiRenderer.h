@@ -39,10 +39,10 @@ namespace ImGui
 		static ImGuiRenderer* GetSingleton();
 
 	private:
-		ImGuiStyle                style;
+		ImGuiStyle                   style;
 		std::set<ImGuiRenderTarget*> targets;
-		std::atomic<bool>         installedHooks;
-		std::string               iniFile = fmt::format("./Data/SKSE/Plugins/{}ImGui.ini", Version::PROJECT);
-		static ImGuiRenderer      singleton;
+		std::atomic<bool>            installedHooks;
+		std::string                  iniFile = fmt::format("./Data/SKSE/Plugins/{}ImGui.ini", Version::PROJECT);
+		static ImGuiRenderer         singleton;
 	};
 }
