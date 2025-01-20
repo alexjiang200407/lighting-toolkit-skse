@@ -1,8 +1,8 @@
-#include "ImGui/ImGuiComponent.h"
+#include "ImGui/ImGuiRenderTarget.h"
 
-bool ImGui::ImGuiComponent::ShouldSkip() { return false; }
+bool ImGui::ImGuiRenderTarget::ShouldSkip() { return false; }
 
-bool ImGui::ImGuiComponent::ShouldDrawCursor()
+bool ImGui::ImGuiRenderTarget::ShouldDrawCursor()
 {
 	return false;
 }

@@ -148,12 +148,12 @@ void ImGui::ImGuiRenderer::Init(ImGuiStyle a_style)
 	style = a_style;
 }
 
-void ImGui::ImGuiRenderer::RegisterRenderTarget(ImGuiComponent* target)
+void ImGui::ImGuiRenderer::RegisterRenderTarget(ImGuiRenderTarget* target)
 {
 	targets.insert(target);
 }
 
-void ImGui::ImGuiRenderer::UnregisterRenderTarget(ImGuiComponent* target)
+void ImGui::ImGuiRenderer::UnregisterRenderTarget(ImGuiRenderTarget* target)
 {
 	targets.erase(target);
 }

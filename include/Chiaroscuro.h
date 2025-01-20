@@ -1,5 +1,5 @@
 #pragma once
-#include "ImGui/ImGuiComponent.h"
+#include "ImGui/ImGuiRenderTarget.h"
 #include "LightEditor.h"
 #include "Lighting.h"
 #include "Preset/PresetDatabase.h"
@@ -7,7 +7,7 @@
 #include "SKSE/SerializableCollection.h"
 
 class Chiaroscuro :
-	ImGui::ImGuiComponent,
+	ImGui::ImGuiRenderTarget,
 	public RE::BSTEventSink<RE::BGSActorCellEvent>,
 	public ImGui::ImGuiTabBar<Lighting>,
 	public SKSE::SerializableCollection

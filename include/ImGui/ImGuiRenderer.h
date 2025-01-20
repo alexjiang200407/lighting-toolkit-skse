@@ -1,5 +1,5 @@
 #pragma once
-#include "ImGuiComponent.h"
+#include "ImGuiRenderTarget.h"
 #include <fmt/compile.h>
 
 namespace ImGui
@@ -34,13 +34,13 @@ namespace ImGui
 
 	public:
 		void                  Init(ImGuiStyle a_style);
-		void                  RegisterRenderTarget(ImGuiComponent* target);
-		void                  UnregisterRenderTarget(ImGuiComponent* target);
+		void                  RegisterRenderTarget(ImGuiRenderTarget* target);
+		void                  UnregisterRenderTarget(ImGuiRenderTarget* target);
 		static ImGuiRenderer* GetSingleton();
 
 	private:
 		ImGuiStyle                style;
-		std::set<ImGuiComponent*> targets;
+		std::set<ImGuiRenderTarget*> targets;
 		std::atomic<bool>         installedHooks;
 		std::string               iniFile = fmt::format("./Data/SKSE/Plugins/{}ImGui.ini", Version::PROJECT);
 		static ImGuiRenderer      singleton;
