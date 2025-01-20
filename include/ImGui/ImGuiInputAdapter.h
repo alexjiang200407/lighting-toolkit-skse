@@ -1,4 +1,5 @@
 #pragma once
+#include "Input/InputFilter.h"
 
 namespace ImGui
 {
@@ -19,6 +20,7 @@ namespace ImGui
 	public:
 		void                      Init();
 		void                      EnableSupression(KeyboardSupressionMask kbd, MouseSupressionMask mouse, GamePadSupressionMask gamepad, bool suppressChar, bool suppressMouseMove);
+		void                      EnableSupression(Input::InputFilter filter);
 		void                      SetSuppressKbd(KeyboardSupressionMask kbd);
 		void                      SetSuppressMouse(MouseSupressionMask mouse);
 		void                      SetSuppressGamepad(GamePadSupressionMask mouse);
@@ -63,6 +65,7 @@ namespace ImGui
 		void HandleCharEvent(RE::CharEvent* const charEvt);
 
 	private:
+		Input::InputFilter                      filter;
 		KeyboardSupressionMask                  kbdSuppress          = 0;
 		MouseSupressionMask                     mouseSuppress        = 0;
 		GamePadSupressionMask                   gamepadSuppress      = 0;
