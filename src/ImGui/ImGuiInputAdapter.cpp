@@ -395,6 +395,11 @@ void ImGui::ImGuiInputAdapter::EnableSupression(KeyboardSupressionMask kbd, Mous
 	blockMouseMoveEvents = suppressMouseMove;
 }
 
+void ImGui::ImGuiInputAdapter::EnableSupression(Input::InputFilter filter)
+{
+	EnableSupression(filter.kbdSuppress, filter.mouseSuppress, filter.gamepadSuppress, filter.blockCharEvents, filter.blockMouseMoveEvents);
+}
+
 void ImGui::ImGuiInputAdapter::SetSuppressKbd(KeyboardSupressionMask kbd)
 {
 	kbdSuppress = kbd;

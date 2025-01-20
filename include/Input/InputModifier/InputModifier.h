@@ -21,6 +21,7 @@ namespace Input
 		bool                           operator<(const InputModifier& rhs) const;
 		int                            GetSlot() const;
 		operator InputModifierPtr();
+
 	private:
 		int slot = 0;
 	};

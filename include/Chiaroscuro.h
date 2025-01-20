@@ -5,6 +5,7 @@
 #include "Preset/PresetDatabase.h"
 #include "Preset/PresetSerializationControl.h"
 #include "SKSE/SerializableCollection.h"
+#include "MenuInputContext.h"
 
 class Chiaroscuro :
 	ImGui::ImGuiRenderTarget,
@@ -40,6 +41,7 @@ private:
 	constexpr uint32_t       GetKey() override;
 
 private:
+	Input::MenuInputContext            inputCtx;
 	preset::PresetSerializationControl presetSerializationControl;
 	preset::PresetDatabase             config;
 	ImGuiLightPresetSelector           lightSelector{ "Light Template", &config };

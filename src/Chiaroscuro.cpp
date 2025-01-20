@@ -102,7 +102,8 @@ void Chiaroscuro::ToggleMenu()
 		}
 
 		RE::PlaySound("UIMenuOK");
-		SuppressDXInput();
+		//SuppressDXInput();
+		inputCtx.MenuOpen();
 		previouslyInFreeCameraMode = RE::PlayerCamera::GetSingleton()->IsInFreeCameraMode();
 		if (!previouslyInFreeCameraMode)
 		{
@@ -116,7 +117,8 @@ void Chiaroscuro::ToggleMenu()
 	else
 	{
 		RE::PlaySound("UIMenuCancel");
-		ImGui::ImGuiInputAdapter::GetSingleton()->DisableSupression();
+		//ImGui::ImGuiInputAdapter::GetSingleton()->DisableSupression();
+		inputCtx.MenuClose();
 		RE::UI::GetSingleton()->ShowMenus(true);
 		RE::Main::GetSingleton()->freezeTime = previouslyFreezeTime;
 		if (!previouslyInFreeCameraMode)
@@ -206,16 +208,10 @@ void Chiaroscuro::UpdateLookingAround()
 {
 	if (lookingAround)
 	{
-		ImGui::ImGuiInputAdapter::GetSingleton()->SetSuppressMouse(0);
-		ImGui::ImGuiInputAdapter::GetSingleton()->SetSuppressMouseMove(false);
+		inputCtx.StartLookingAround();
 		return;
 	}
-
-	ImGui::ImGuiInputAdapter::MouseSupressionMask mouse;
-	mouse.set();
-
-	ImGui::ImGuiInputAdapter::GetSingleton()->SetSuppressMouse(mouse);
-	ImGui::ImGuiInputAdapter::GetSingleton()->SetSuppressMouseMove(true);
+	inputCtx.StopLookingAround();
 }
 
 void Chiaroscuro::DrawPropControlWindow()
