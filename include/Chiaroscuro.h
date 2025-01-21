@@ -2,10 +2,14 @@
 #include "ImGui/ImGuiRenderTarget.h"
 #include "LightEditor.h"
 #include "Lighting.h"
+#include "MenuInputContext.h"
+#include "MenuState/MenuState.h"
 #include "Preset/PresetDatabase.h"
 #include "Preset/PresetSerializationControl.h"
 #include "SKSE/SerializableCollection.h"
-#include "MenuInputContext.h"
+
+class MenuState;
+class MenuOpen;
 
 class Chiaroscuro :
 	ImGui::ImGuiRenderTarget,
@@ -20,6 +24,10 @@ public:
 	void                DoFrame();
 	ImGuiStyle          Style();
 	static Chiaroscuro* GetSingleton();
+	void                DrawPropControlWindow();
+	void                DrawCameraControlWindow();
+	void                DrawSceneControlWindow();
+	void                PositionLight();
 
 private:
 	Chiaroscuro();
@@ -30,9 +38,6 @@ private:
 	bool                     ShouldDrawCursor() override;
 	static float*            GetCameraMoveSpeed();
 	void                     UpdateLookingAround();
-	void                     DrawPropControlWindow();
-	void                     DrawCameraControlWindow();
-	void                     DrawSceneControlWindow();
 	RE::BSEventNotifyControl ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>* a_eventSource) override;
 	void                     SerializeItems(SKSE::CoSaveIO io) const override;
 	void                     DeserializeItems(SKSE::CoSaveIO io) override;
@@ -40,6 +45,7 @@ private:
 	constexpr uint32_t       GetKey() override;
 
 private:
+	std::unique_ptr<MenuState>         menuState{ nullptr };
 	Input::MenuInputContext            inputCtx;
 	preset::PresetSerializationControl presetSerializationControl;
 	preset::PresetDatabase             config;

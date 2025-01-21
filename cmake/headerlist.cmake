@@ -29,6 +29,12 @@ set(HEADERS ${HEADERS}
 	include/Lighting.h
 	include/LightingPreset.h
 	include/MenuInputContext.h
+	include/MenuState/MenuHidden.h
+	include/MenuState/MenuItemActive.h
+	include/MenuState/MenuLookingAround.h
+	include/MenuState/MenuOpen.h
+	include/MenuState/MenuPositioning.h
+	include/MenuState/MenuState.h
 	include/MyEnumSet.h
 	include/PCH.h
 	include/Preset/Preset.h
