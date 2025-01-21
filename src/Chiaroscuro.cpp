@@ -5,6 +5,7 @@
 #include "Lighting.h"
 #include "LightingPreset.h"
 #include "SKSE/SerializationControl.h"
+#include "MenuState/MenuOpen.h"
 
 Chiaroscuro Chiaroscuro::singleton;
 
@@ -40,42 +41,14 @@ void Chiaroscuro::DoFrame()
 	if (!doProcess)
 		return;
 
-	if (ImGui::IsKeyPressedA(ImGuiKey_H, false))
-		hidden = !hidden;
-
-	if (hidden)
-		return;
-
-	if (ImGui::IsKeyPressedA(ImGuiKey_F, false) && !lookingAround)
-		RE::Main::GetSingleton()->freezeTime = !RE::Main::GetSingleton()->freezeTime;
-
-	if (lookingAround != (ImGui::IsKeyDownA(ImGuiKey_LeftCtrl) || ImGui::IsKeyDownA(ImGuiKey_LeftAlt)))
+	if (auto newState = menuState->Transition(&inputCtx))
 	{
-		UpdateLookingAround();
+		menuState = std::move(newState);
 	}
+	menuState->DoFrame(this);
 
-	if (!lookingAround && isAnyItemActive != ImGui::IsAnyItemActive())
-	{
-		isAnyItemActive = !isAnyItemActive;
-
-		if (isAnyItemActive)
-			inputCtx.StartTextInput();
-		else
-			inputCtx.StopTextInput();
-	}
-
-	ImGui::Begin("##SCMain", nullptr, windowFlags);
-	{
-		ImGui::BeginDisabled(lookingAround);
-		{
-			DrawTabBar();
-			DrawPropControlWindow();
-			DrawCameraControlWindow();
-			DrawSceneControlWindow();
-		}
-		ImGui::EndDisabled();
-	}
-	ImGui::End();
+	// Reset currentTab and wait for next draw cycle
+	currentTab = nullptr;
 }
 
 Chiaroscuro* Chiaroscuro::GetSingleton()
@@ -103,6 +76,7 @@ void Chiaroscuro::ToggleMenu()
 
 		RE::PlaySound("UIMenuOK");
 		inputCtx.MenuOpen();
+		menuState                  = std::make_unique<MenuOpen>(&inputCtx);
 		previouslyInFreeCameraMode = RE::PlayerCamera::GetSingleton()->IsInFreeCameraMode();
 		if (!previouslyInFreeCameraMode)
 		{
@@ -116,6 +90,7 @@ void Chiaroscuro::ToggleMenu()
 	else
 	{
 		RE::PlaySound("UIMenuCancel");
+		menuState.reset();
 		inputCtx.MenuClose();
 		RE::UI::GetSingleton()->ShowMenus(true);
 		RE::Main::GetSingleton()->freezeTime = previouslyFreezeTime;
@@ -168,7 +143,7 @@ bool Chiaroscuro::CanOpenWindow()
 
 bool Chiaroscuro::ShouldDrawCursor()
 {
-	return doProcess && !lookingAround && !hidden;
+	return doProcess && menuState->ShouldDrawCursor();
 }
 
 float* Chiaroscuro::GetCameraMoveSpeed()
@@ -203,8 +178,6 @@ void Chiaroscuro::DrawPropControlWindow()
 	ImGui::PushID("###PropControlWindow");
 	if (currentTab)
 	{
-		if (ImGui::IsKeyDownA(ImGuiKey_LeftAlt))
-			currentTab->MoveToCameraLookingAt(true);
 		if (ImGui::IsKeyDownA(ImGuiKey_R))
 			currentTab->Rotate(-0.1f);
 		if (ImGui::IsKeyDownA(ImGuiKey_T))
@@ -215,9 +188,6 @@ void Chiaroscuro::DrawPropControlWindow()
 			currentTab->DrawControlPanel();
 		}
 		ImGui::EndChild();
-
-		// Reset currentTab and wait for next draw cycle
-		currentTab = nullptr;
 	}
 	ImGui::PopID();
 }
@@ -311,6 +281,12 @@ void Chiaroscuro::Revert(SKSE::CoSaveIO)
 constexpr uint32_t Chiaroscuro::GetKey()
 {
 	return serializationKey;
+}
+
+void Chiaroscuro::PositionLight()
+{
+	if (currentTab)
+		currentTab->MoveToCameraLookingAt(true);
 }
 
 ImGuiStyle Chiaroscuro::Style()

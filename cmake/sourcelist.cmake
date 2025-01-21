@@ -23,6 +23,12 @@ set(SOURCES ${SOURCES}
 	src/LightingPreset.cpp
 	src/main.cpp
 	src/MenuInputContext.cpp
+	src/MenuState/MenuHidden.cpp
+	src/MenuState/MenuItemActive.cpp
+	src/MenuState/MenuLookingAround.cpp
+	src/MenuState/MenuOpen.cpp
+	src/MenuState/MenuPositioning.cpp
+	src/MenuState/MenuState.cpp
 	src/Preset/Preset.cpp
 	src/Preset/PresetDatabase.cpp
 	src/Preset/PresetSerializationControl.cpp
