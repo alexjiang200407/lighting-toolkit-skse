@@ -4,7 +4,7 @@
 namespace Input
 {
 	class CanMouseMove :
-		public InputModifier
+		virtual public InputModifier
 	{
 	public:
 		CanMouseMove(bool blockLookAround);

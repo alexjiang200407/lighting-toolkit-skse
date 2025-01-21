@@ -4,7 +4,7 @@
 namespace Input
 {
 	class CanMouseButton :
-		public InputModifier
+		virtual public InputModifier
 	{
 	public:
 		CanMouseButton(bool blockMouseButtons);

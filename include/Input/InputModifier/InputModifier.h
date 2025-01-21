@@ -9,6 +9,8 @@ namespace Input
 	class InputModifier
 	{
 	public:
+		virtual ~InputModifier() = default;
+	public:
 		virtual KeyboardSupressionMask ApplyKeyModifier(KeyboardSupressionMask kbd) const;
 		virtual MouseSupressionMask    ApplyMouseKeyModifier(MouseSupressionMask mouse) const;
 		virtual GamePadSupressionMask  ApplyGamepadKeyModifier(GamePadSupressionMask gamepad) const;

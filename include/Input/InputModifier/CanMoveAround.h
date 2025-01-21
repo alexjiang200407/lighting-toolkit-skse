@@ -4,7 +4,7 @@
 namespace Input
 {
 	class CanMoveAround :
-		public BSControlModifier
+		virtual public BSControlModifier
 	{
 	public:
 		CanMoveAround(bool blockMove);

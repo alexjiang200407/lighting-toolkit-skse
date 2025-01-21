@@ -3,7 +3,7 @@
 namespace Input
 {
 	class BSControlModifier :
-		public InputModifier
+		virtual public InputModifier
 	{
 	public:
 		BSControlModifier(std::initializer_list<std::string> controlIDs, bool blockControls);
