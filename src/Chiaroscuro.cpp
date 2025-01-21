@@ -48,22 +48,22 @@ void Chiaroscuro::DoFrame()
 
 	if (ImGui::IsKeyPressedA(ImGuiKey_F, false) && !lookingAround)
 		RE::Main::GetSingleton()->freezeTime = !RE::Main::GetSingleton()->freezeTime;
+
 	if (lookingAround != (ImGui::IsKeyDownA(ImGuiKey_LeftCtrl) || ImGui::IsKeyDownA(ImGuiKey_LeftAlt)))
 	{
-		lookingAround = !lookingAround;
-
-		if (lookingAround)
-		{
-			previouslyFreezeTimeLookingAround    = RE::Main::GetSingleton()->freezeTime;
-			RE::Main::GetSingleton()->freezeTime = true;
-		}
-		else
-		{
-			RE::Main::GetSingleton()->freezeTime = previouslyFreezeTimeLookingAround;
-		}
-
 		UpdateLookingAround();
 	}
+
+	if (!lookingAround && isAnyItemActive != ImGui::IsAnyItemActive())
+	{
+		isAnyItemActive = !isAnyItemActive;
+
+		if (isAnyItemActive)
+			inputCtx.StartTextInput();
+		else
+			inputCtx.StopTextInput();
+	}
+
 	ImGui::Begin("##SCMain", nullptr, windowFlags);
 	{
 		ImGui::BeginDisabled(lookingAround);
@@ -178,6 +178,18 @@ float* Chiaroscuro::GetCameraMoveSpeed()
 
 void Chiaroscuro::UpdateLookingAround()
 {
+	lookingAround = !lookingAround;
+
+	if (lookingAround)
+	{
+		previouslyFreezeTimeLookingAround    = RE::Main::GetSingleton()->freezeTime;
+		RE::Main::GetSingleton()->freezeTime = true;
+	}
+	else
+	{
+		RE::Main::GetSingleton()->freezeTime = previouslyFreezeTimeLookingAround;
+	}
+
 	if (lookingAround)
 	{
 		inputCtx.StartLookingAround();

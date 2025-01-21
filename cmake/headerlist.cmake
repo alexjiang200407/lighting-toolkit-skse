@@ -22,6 +22,7 @@ set(HEADERS ${HEADERS}
 	include/Input/InputModifier/CanMouseButton.h
 	include/Input/InputModifier/CanMouseMove.h
 	include/Input/InputModifier/CanMoveAround.h
+	include/Input/InputModifier/FreeCameraControl.h
 	include/Input/InputModifier/InputModifier.h
 	include/LightDesigner.h
 	include/LightEditor.h

@@ -2,7 +2,7 @@
 #include "Input/InputModifier/CanMoveAround.h"
 #include "Input/InputModifier/CanMouseMove.h"
 #include "Input/InputModifier/CanCharInput.h"
-#include "Input/InputModifier/CanMouseButton.h"
+#include "Input/InputModifier/FreeCameraControl.h"
 #include "ImGui/ImGuiInputAdapter.h"
 
 Input::MenuInputContext::MenuInputContext() :
@@ -12,35 +12,31 @@ Input::MenuInputContext::MenuInputContext() :
 
 void Input::MenuInputContext::StartLookingAround()
 {
-	AddModifier(ModifierSlots::kPlayerLookAround, new CanMouseMove(false));
-	AddModifier(ModifierSlots::kMouseButton, new CanMouseButton(false));
+	AddModifier(kFreeCameraMoveMode, new FreeCameraControl());
 	Update();
 }
 
 void Input::MenuInputContext::StopLookingAround()
 {
-	AddModifier(ModifierSlots::kPlayerLookAround, new CanMouseMove(true));
-	AddModifier(ModifierSlots::kMouseButton, new CanMouseButton(true));
+	AddModifier(kFreeCameraMoveMode, new CanMoveAround(false));
 	Update();
 }
 
 void Input::MenuInputContext::StartTextInput()
 {
-	AddModifier(ModifierSlots::kPlayerMove, new CanMoveAround(true));
-	AddModifier(ModifierSlots::kCharInput, new CanCharInput(false));
+	AddModifier(kTextInput, new CanMoveAround(true));
 	Update();
 }
 
 void Input::MenuInputContext::StopTextInput()
 {
-	AddModifier(ModifierSlots::kPlayerMove, new CanMoveAround(false));
-	AddModifier(ModifierSlots::kCharInput, new CanCharInput(true));
+	RemoveModifier(kTextInput);
 	Update();
 }
 
 void Input::MenuInputContext::MenuOpen()
 {
-	AddModifier(ModifierSlots::kPlayerMove, new CanMoveAround(false));
+	AddModifier(kFreeCameraMoveMode, new CanMoveAround(false));
 	Update();
 }
 

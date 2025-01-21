@@ -44,6 +44,7 @@ private:
 	preset::PresetSerializationControl presetSerializationControl;
 	preset::PresetDatabase             config;
 	ImGuiLightPresetSelector           lightSelector{ "Light Template", &config };
+	bool                               isAnyItemActive                   = false;
 	bool                               lookingAround                     = false;
 	bool                               previouslyInFreeCameraMode        = false;
 	bool                               previouslyFreezeTime              = false;

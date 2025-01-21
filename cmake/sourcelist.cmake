@@ -15,6 +15,7 @@ set(SOURCES ${SOURCES}
 	src/Input/InputModifier/CanMouseButton.cpp
 	src/Input/InputModifier/CanMouseMove.cpp
 	src/Input/InputModifier/CanMoveAround.cpp
+	src/Input/InputModifier/FreeCameraControl.cpp
 	src/Input/InputModifier/InputModifier.cpp
 	src/LightDesigner.cpp
 	src/LightEditor.cpp
