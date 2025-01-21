@@ -37,7 +37,6 @@ private:
 	bool                     CanOpenWindow();
 	bool                     ShouldDrawCursor() override;
 	static float*            GetCameraMoveSpeed();
-	void                     UpdateLookingAround();
 	RE::BSEventNotifyControl ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>* a_eventSource) override;
 	void                     SerializeItems(SKSE::CoSaveIO io) const override;
 	void                     DeserializeItems(SKSE::CoSaveIO io) override;
@@ -50,14 +49,9 @@ private:
 	preset::PresetSerializationControl presetSerializationControl;
 	preset::PresetDatabase             config;
 	ImGuiLightPresetSelector           lightSelector{ "Light Template", &config };
-	bool                               isAnyItemActive                   = false;
-	bool                               lookingAround                     = false;
 	bool                               previouslyInFreeCameraMode        = false;
 	bool                               previouslyFreezeTime              = false;
-	bool                               previouslyFreezeTimeLookingAround = false;
 	bool                               doProcess                         = false;
+	static constexpr uint32_t          serializationKey                  = 'CHIA';
 	static Chiaroscuro                 singleton;
-	static constexpr ImGuiWindowFlags  windowFlags      = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
-	bool                               hidden           = false;
-	static constexpr uint32_t          serializationKey = 'CHIA';
 };

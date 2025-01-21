@@ -99,8 +99,6 @@ void Chiaroscuro::ToggleMenu()
 			RE::PlayerCamera::GetSingleton()->ToggleFreeCameraMode(false);
 			RE::ControlMap::GetSingleton()->PopInputContext(RE::ControlMap::InputContextID::kTFCMode);
 		}
-		lookingAround = false;
-		hidden        = false;
 	}
 }
 
@@ -149,28 +147,6 @@ bool Chiaroscuro::ShouldDrawCursor()
 float* Chiaroscuro::GetCameraMoveSpeed()
 {
 	return REL::Relocation<float*>{ RELOCATION_ID(509808, 382522) }.get();
-}
-
-void Chiaroscuro::UpdateLookingAround()
-{
-	lookingAround = !lookingAround;
-
-	if (lookingAround)
-	{
-		previouslyFreezeTimeLookingAround    = RE::Main::GetSingleton()->freezeTime;
-		RE::Main::GetSingleton()->freezeTime = true;
-	}
-	else
-	{
-		RE::Main::GetSingleton()->freezeTime = previouslyFreezeTimeLookingAround;
-	}
-
-	if (lookingAround)
-	{
-		inputCtx.StartLookingAround();
-		return;
-	}
-	inputCtx.StopLookingAround();
 }
 
 void Chiaroscuro::DrawPropControlWindow()

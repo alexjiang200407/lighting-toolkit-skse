@@ -1,6 +1,6 @@
 #include "MenuState/MenuState.h"
 
-void MenuState::DoFrame(Chiaroscuro* chiaroscuro)
+void MenuState::DoFrame(Chiaroscuro*)
 {
 }
 
