@@ -7,6 +7,6 @@ namespace Input
 		public BSControlModifier
 	{
 	public:
-		CanMoveAround(bool blockMove, int slot);
+		CanMoveAround(bool blockMove);
 	};
 }

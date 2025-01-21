@@ -1,7 +1,7 @@
 #include "Input/InputModifier/BSControlModifier.h"
 
-Input::BSControlModifier::BSControlModifier(std::initializer_list<std::string> controlIDs, bool blockControls, int slot) :
-	InputModifier(slot), blockControls(blockControls), controls(controlIDs)
+Input::BSControlModifier::BSControlModifier(std::initializer_list<std::string> controlIDs, bool blockControls) :
+	blockControls(blockControls), controls(controlIDs)
 {
 }
 

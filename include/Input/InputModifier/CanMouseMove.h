@@ -7,7 +7,7 @@ namespace Input
 		public InputModifier
 	{
 	public:
-		CanMouseMove(bool blockLookAround, int slot);
+		CanMouseMove(bool blockLookAround);
 	public:
 		bool ApplyBlockMouseMoveModifier(bool prevBlockMouseMove) const override;
 

@@ -6,10 +6,9 @@ Input::InputContext::InputContext(InputFilter filter) :
 {
 }
 
-void Input::InputContext::AddModifier(InputModifier* modifier)
+void Input::InputContext::AddModifier(int slot, InputModifier* modifier)
 {
-	modifiers.erase(modifier->GetSlot());
-	modifiers.insert(std::move(InputModifierPtr(modifier)));
+	modifiers[slot] = std::move(InputModifierPtr(modifier));
 }
 
 void Input::InputContext::ClearAllModifiers()
@@ -25,24 +24,9 @@ void Input::InputContext::Update()
 
 Input::InputFilter Input::InputContext::AggregateModifiers(InputFilter data) const
 {
-	for (const auto& modifier : modifiers)
+	for (const auto& [_, modifier] : modifiers)
 	{
 		data = modifier->ApplyModifier(data);
 	}
 	return data;
-}
-
-bool Input::InputContext::InputModifierComparator::operator()(const InputModifierPtr& lhs, const InputModifierPtr& rhs) const
-{
-	return *lhs < *rhs;
-}
-
-bool Input::InputContext::InputModifierComparator::operator()(const InputModifierPtr& lhs, int rhs) const
-{
-	return lhs->GetSlot() < rhs;
-}
-
-bool Input::InputContext::InputModifierComparator::operator()(int lhs, const InputModifierPtr& rhs) const
-{
-	return lhs < rhs->GetSlot();
 }

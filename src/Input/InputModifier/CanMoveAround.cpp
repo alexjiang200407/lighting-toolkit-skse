@@ -1,6 +1,6 @@
 #include "Input/InputModifier/CanMoveAround.h"
 
-Input::CanMoveAround::CanMoveAround(bool blockMove, int slot) :
-	BSControlModifier({ "Forward", "Back", "Strafe Left", "Strafe Right" }, blockMove, slot)
+Input::CanMoveAround::CanMoveAround(bool blockMove) :
+	BSControlModifier({ "Forward", "Back", "Strafe Left", "Strafe Right" }, blockMove)
 {
 }

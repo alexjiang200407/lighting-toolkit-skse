@@ -1,7 +1,7 @@
 #include "Input/InputModifier/CanMouseButton.h"
 
-Input::CanMouseButton::CanMouseButton(bool blockMouseButtons, int slot) :
-	InputModifier(slot), blockMouseButtons(blockMouseButtons)
+Input::CanMouseButton::CanMouseButton(bool blockMouseButtons) :
+	blockMouseButtons(blockMouseButtons)
 {
 }
 

@@ -1,10 +1,5 @@
 #include "Input/InputModifier/InputModifier.h"
 
-Input::InputModifier::InputModifier(int slot) :
-	slot(slot)
-{
-}
-
 Input::KeyboardSupressionMask Input::InputModifier::ApplyKeyModifier(KeyboardSupressionMask kbd) const
 {
 	return kbd;
@@ -38,14 +33,4 @@ Input::InputFilter Input::InputModifier::ApplyModifier(InputFilter filter) const
 	filter.mouseSuppress        = ApplyMouseKeyModifier(filter.mouseSuppress);
 	filter.kbdSuppress          = ApplyKeyModifier(filter.kbdSuppress);
 	return filter;
-}
-
-bool Input::InputModifier::operator<(const InputModifier& rhs) const
-{
-	return slot < rhs.slot;
-}
-
-int Input::InputModifier::GetSlot() const
-{
-	return slot;
 }

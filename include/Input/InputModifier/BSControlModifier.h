@@ -6,7 +6,7 @@ namespace Input
 		public InputModifier
 	{
 	public:
-		BSControlModifier(std::initializer_list<std::string> controlIDs, bool blockControls, int slot);
+		BSControlModifier(std::initializer_list<std::string> controlIDs, bool blockControls);
 
 	public:
 		KeyboardSupressionMask ApplyKeyModifier(KeyboardSupressionMask kbd) const override;

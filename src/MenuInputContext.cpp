@@ -12,35 +12,35 @@ Input::MenuInputContext::MenuInputContext() :
 
 void Input::MenuInputContext::StartLookingAround()
 {
-	AddModifier(new CanMouseMove(false, ModifierSlots::kPlayerLookAround));
-	AddModifier(new CanMouseButton(false, ModifierSlots::kMouseButton));
+	AddModifier(ModifierSlots::kPlayerLookAround, new CanMouseMove(false));
+	AddModifier(ModifierSlots::kMouseButton, new CanMouseButton(false));
 	Update();
 }
 
 void Input::MenuInputContext::StopLookingAround()
 {
-	AddModifier(new CanMouseMove(true, ModifierSlots::kPlayerLookAround));
-	AddModifier(new CanMouseButton(true, ModifierSlots::kMouseButton));
+	AddModifier(ModifierSlots::kPlayerLookAround, new CanMouseMove(true));
+	AddModifier(ModifierSlots::kMouseButton, new CanMouseButton(true));
 	Update();
 }
 
 void Input::MenuInputContext::StartTextInput()
 {
-	AddModifier(new CanMoveAround(true, ModifierSlots::kPlayerMove));
-	AddModifier(new CanCharInput(false, ModifierSlots::kCharInput));
+	AddModifier(ModifierSlots::kPlayerMove, new CanMoveAround(true));
+	AddModifier(ModifierSlots::kCharInput, new CanCharInput(false));
 	Update();
 }
 
 void Input::MenuInputContext::StopTextInput()
 {
-	AddModifier(new CanMoveAround(false, ModifierSlots::kPlayerMove));
-	AddModifier(new CanCharInput(true, ModifierSlots::kCharInput));
+	AddModifier(ModifierSlots::kPlayerMove, new CanMoveAround(false));
+	AddModifier(ModifierSlots::kCharInput, new CanCharInput(true));
 	Update();
 }
 
 void Input::MenuInputContext::MenuOpen()
 {
-	AddModifier(new CanMoveAround(false, ModifierSlots::kPlayerMove));
+	AddModifier(ModifierSlots::kPlayerMove, new CanMoveAround(false));
 	Update();
 }
 

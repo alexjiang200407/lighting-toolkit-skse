@@ -7,7 +7,7 @@ namespace Input
 		public InputModifier
 	{
 	public:
-		CanCharInput(bool blockCharModifer, int slot);
+		CanCharInput(bool blockCharModifer);
 
 	public:
 		bool ApplyBlockCharModifier(bool prevBockCharModifier) const override;

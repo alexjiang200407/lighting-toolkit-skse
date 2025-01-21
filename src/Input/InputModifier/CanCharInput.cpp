@@ -1,7 +1,7 @@
 #include "Input/InputModifier/CanCharInput.h"
 
-Input::CanCharInput::CanCharInput(bool blockCharModifer, int slot) :
-	InputModifier(slot), blockCharModifer(blockCharModifer)
+Input::CanCharInput::CanCharInput(bool blockCharModifer) :
+	blockCharModifer(blockCharModifer)
 {
 }
 

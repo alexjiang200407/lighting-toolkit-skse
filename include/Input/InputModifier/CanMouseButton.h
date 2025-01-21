@@ -7,7 +7,7 @@ namespace Input
 		public InputModifier
 	{
 	public:
-		CanMouseButton(bool blockMouseButtons, int slot);
+		CanMouseButton(bool blockMouseButtons);
 
 	public:
 		MouseSupressionMask ApplyMouseKeyModifier(MouseSupressionMask mouse) const override;
