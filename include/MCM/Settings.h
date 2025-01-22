@@ -1,5 +1,4 @@
 #pragma once
-#include <SimpleIni.h>
 
 namespace MCM
 {

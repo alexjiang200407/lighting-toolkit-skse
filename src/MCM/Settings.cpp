@@ -1,4 +1,5 @@
 #include "MCM/Settings.h"
+#include <SimpleIni.h>
 
 MCM::Settings MCM::Settings::singleton;
 
