@@ -33,7 +33,7 @@ void Chiaroscuro::OnSavePostLoaded()
 
 void Chiaroscuro::DoFrame()
 {
-	if (ImGui::IsKeyPressed(ImGuiKey_End, false))
+	if (ImGui::ImGuiInputAdapter::IsKeyPressed("iOpenCloseMenuKey", false))
 	{
 		ToggleMenu();
 	}
@@ -154,9 +154,9 @@ void Chiaroscuro::DrawPropControlWindow()
 	ImGui::PushID("###PropControlWindow");
 	if (currentTab)
 	{
-		if (ImGui::IsKeyDownA(ImGuiKey_R))
+		if (ImGui::ImGuiInputAdapter::IsKeyDown("iRotateLeftKey"))
 			currentTab->Rotate(-0.1f);
-		if (ImGui::IsKeyDownA(ImGuiKey_T))
+		if (ImGui::ImGuiInputAdapter::IsKeyDown("iRotateRightKey"))
 			currentTab->Rotate(0.1f);
 
 		ImGui::BeginChild("##PropControlPanel", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);

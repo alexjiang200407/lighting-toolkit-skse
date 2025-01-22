@@ -1,4 +1,5 @@
 #include "ImGui/ImGuiInputAdapter.h"
+#include "MCM/Settings.h"
 #include <d3d11.h>
 
 ImGui::ImGuiInputAdapter ImGui::ImGuiInputAdapter::singleton;
@@ -421,4 +422,28 @@ void ImGui::ImGuiInputAdapter::Adapt(RE::BSTEventSource<RE::InputEvent*>* dispat
 	}
 
 	*ppEvents = list.first;
+}
+
+bool ImGui::ImGuiInputAdapter::IsKeyPressed(const char* keyID, bool repeat)
+{
+	uint32_t dInputkey;
+	if (MCM::Settings::GetSingleton()->Get("Controls", keyID, dInputkey))
+	{
+		ImGuiKey key = ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32KeyboardDevice::Key(dInputkey));
+		return ImGui::IsKeyPressedA(key, repeat);
+	}
+
+	return false;
+}
+
+bool ImGui::ImGuiInputAdapter::IsKeyDown(const char* keyID)
+{
+	uint32_t dInputkey;
+	if (MCM::Settings::GetSingleton()->Get("Controls", keyID, dInputkey))
+	{
+		ImGuiKey key = ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32KeyboardDevice::Key(dInputkey));
+		return ImGui::IsKeyDownA(key);
+	}
+
+	return false;
 }

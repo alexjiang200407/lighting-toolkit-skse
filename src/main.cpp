@@ -1,5 +1,6 @@
 #include "Chiaroscuro.h"
 #include "SKSE/SerializationControl.h"
+#include "MCM/Settings.h"
 
 void InitializeLog()
 {
@@ -75,6 +76,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 
 	logger::info("Game version : {}", a_skse->RuntimeVersion().string());
 	Chiaroscuro::GetSingleton()->Init();
+	MCM::Settings::GetSingleton()->Init();
 
 	SKSE::GetMessagingInterface()->RegisterListener([](SKSE::MessagingInterface::Message* message) {
 		if (message->type == SKSE::MessagingInterface::kDataLoaded)

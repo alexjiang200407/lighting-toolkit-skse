@@ -102,6 +102,9 @@ set(OUTPUT_FOLDER "C:/Modding/MO2/mods/${PROJECT_NAME}")
 include(cmake/headerlist.cmake)
 include(cmake/sourcelist.cmake)
 
+find_path(SIMPLEINI_INCLUDE_DIRS "ConvertUTF.c")
+
+
 source_group(
 	TREE
 		${CMAKE_CURRENT_SOURCE_DIR}
@@ -144,6 +147,7 @@ target_include_directories(
     PRIVATE 
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_BINARY_DIR}/include
+		${SIMPLEINI_INCLUDE_DIRS}
 )
 
 

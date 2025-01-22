@@ -22,6 +22,7 @@ set(SOURCES ${SOURCES}
 	src/Lighting.cpp
 	src/LightingPreset.cpp
 	src/main.cpp
+	src/MCM/Settings.cpp
 	src/MenuInputContext.cpp
 	src/MenuState/MenuHidden.cpp
 	src/MenuState/MenuItemActive.cpp

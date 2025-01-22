@@ -1,5 +1,6 @@
 #include "MenuState/MenuLookingAround.h"
 #include "MenuState/MenuOpen.h"
+#include "ImGui/ImGuiInputAdapter.h"
 
 MenuLookingAround::MenuLookingAround(Input::MenuInputContext* inputCtx)
 {
@@ -8,7 +9,7 @@ MenuLookingAround::MenuLookingAround(Input::MenuInputContext* inputCtx)
 
 MenuStatePtr MenuLookingAround::Transition(Input::MenuInputContext* inputCtx)
 {
-	if (!ImGui::IsKeyDownA(ImGuiKey_LeftCtrl))
+	if (!ImGui::ImGuiInputAdapter::IsKeyDown("iLookAroundKey"))
 	{
 		return std::make_unique<MenuOpen>(MenuOpen(inputCtx));
 	}

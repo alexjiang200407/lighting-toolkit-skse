@@ -25,6 +25,8 @@ namespace ImGui
 		bool                      IsSuppressingButtons();
 		void                      DispatchImGuiInputEvents();
 		void                      Adapt(RE::BSTEventSource<RE::InputEvent*>* dispatcher, RE::InputEvent** ppEvents);
+		static bool               IsKeyPressed(const char* keyID, bool repeat);
+		static bool               IsKeyDown(const char* keyID);
 
 	private:
 		ImGuiInputAdapter() = default;
