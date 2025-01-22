@@ -1,4 +1,5 @@
 #include "MenuState/MenuPositioning.h"
+#include "ImGui/ImGuiInputAdapter.h"
 
 MenuPositioning::MenuPositioning(Input::MenuInputContext* inputCtx) :
 	MenuLookingAround(inputCtx)
@@ -14,7 +15,7 @@ MenuPositioning::~MenuPositioning()
 
 MenuStatePtr MenuPositioning::Transition(Input::MenuInputContext* inputCtx)
 {
-	if (!ImGui::IsKeyDownA(ImGuiKey_LeftAlt))
+	if (!ImGui::ImGuiInputAdapter::IsKeyDown("iPositionLightKey"))
 	{
 		return std::make_unique<MenuOpen>(MenuOpen(inputCtx));
 	}

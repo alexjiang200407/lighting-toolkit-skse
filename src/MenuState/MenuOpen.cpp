@@ -3,6 +3,7 @@
 #include "MenuState/MenuLookingAround.h"
 #include "MenuState/MenuPositioning.h"
 #include "MenuState/MenuItemActive.h"
+#include "ImGui/ImGuiInputAdapter.h"
 
 MenuOpen::MenuOpen(Input::MenuInputContext* inputCtx)
 {
@@ -12,15 +13,15 @@ MenuOpen::MenuOpen(Input::MenuInputContext* inputCtx)
 
 MenuStatePtr MenuOpen::Transition(Input::MenuInputContext* inputCtx)
 {
-	if (ImGui::IsKeyPressedA(ImGuiKey_H, false))
+	if (ImGui::ImGuiInputAdapter::IsKeyPressed("iHideKey", false))
 	{
 		return std::make_unique<MenuHidden>(inputCtx);
 	}
-	if (ImGui::IsKeyDownA(ImGuiKey_LeftCtrl))
+	if (ImGui::ImGuiInputAdapter::IsKeyDown("iLookAroundKey"))
 	{
 		return std::make_unique<MenuLookingAround>(inputCtx);
 	}
-	if (ImGui::IsKeyDownA(ImGuiKey_LeftAlt))
+	if (ImGui::ImGuiInputAdapter::IsKeyDown("iPositionLightKey"))
 	{
 		return std::make_unique<MenuPositioning>(inputCtx);
 	}
