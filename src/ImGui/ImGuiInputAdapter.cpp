@@ -5,7 +5,7 @@ ImGui::ImGuiInputAdapter ImGui::ImGuiInputAdapter::singleton;
 
 void ImGui::ImGuiInputAdapter::SendInputEvent::thunk(RE::BSTEventSource<RE::InputEvent*>* dispatcher, RE::InputEvent** ppEvents)
 {
-	if (!ppEvents)
+	if (!ppEvents || !*ppEvents)
 	{
 		func(dispatcher, ppEvents);
 		return;
