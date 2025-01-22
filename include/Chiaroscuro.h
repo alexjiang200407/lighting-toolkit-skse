@@ -7,6 +7,7 @@
 #include "Preset/PresetDatabase.h"
 #include "Preset/PresetSerializationControl.h"
 #include "SKSE/SerializableCollection.h"
+#include "MCM/Settings.h"
 
 class MenuState;
 class MenuOpen;

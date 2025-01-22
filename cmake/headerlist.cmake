@@ -28,6 +28,7 @@ set(HEADERS ${HEADERS}
 	include/LightEditor.h
 	include/Lighting.h
 	include/LightingPreset.h
+	include/MCM/Settings.h
 	include/MenuInputContext.h
 	include/MenuState/MenuHidden.h
 	include/MenuState/MenuItemActive.h
