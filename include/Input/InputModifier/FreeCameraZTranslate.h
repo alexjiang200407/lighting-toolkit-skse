@@ -3,11 +3,11 @@
 
 namespace Input
 {
-	class CanMouseButton :
+	class FreeCameraZTranslate :
 		public BSControlModifier<RE::INPUT_DEVICE::kMouse>
 	{
 	public:
-		CanMouseButton(bool blockMouseButtons);
+		FreeCameraZTranslate(bool blockMouseButtons);
 
 	public:
 		static inline constexpr const char* inputIDs[] = { "WorldZUp", "WorldZDown" };

@@ -6,12 +6,12 @@ Input::FreeCameraControl::FreeCameraControl() :
 }
 
 Input::FreeCameraControl::FreeCameraControl(bool block) :
-	CanMouseButton(block), CanMouseMove(block), CanMoveAround(block)
+	FreeCameraZTranslate(block), CanMouseMove(block), CanMoveAround(block)
 {
 }
 
 void Input::FreeCameraControl::ApplyKeySuppressionModifier(InputFilter& filter) const
 {
-	CanMouseButton::ApplyKeySuppressionModifier(filter);
+	FreeCameraZTranslate::ApplyKeySuppressionModifier(filter);
 	CanMoveAround::ApplyKeySuppressionModifier(filter);
 }

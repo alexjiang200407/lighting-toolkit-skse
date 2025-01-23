@@ -15,7 +15,7 @@ set(SOURCES ${SOURCES}
 	src/Input/InputModifier/BSControlModifier.cpp
 	src/Input/InputModifier/BSKeyboardGamepadModifier.cpp
 	src/Input/InputModifier/CanCharInput.cpp
-	src/Input/InputModifier/CanMouseButton.cpp
+	src/Input/InputModifier/FreeCameraZTranslate.cpp
 	src/Input/InputModifier/CanMouseMove.cpp
 	src/Input/InputModifier/CanMoveAround.cpp
 	src/Input/InputModifier/FreeCameraControl.cpp
