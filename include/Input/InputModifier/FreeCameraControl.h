@@ -6,12 +6,16 @@
 namespace Input
 {
 	class FreeCameraControl :
-		public CanMouseButton,
 		public CanMouseMove,
+		public CanMouseButton,
 		public CanMoveAround
 	{
 	public:
 		FreeCameraControl();
 		FreeCameraControl(bool enable);
+
+	public:
+		void ApplyKeySuppressionModifier(InputFilter& filter) const override;
+
 	};
 }

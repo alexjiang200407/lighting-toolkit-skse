@@ -1,18 +1,15 @@
 #pragma once
-#include "InputModifier.h"
+#include "BSControlModifier.h"
 
 namespace Input
 {
 	class CanMouseButton :
-		virtual public InputModifier
+		public BSControlModifier<RE::INPUT_DEVICE::kMouse>
 	{
 	public:
 		CanMouseButton(bool blockMouseButtons);
 
 	public:
-		MouseSupressionMask ApplyMouseKeyModifier(MouseSupressionMask mouse) const override;
-
-	private:
-		bool blockMouseButtons;
+		static inline constexpr const char* inputIDs[] = { "WorldZUp", "WorldZDown" };
 	};
 }

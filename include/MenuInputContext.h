@@ -8,8 +8,9 @@ namespace Input
 	private:
 		enum ModifierSlots : int
 		{
-			kFreeCameraMoveMode = 0,
-			kTextInput          = 1,
+			kFreeCameraLook = 0,
+			kFreeCameraMoveMode,
+			kTextInput,
 		};
 
 	public:

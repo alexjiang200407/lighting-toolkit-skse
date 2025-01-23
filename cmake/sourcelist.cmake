@@ -9,8 +9,11 @@ set(SOURCES ${SOURCES}
 	src/ImGui/ImGuiRenderTarget.cpp
 	src/ImGui/ImGuiTabBarAbstract.cpp
 	src/ImGui/ImGuiWidgets.cpp
+	src/Input/DeviceKeyMapping.cpp
 	src/Input/InputContext.cpp
+	src/Input/InputFilter.cpp
 	src/Input/InputModifier/BSControlModifier.cpp
+	src/Input/InputModifier/BSKeyboardGamepadModifier.cpp
 	src/Input/InputModifier/CanCharInput.cpp
 	src/Input/InputModifier/CanMouseButton.cpp
 	src/Input/InputModifier/CanMouseMove.cpp

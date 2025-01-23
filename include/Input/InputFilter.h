@@ -1,17 +1,24 @@
 #pragma once
+#include "DeviceKeyMapping.h"
 
 namespace Input
 {
-	typedef std::bitset<256> KeyboardSupressionMask;
-	typedef std::bitset<256> MouseSupressionMask;
-	typedef std::bitset<256> GamePadSupressionMask;
-
-	struct InputFilter
+	class InputFilter
 	{
-		KeyboardSupressionMask kbdSuppress          = 0;
-		MouseSupressionMask    mouseSuppress        = 0;
-		GamePadSupressionMask  gamepadSuppress      = 0;
-		bool                   blockCharEvents      = false;
-		bool                   blockMouseMoveEvents = false;
+	public:
+		bool IsSuppressing(RE::IDEvent* evt) const;
+		bool IsSuppressing(const DeviceKeyMapping& id) const;
+		void SuppressInput(const std::vector<DeviceKeyMapping>& list);
+		void AllowInput(const std::vector<DeviceKeyMapping>& list);
+		bool IsBlockingChar() const;
+		void SetBlockingChar(bool blockingChar);
+		void SetBlockingMouseMove(bool blockingMouseMove);
+		bool IsBlockingMouseMove() const;
+		void Clear();
+
+	private:
+		std::set<DeviceKeyMapping> allowedInputIDs;
+		bool                       blockCharEvents      = true;
+		bool                       blockMouseMoveEvents = true;
 	};
 }

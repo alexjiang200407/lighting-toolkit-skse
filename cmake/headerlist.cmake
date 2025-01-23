@@ -15,9 +15,11 @@ set(HEADERS ${HEADERS}
 	include/ImGui/ImGuiTabBarAbstract.h
 	include/ImGui/ImGuiValueEditor.h
 	include/ImGui/ImGuiWidgets.h
+	include/Input/DeviceKeyMapping.h
 	include/Input/InputContext.h
 	include/Input/InputFilter.h
 	include/Input/InputModifier/BSControlModifier.h
+	include/Input/InputModifier/BSKeyboardGamepadModifier.h
 	include/Input/InputModifier/CanCharInput.h
 	include/Input/InputModifier/CanMouseButton.h
 	include/Input/InputModifier/CanMouseMove.h

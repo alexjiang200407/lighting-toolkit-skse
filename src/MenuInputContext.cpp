@@ -4,9 +4,9 @@
 #include "Input/InputModifier/CanCharInput.h"
 #include "Input/InputModifier/FreeCameraControl.h"
 #include "ImGui/ImGuiInputAdapter.h"
+#include "Input/InputModifier/CanMouseMove.h"
 
-Input::MenuInputContext::MenuInputContext() :
-	InputContext({ KeyboardSupressionMask().set(), MouseSupressionMask().set(), GamePadSupressionMask().set(), true, true })
+Input::MenuInputContext::MenuInputContext()
 {
 }
 
@@ -24,7 +24,7 @@ void Input::MenuInputContext::StopLookingAround()
 
 void Input::MenuInputContext::StartTextInput()
 {
-	AddModifier(kTextInput, new CanMoveAround(true));
+	AddModifier(kTextInput, new FreeCameraControl(true));
 	Update();
 }
 
@@ -36,6 +36,7 @@ void Input::MenuInputContext::StopTextInput()
 
 void Input::MenuInputContext::MenuOpen()
 {
+	AddModifier(kFreeCameraLook, new CanMouseMove(true));
 	AddModifier(kFreeCameraMoveMode, new CanMoveAround(false));
 	Update();
 }

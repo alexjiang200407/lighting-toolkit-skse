@@ -2,38 +2,37 @@
 #include "InputModifier.h"
 namespace Input
 {
+	template <RE::INPUT_DEVICE DEVICE>
 	class BSControlModifier :
 		virtual public InputModifier
 	{
 	public:
-		BSControlModifier(std::initializer_list<std::string> controlIDs, bool blockControls);
+		template <size_t SZ>
+		BSControlModifier(const char* const (&inputIDs)[SZ], bool blockControls) :
+			blockControls(blockControls)
+		{
+			for (size_t i = 0; i < SZ; i++)
+			{
+				this->inputIDs.push_back(DeviceKeyMapping(inputIDs[i], DEVICE));
+			}
+		}
+
+		BSControlModifier(std::initializer_list<DeviceKeyMapping> inputIDs, bool blockControls) :
+			blockControls(blockControls), inputIDs(inputIDs)
+		{
+		}
 
 	public:
-		KeyboardSupressionMask ApplyKeyModifier(KeyboardSupressionMask kbd) const override;
-		GamePadSupressionMask  ApplyGamepadKeyModifier(GamePadSupressionMask gamepad) const override;
-
-		template <typename T>
-		T ApplyBSControlModifier(T mask, RE::INPUT_DEVICE deviceType) const
+		void ApplyKeySuppressionModifier(InputFilter& filter) const override
 		{
-			using INPUT_CONTEXT = RE::UserEvents::INPUT_CONTEXT_IDS;
-			auto* controlMap    = RE::ControlMap::GetSingleton();
-
-			for (const auto& controlID : controls)
-			{
-				if (blockControls)
-				{
-					mask.set(controlMap->GetMappedKey(controlID.c_str(), deviceType, INPUT_CONTEXT::kGameplay));
-				}
-				else
-				{
-					mask.reset(controlMap->GetMappedKey(controlID.c_str(), deviceType, INPUT_CONTEXT::kGameplay));
-				}
-			}
-			return mask;
+			if (blockControls)
+				filter.SuppressInput(inputIDs);
+			else
+				filter.AllowInput(inputIDs);
 		}
 
 	private:
-		bool                           blockControls;
-		const std::vector<std::string> controls;
+		bool                          blockControls;
+		std::vector<DeviceKeyMapping> inputIDs;
 	};
 }
