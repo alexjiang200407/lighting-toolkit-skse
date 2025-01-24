@@ -15,3 +15,8 @@ void Input::FreeCameraControl::ApplyKeySuppressionModifier(InputFilter& filter) 
 	FreeCameraZTranslate::ApplyKeySuppressionModifier(filter);
 	CanMoveAround::ApplyKeySuppressionModifier(filter);
 }
+
+bool Input::FreeCameraControl::ApplyBlockMouseMoveModifier(bool prevBlockMouseMove) const
+{
+	return CanMouseMove::ApplyBlockMouseMoveModifier(prevBlockMouseMove);
+}

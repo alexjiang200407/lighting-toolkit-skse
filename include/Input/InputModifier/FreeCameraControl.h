@@ -16,6 +16,6 @@ namespace Input
 
 	public:
 		void ApplyKeySuppressionModifier(InputFilter& filter) const override;
-
+		bool ApplyBlockMouseMoveModifier(bool prevBlockMouseMove) const override;
 	};
 }

@@ -10,7 +10,7 @@ bool Input::InputModifier::ApplyBlockMouseMoveModifier(bool prevBlockMouseMove) 
 	return prevBlockMouseMove;
 }
 
-void Input::InputModifier::ApplyKeySuppressionModifier(InputFilter& filter) const
+void Input::InputModifier::ApplyKeySuppressionModifier(InputFilter&) const
 {
 }
 

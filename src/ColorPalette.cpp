@@ -26,7 +26,7 @@ void ColorPalette::Serialize(SKSE::CoSaveIO io) const
 	io.Write(GetSelection()->GetSID());
 	io.Write(static_cast<RE::NiColor>(*GetSelection()));
 
-	size_t strLen = GetSelection()->GetName().size() + 1;
+	uint32_t strLen = (uint32_t)GetSelection()->GetName().size() + 1;
 	io.Write(strLen);
 	io.Write(GetSelection()->GetName().c_str(), strLen);
 }
@@ -41,7 +41,7 @@ preset::Color ColorPalette::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabas
 
 	io.Read(color);
 
-	size_t nameSz;
+	uint32_t nameSz;
 	io.Read(nameSz);
 	auto buf = std::unique_ptr<char[]>(new char[nameSz]);
 	io.Read(buf.get(), nameSz);
