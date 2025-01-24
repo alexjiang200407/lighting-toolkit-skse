@@ -43,6 +43,7 @@ void Chiaroscuro::DoFrame()
 
 	if (auto newState = menuState->Transition(&inputCtx))
 	{
+		inputCtx.Update();
 		menuState = std::move(newState);
 	}
 	menuState->DoFrame(this);
@@ -76,6 +77,7 @@ void Chiaroscuro::ToggleMenu()
 
 		RE::PlaySound("UIMenuOK");
 		inputCtx.MenuOpen();
+		inputCtx.Update();
 		menuState                  = std::make_unique<MenuOpen>(&inputCtx);
 		previouslyInFreeCameraMode = RE::PlayerCamera::GetSingleton()->IsInFreeCameraMode();
 		if (!previouslyInFreeCameraMode)

@@ -12,13 +12,13 @@ set(SOURCES ${SOURCES}
 	src/Input/DeviceKeyMapping.cpp
 	src/Input/InputContext.cpp
 	src/Input/InputFilter.cpp
-	src/Input/InputModifier/BSControlModifier.cpp
 	src/Input/InputModifier/BSKeyboardGamepadModifier.cpp
 	src/Input/InputModifier/CanCharInput.cpp
-	src/Input/InputModifier/FreeCameraZTranslate.cpp
 	src/Input/InputModifier/CanMouseMove.cpp
 	src/Input/InputModifier/CanMoveAround.cpp
+	src/Input/InputModifier/CanRun.cpp
 	src/Input/InputModifier/FreeCameraControl.cpp
+	src/Input/InputModifier/FreeCameraZTranslate.cpp
 	src/Input/InputModifier/InputModifier.cpp
 	src/LightDesigner.cpp
 	src/LightEditor.cpp

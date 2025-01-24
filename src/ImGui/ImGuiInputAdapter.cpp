@@ -252,12 +252,12 @@ bool ImGui::ImGuiInputAdapter::AddButtonEvent(InputList& list, InputList& remove
 
 bool ImGui::ImGuiInputAdapter::AddIDEvent(InputList& list, InputList& removed, RE::IDEvent* const event)
 {
-	return AddInputEvent(!isSuppressing || !filter.IsSuppressing(event), list, removed, event);
+	return AddInputEvent(!filter.IsSuppressing(event), list, removed, event);
 }
 
 bool ImGui::ImGuiInputAdapter::AddInputEvent(bool cond, InputList& list, InputList& removed, RE::InputEvent* const event)
 {
-	if (cond)
+	if (!isSuppressing || cond)
 	{
 		AddToInputList(list, event);
 		return true;
@@ -316,19 +316,19 @@ void ImGui::ImGuiInputAdapter::HandleButtonEvent(RE::ButtonEvent* const buttonEv
 	case RE::INPUT_DEVICE::kVirtualKeyboard:
 		{
 			HandleKeyboardButtonEvent(buttonEvt->GetIDCode(), buttonEvt->IsPressed());
-			AddIDEvent(list, removed, buttonEvt);
+			AddButtonEvent(list, removed, buttonEvt);
 		}
 		break;
 	case RE::INPUT_DEVICE::kMouse:
 		{
 			HandleMouseButtonEvent(buttonEvt->GetIDCode(), buttonEvt->Value(), buttonEvt->IsPressed());
-			AddIDEvent(list, removed, buttonEvt);
+			AddButtonEvent(list, removed, buttonEvt);
 		}
 		break;
 	case RE::INPUT_DEVICE::kGamepad:
 		{
 			HandleGamepadButtonEvent(buttonEvt->GetIDCode(), buttonEvt->IsPressed());
-			AddIDEvent(list, removed, buttonEvt);
+			AddButtonEvent(list, removed, buttonEvt);
 		}
 		break;
 	default:
@@ -382,11 +382,13 @@ void ImGui::ImGuiInputAdapter::HandleCharEvent(RE::CharEvent* const charEvt)
 	inputEvtCallbacks.push_back([=](auto io) { io.AddInputCharacter(charEvt->keycode); });
 }
 
-void ImGui::ImGuiInputAdapter::ReleaseAllSuppressed()
+void ImGui::ImGuiInputAdapter::ReleaseAllSuppressedKeys()
 {
 	logger::trace("Releasing all suppressed keys");
+	
+	if (!isSuppressing)
+		return;
 
-	//auto kbd = kbdDown & filter.kbdSuppress;
 	RE::ButtonEvent* prev = nullptr;
 	RE::ButtonEvent* first = nullptr;
 	for (const auto& idEvent : idEventsDown)
@@ -407,7 +409,7 @@ void ImGui::ImGuiInputAdapter::EnableSupression(const Input::InputContext& input
 {
 	inputCtx.TransformInputFilter(this->filter);
 	isSuppressing = true;
-	ReleaseAllSuppressed();
+	ReleaseAllSuppressedKeys();
 }
 
 void ImGui::ImGuiInputAdapter::DisableSupression()
@@ -461,7 +463,10 @@ void ImGui::ImGuiInputAdapter::Adapt(RE::BSTEventSource<RE::InputEvent*>* dispat
 		}
 
 		if (!handled)
+		{
 			AddToInputList(list, event);
+			logger::warn("Input not handled");
+		}
 	}
 
 	*ppEvents = list.first;

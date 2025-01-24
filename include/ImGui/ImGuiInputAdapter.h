@@ -46,7 +46,7 @@ namespace ImGui
 		void HandleMouseButtonEvent(uint32_t key, float value, bool isPressed);
 		void HandleGamepadButtonEvent(uint32_t key, bool isPressed);
 		void HandleCharEvent(RE::CharEvent* const charEvt);
-		void ReleaseAllSuppressed();
+		void ReleaseAllSuppressedKeys();
 
 	private:
 		std::set<Input::DeviceKeyMapping>        idEventsDown;
