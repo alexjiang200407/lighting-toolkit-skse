@@ -37,12 +37,14 @@ namespace ImGui
 		void                  RegisterRenderTarget(ImGuiRenderTarget* target);
 		void                  UnregisterRenderTarget(ImGuiRenderTarget* target);
 		static ImGuiRenderer* GetSingleton();
+		bool                  HasPreexistingIni() const;
 
 	private:
+		bool                         hasPreexistingIni = false;
 		ImGuiStyle                   style;
 		std::set<ImGuiRenderTarget*> targets;
 		std::atomic<bool>            installedHooks;
-		std::string                  iniFile = fmt::format("./Data/SKSE/Plugins/{}ImGui.ini", Version::PROJECT);
+		std::string                  iniFile = fmt::format("./Data/SKSE/Plugins/{}ImGui", Version::PROJECT);
 		static ImGuiRenderer         singleton;
 	};
 }

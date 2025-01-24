@@ -45,6 +45,7 @@ private:
 	constexpr uint32_t       GetKey() override;
 
 private:
+	bool                               firstRender = true;
 	std::unique_ptr<MenuState>         menuState{ nullptr };
 	Input::MenuInputContext            inputCtx;
 	preset::PresetSerializationControl presetSerializationControl;

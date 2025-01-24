@@ -35,20 +35,26 @@ void ImGui::ImGuiRenderer::CreateD3DAndSwapChain::thunk()
 	ImGui::CreateContext();
 
 	auto& io = ImGui::GetIO();
-	io.ConfigFlags |= (ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad | ImGuiConfigFlags_NoMouseCursorChange);
-
-	io.IniFilename                       = singleton.iniFile.c_str();
-	io.ConfigWindowsMoveFromTitleBarOnly = true;
-	io.MousePos                          = { io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f };
 
 	{
 		static const auto screenSize         = RE::BSGraphics::Renderer::GetSingleton()->GetScreenSize();
 		io.DisplaySize.x                     = static_cast<float>(screenSize.width);
 		io.DisplaySize.y                     = static_cast<float>(screenSize.height);
+		io.FontGlobalScale                   = screenSize.height / 1080.0f * 1.5f;
 		io.ConfigWindowsMoveFromTitleBarOnly = true;
 		io.WantCaptureMouse                  = false;
 		io.MouseDrawCursor                   = false;
+
+		singleton.iniFile += std::to_string(screenSize.height);
+		singleton.iniFile += ".ini";
 	}
+
+	io.ConfigFlags |= (ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad | ImGuiConfigFlags_NoMouseCursorChange);
+
+	singleton.hasPreexistingIni          = std::filesystem::exists(singleton.iniFile);
+	io.IniFilename                       = singleton.iniFile.c_str();
+	io.ConfigWindowsMoveFromTitleBarOnly = true;
+	io.MousePos                          = { io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f };
 
 	if (!ImGui_ImplWin32_Init(desc.OutputWindow))
 	{
@@ -161,4 +167,9 @@ void ImGui::ImGuiRenderer::UnregisterRenderTarget(ImGuiRenderTarget* target)
 ImGui::ImGuiRenderer* ImGui::ImGuiRenderer::GetSingleton()
 {
 	return &singleton;
+}
+
+bool ImGui::ImGuiRenderer::HasPreexistingIni() const
+{
+	return hasPreexistingIni;
 }

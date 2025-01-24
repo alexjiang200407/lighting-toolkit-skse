@@ -4,8 +4,8 @@
 #include "ImGui/ImGuiTabBar.h"
 #include "Lighting.h"
 #include "LightingPreset.h"
-#include "SKSE/SerializationControl.h"
 #include "MenuState/MenuOpen.h"
+#include "SKSE/SerializationControl.h"
 
 Chiaroscuro Chiaroscuro::singleton;
 
@@ -46,6 +46,13 @@ void Chiaroscuro::DoFrame()
 		inputCtx.Update();
 		menuState = std::move(newState);
 	}
+
+	if (firstRender && !ImGui::ImGuiRenderer::GetSingleton()->HasPreexistingIni())
+	{
+		const auto& io = ImGui::GetIO();
+		ImGui::SetNextWindowSize({ 500.0f * io.FontGlobalScale, 600.0f * io.FontGlobalScale });
+	}
+	firstRender = false;
 	menuState->DoFrame(this);
 
 	// Reset currentTab and wait for next draw cycle
@@ -202,10 +209,10 @@ void Chiaroscuro::DrawSceneControlWindow()
 				const auto                ref     = dataHandler->CreateReferenceAtLocation(boundObj, Lighting::GetCameraLookingAt(50.0f), RE::NiPoint3(), RE::PlayerCharacter::GetSingleton()->GetParentCell(), RE::PlayerCharacter::GetSingleton()->GetWorldspace(), nullptr, nullptr, RE::ObjectRefHandle(), true, true).get();
 				std::unique_ptr<Lighting> newProp = std::make_unique<Lighting>(ref, &config, *lightSelector.GetSelection());
 
-			newProp->Init3D();
-			AddItem(std::move(newProp));
+				newProp->Init3D();
+				AddItem(std::move(newProp));
+			}
 		}
-	}
 	}
 	ImGui::EndChild();
 }
