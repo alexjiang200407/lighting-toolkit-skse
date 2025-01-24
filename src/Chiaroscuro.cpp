@@ -194,15 +194,18 @@ void Chiaroscuro::DrawSceneControlWindow()
 		lightSelector.DrawValueEditor();
 		if (ImGui::Button("Add Light"))
 		{
-			// TODO Add a PropFactory creation method here
-			const auto                dataHandler = RE::TESDataHandler::GetSingleton();
-			const RE::FormID          id          = dataHandler->LookupFormID(0x800, "Chiaroscuro.esp");
-			const auto                ref         = dataHandler->CreateReferenceAtLocation(RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>(), Lighting::GetCameraLookingAt(50.0f), RE::NiPoint3(), RE::PlayerCharacter::GetSingleton()->GetParentCell(), RE::PlayerCharacter::GetSingleton()->GetWorldspace(), nullptr, nullptr, RE::ObjectRefHandle(), true, true).get();
-			std::unique_ptr<Lighting> newProp     = std::make_unique<Lighting>(ref, &config, *lightSelector.GetSelection());
+			const auto       dataHandler = RE::TESDataHandler::GetSingleton();
+			const RE::FormID id          = dataHandler->LookupFormID(0x800, "Chiaroscuro.esp");
+
+			if (auto* boundObj = RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>())
+			{
+				const auto                ref     = dataHandler->CreateReferenceAtLocation(boundObj, Lighting::GetCameraLookingAt(50.0f), RE::NiPoint3(), RE::PlayerCharacter::GetSingleton()->GetParentCell(), RE::PlayerCharacter::GetSingleton()->GetWorldspace(), nullptr, nullptr, RE::ObjectRefHandle(), true, true).get();
+				std::unique_ptr<Lighting> newProp = std::make_unique<Lighting>(ref, &config, *lightSelector.GetSelection());
 
 			newProp->Init3D();
 			AddItem(std::move(newProp));
 		}
+	}
 	}
 	ImGui::EndChild();
 }
@@ -232,6 +235,7 @@ RE::BSEventNotifyControl Chiaroscuro::ProcessEvent(const RE::BGSActorCellEvent* 
 
 void Chiaroscuro::SerializeItems(SKSE::CoSaveIO io) const
 {
+	logger::info("Serializing Lights...");
 	io.Write(items.size());
 	for (const auto& light : items)
 	{

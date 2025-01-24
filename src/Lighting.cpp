@@ -210,7 +210,6 @@ RE::BSFadeNode* Lighting::Attach3D()
 		niLight->name = "ChiaroscuroLight";
 		RE::AttachNode(niNode, niLight.get());
 
-		// TODO put these into a settings class
 		niLight->ambient = RE::NiColor();
 		niLight->radius  = radius;
 		niLight->SetLightAttenuation(500);
@@ -229,7 +228,7 @@ RE::BSFadeNode* Lighting::Attach3D()
 void Lighting::Init3D()
 {
 	Attach3D();
-	MoveTo(worldTranslate);
+	//MoveTo(worldTranslate); Causes the EXCEPTION_ACCESS_VIOLATION bug?
 	UpdateLightColor();
 	UpdateLightTemplate();
 }
@@ -255,7 +254,6 @@ LightingPtr Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* pre
 		return LightingPtr();
 
 	auto* tesObjectREFR = tesForm->As<RE::TESObjectREFR>();
-
 	if (!tesObjectREFR)
 		return LightingPtr();	
 
