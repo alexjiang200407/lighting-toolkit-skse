@@ -242,12 +242,8 @@ ImGuiKey ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32KeyboardDevice::Key key
 
 bool ImGui::ImGuiInputAdapter::AddButtonEvent(InputList& list, InputList& removed, RE::ButtonEvent* const event)
 {
-	bool added = AddIDEvent(list, removed, event);
-	if (added && event->IsDown())
-		idEventsDown.insert(event);
-	else if (added && event->IsUp())
-		idEventsDown.erase(event);
-	return added;
+	bool suppressing = filter.IsSuppressing(event);
+	return AddInputEvent(!suppressing || (suppressing && event->IsUp()), list, removed, event);
 }
 
 bool ImGui::ImGuiInputAdapter::AddIDEvent(InputList& list, InputList& removed, RE::IDEvent* const event)
@@ -382,34 +378,10 @@ void ImGui::ImGuiInputAdapter::HandleCharEvent(RE::CharEvent* const charEvt)
 	inputEvtCallbacks.push_back([=](auto io) { io.AddInputCharacter(charEvt->keycode); });
 }
 
-void ImGui::ImGuiInputAdapter::ReleaseAllSuppressedKeys()
-{
-	logger::trace("Releasing all suppressed keys");
-	
-	if (!isSuppressing)
-		return;
-
-	RE::ButtonEvent* prev = nullptr;
-	RE::ButtonEvent* first = nullptr;
-	for (const auto& idEvent : idEventsDown)
-	{
-		if (!filter.IsSuppressing(idEvent))
-			continue;
-		auto* btnEvt = RE::ButtonEvent::Create(idEvent.device, idEvent.userEvt, idEvent.idCode, 0.0f, 0.1f);
-		if (prev)
-			prev->next = btnEvt;
-		else
-			first = btnEvt;
-		prev = btnEvt;
-	}
-	injectedInputEvts = first;
-}
-
 void ImGui::ImGuiInputAdapter::EnableSupression(const Input::InputContext& inputCtx)
 {
 	inputCtx.TransformInputFilter(this->filter);
 	isSuppressing = true;
-	ReleaseAllSuppressedKeys();
 }
 
 void ImGui::ImGuiInputAdapter::DisableSupression()
@@ -435,7 +407,7 @@ void ImGui::ImGuiInputAdapter::DispatchImGuiInputEvents()
 	}
 }
 
-void ImGui::ImGuiInputAdapter::Adapt(RE::BSTEventSource<RE::InputEvent*>* dispatcher, RE::InputEvent** ppEvents)
+void ImGui::ImGuiInputAdapter::Adapt(RE::BSTEventSource<RE::InputEvent*>*, RE::InputEvent** ppEvents)
 {
 	InputList list{ nullptr, nullptr };
 	InputList removed{ nullptr, nullptr };
@@ -470,12 +442,6 @@ void ImGui::ImGuiInputAdapter::Adapt(RE::BSTEventSource<RE::InputEvent*>* dispat
 	}
 
 	*ppEvents = list.first;
-	if (list.second)
-		list.second->next = injectedInputEvts;
-	else
-		*ppEvents = injectedInputEvts;
-
-	injectedInputEvts = nullptr;
 }
 
 bool ImGui::ImGuiInputAdapter::IsKeyPressed(const char* keyID, bool repeat)
