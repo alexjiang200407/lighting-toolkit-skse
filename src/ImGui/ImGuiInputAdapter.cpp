@@ -240,6 +240,36 @@ ImGuiKey ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32KeyboardDevice::Key key
 	}
 }
 
+bool ImGui::ImGuiInputAdapter::AddButtonEvent(InputList& list, InputList& removed, RE::ButtonEvent* const event)
+{
+	bool added = AddIDEvent(list, removed, event);
+	if (added && event->IsDown())
+		idEventsDown.insert(event);
+	else if (added && event->IsUp())
+		idEventsDown.erase(event);
+	return added;
+}
+
+bool ImGui::ImGuiInputAdapter::AddIDEvent(InputList& list, InputList& removed, RE::IDEvent* const event)
+{
+	return AddInputEvent(!filter.IsSuppressing(event), list, removed, event);
+}
+
+bool ImGui::ImGuiInputAdapter::AddInputEvent(bool cond, InputList& list, InputList& removed, RE::InputEvent* const event)
+{
+	if (!isSuppressing || cond)
+	{
+		AddToInputList(list, event);
+		return true;
+	}
+	else
+	{
+		AddToInputList(removed, event);
+		return false;
+	}
+}
+
+
 ImGuiKey ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32GamepadDevice::Key key)
 {
 	using GAMEPAD_DIRECTX = RE::BSWin32GamepadDevice::Key;
@@ -286,19 +316,19 @@ void ImGui::ImGuiInputAdapter::HandleButtonEvent(RE::ButtonEvent* const buttonEv
 	case RE::INPUT_DEVICE::kVirtualKeyboard:
 		{
 			HandleKeyboardButtonEvent(buttonEvt->GetIDCode(), buttonEvt->IsPressed());
-			UpdateInputList(filter.kbdSuppress, list, removed, buttonEvt);
+			AddButtonEvent(list, removed, buttonEvt);
 		}
 		break;
 	case RE::INPUT_DEVICE::kMouse:
 		{
 			HandleMouseButtonEvent(buttonEvt->GetIDCode(), buttonEvt->Value(), buttonEvt->IsPressed());
-			UpdateInputList(filter.mouseSuppress, list, removed, buttonEvt);
+			AddButtonEvent(list, removed, buttonEvt);
 		}
 		break;
 	case RE::INPUT_DEVICE::kGamepad:
 		{
 			HandleGamepadButtonEvent(buttonEvt->GetIDCode(), buttonEvt->IsPressed());
-			UpdateInputList(filter.gamepadSuppress, list, removed, buttonEvt);
+			AddButtonEvent(list, removed, buttonEvt);
 		}
 		break;
 	default:
@@ -352,24 +382,45 @@ void ImGui::ImGuiInputAdapter::HandleCharEvent(RE::CharEvent* const charEvt)
 	inputEvtCallbacks.push_back([=](auto io) { io.AddInputCharacter(charEvt->keycode); });
 }
 
-void ImGui::ImGuiInputAdapter::EnableSupression(Input::InputFilter filter)
+void ImGui::ImGuiInputAdapter::ReleaseAllSuppressedKeys()
 {
-	this->filter = filter;
+	logger::trace("Releasing all suppressed keys");
+	
+	if (!isSuppressing)
+		return;
+
+	RE::ButtonEvent* prev = nullptr;
+	RE::ButtonEvent* first = nullptr;
+	for (const auto& idEvent : idEventsDown)
+	{
+		if (!filter.IsSuppressing(idEvent))
+			continue;
+		auto* btnEvt = RE::ButtonEvent::Create(idEvent.device, idEvent.userEvt, idEvent.idCode, 0.0f, 0.1f);
+		if (prev)
+			prev->next = btnEvt;
+		else
+			first = btnEvt;
+		prev = btnEvt;
+	}
+	injectedInputEvts = first;
+}
+
+void ImGui::ImGuiInputAdapter::EnableSupression(const Input::InputContext& inputCtx)
+{
+	inputCtx.TransformInputFilter(this->filter);
+	isSuppressing = true;
+	ReleaseAllSuppressedKeys();
 }
 
 void ImGui::ImGuiInputAdapter::DisableSupression()
 {
-	memset(&filter, 0, sizeof(filter));
+	filter.Clear();
+	isSuppressing = false;
 }
 
 ImGui::ImGuiInputAdapter* ImGui::ImGuiInputAdapter::GetSingleton()
 {
 	return &singleton;
-}
-
-bool ImGui::ImGuiInputAdapter::IsSuppressingButtons()
-{
-	return !(filter.kbdSuppress == 0 && filter.mouseSuppress == 0 && filter.gamepadSuppress == 0);
 }
 
 void ImGui::ImGuiInputAdapter::DispatchImGuiInputEvents()
@@ -402,26 +453,29 @@ void ImGui::ImGuiInputAdapter::Adapt(RE::BSTEventSource<RE::InputEvent*>* dispat
 		if (const auto charEvt = event->AsCharEvent())
 		{
 			HandleCharEvent(charEvt);
-			if (!filter.blockCharEvents)
-				AddToInputList(list, charEvt);
-			else
-				AddToInputList(removed, charEvt);
+			AddInputEvent(!filter.IsBlockingChar(), list, removed, charEvt);
 			handled = true;
 		}
 		if (const auto mouseMoveEvt = event->AsMouseMoveEvent())
 		{
-			if (!filter.blockMouseMoveEvents)
-				AddToInputList(list, mouseMoveEvt);
-			else
-				AddToInputList(removed, mouseMoveEvt);
+			AddInputEvent(!filter.IsBlockingMouseMove(), list, removed, mouseMoveEvt);
 			handled = true;
 		}
 
 		if (!handled)
+		{
 			AddToInputList(list, event);
+			logger::warn("Input not handled");
+		}
 	}
 
 	*ppEvents = list.first;
+	if (list.second)
+		list.second->next = injectedInputEvts;
+	else
+		*ppEvents = injectedInputEvts;
+
+	injectedInputEvts = nullptr;
 }
 
 bool ImGui::ImGuiInputAdapter::IsKeyPressed(const char* keyID, bool repeat)

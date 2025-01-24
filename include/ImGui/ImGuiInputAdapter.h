@@ -1,15 +1,12 @@
 #pragma once
+#include "Input/DeviceKeyMapping.h"
+#include "Input/InputContext.h"
 #include "Input/InputFilter.h"
 
 namespace ImGui
 {
 	class ImGuiInputAdapter
 	{
-	public:
-		typedef std::bitset<256> KeyboardSupressionMask;
-		typedef std::bitset<256> MouseSupressionMask;
-		typedef std::bitset<256> GamePadSupressionMask;
-
 	private:
 		struct SendInputEvent
 		{
@@ -19,10 +16,9 @@ namespace ImGui
 
 	public:
 		void                      Init();
-		void                      EnableSupression(Input::InputFilter filter);
+		void                      EnableSupression(const Input::InputContext& inputCtx);
 		void                      DisableSupression();
 		static ImGuiInputAdapter* GetSingleton();
-		bool                      IsSuppressingButtons();
 		void                      DispatchImGuiInputEvents();
 		void                      Adapt(RE::BSTEventSource<RE::InputEvent*>* dispatcher, RE::InputEvent** ppEvents);
 		static bool               IsKeyPressed(const char* keyID, bool repeat);
@@ -36,20 +32,10 @@ namespace ImGui
 		static int      ToImGuiKey(RE::BSWin32MouseDevice::Key key);
 
 		typedef std::pair<RE::InputEvent*, RE::InputEvent*> InputList;
-		template <size_t S>
-		static void UpdateInputList(std::bitset<S> keySet, InputList& list, InputList& removed, RE::ButtonEvent* const event)
-		{
-			if (!singleton.IsSuppressingButtons() || !keySet.test(event->GetIDCode()) || event->IsUp())
-			{
-				AddToInputList(list, event);
-			}
-			else
-			{
-				AddToInputList(removed, event);
-			}
-		}
-
-		static void AddToInputList(InputList& list, RE::InputEvent* const event)
+		bool                                                AddButtonEvent(InputList& list, InputList& removed, RE::ButtonEvent* const event);
+		bool                                                AddIDEvent(InputList& list, InputList& removed, RE::IDEvent* const event);
+		bool                                                AddInputEvent(bool cond, InputList& list, InputList& removed, RE::InputEvent* const event);
+		static void                                         AddToInputList(InputList& list, RE::InputEvent* const event)
 		{
 			list.second       = list.first ? list.second->next = event : list.first = event;
 			list.second->next = nullptr;
@@ -60,8 +46,12 @@ namespace ImGui
 		void HandleMouseButtonEvent(uint32_t key, float value, bool isPressed);
 		void HandleGamepadButtonEvent(uint32_t key, bool isPressed);
 		void HandleCharEvent(RE::CharEvent* const charEvt);
+		void ReleaseAllSuppressedKeys();
 
 	private:
+		std::set<Input::DeviceKeyMapping>        idEventsDown;
+		bool                                     isSuppressing     = false;
+		RE::InputEvent*                          injectedInputEvts = nullptr;
 		Input::InputFilter                       filter;
 		static ImGuiInputAdapter                 singleton;
 		std::list<std::function<void(ImGuiIO&)>> inputEvtCallbacks;

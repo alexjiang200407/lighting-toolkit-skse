@@ -9,13 +9,16 @@ set(SOURCES ${SOURCES}
 	src/ImGui/ImGuiRenderTarget.cpp
 	src/ImGui/ImGuiTabBarAbstract.cpp
 	src/ImGui/ImGuiWidgets.cpp
+	src/Input/DeviceKeyMapping.cpp
 	src/Input/InputContext.cpp
-	src/Input/InputModifier/BSControlModifier.cpp
+	src/Input/InputFilter.cpp
+	src/Input/InputModifier/BSKeyboardGamepadModifier.cpp
 	src/Input/InputModifier/CanCharInput.cpp
-	src/Input/InputModifier/CanMouseButton.cpp
 	src/Input/InputModifier/CanMouseMove.cpp
 	src/Input/InputModifier/CanMoveAround.cpp
+	src/Input/InputModifier/CanRun.cpp
 	src/Input/InputModifier/FreeCameraControl.cpp
+	src/Input/InputModifier/FreeCameraZTranslate.cpp
 	src/Input/InputModifier/InputModifier.cpp
 	src/LightDesigner.cpp
 	src/LightEditor.cpp

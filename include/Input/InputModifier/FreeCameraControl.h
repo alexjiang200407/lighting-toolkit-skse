@@ -1,17 +1,21 @@
 #pragma once
-#include "CanMouseButton.h"
+#include "FreeCameraZTranslate.h"
 #include "CanMouseMove.h"
 #include "CanMoveAround.h"
 
 namespace Input
 {
 	class FreeCameraControl :
-		public CanMouseButton,
 		public CanMouseMove,
+		public FreeCameraZTranslate,
 		public CanMoveAround
 	{
 	public:
 		FreeCameraControl();
 		FreeCameraControl(bool enable);
+
+	public:
+		void ApplyKeySuppressionModifier(InputFilter& filter) const override;
+
 	};
 }

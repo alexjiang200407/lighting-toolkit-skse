@@ -1,12 +1,15 @@
 #pragma once
-#include "BSControlModifier.h"
+#include "BSKeyboardGamepadModifier.h"
 
 namespace Input
 {
 	class CanMoveAround :
-		public BSControlModifier
+		public BSKeyboardGamepadModifier
 	{
 	public:
 		CanMoveAround(bool blockMove);
+
+	public:
+		static inline constexpr const char* inputIDs[4] = { "Forward", "Back", "Strafe Left", "Strafe Right" };
 	};
 }

@@ -10,12 +10,11 @@ namespace Input
 	{
 	public:
 		virtual ~InputModifier() = default;
+
 	public:
-		virtual KeyboardSupressionMask ApplyKeyModifier(KeyboardSupressionMask kbd) const;
-		virtual MouseSupressionMask    ApplyMouseKeyModifier(MouseSupressionMask mouse) const;
-		virtual GamePadSupressionMask  ApplyGamepadKeyModifier(GamePadSupressionMask gamepad) const;
-		virtual bool                   ApplyBlockCharModifier(bool prevBlockChars) const;
-		virtual bool                   ApplyBlockMouseMoveModifier(bool prevBlockMouseMove) const;
-		virtual InputFilter            ApplyModifier(InputFilter filter) const;
+		virtual bool ApplyBlockCharModifier(bool prevBlockChars) const;
+		virtual bool ApplyBlockMouseMoveModifier(bool prevBlockMouseMove) const;
+		virtual void ApplyKeySuppressionModifier(InputFilter& filter) const;
+		virtual void ApplyModifier(InputFilter& filter) const;
 	};
 }

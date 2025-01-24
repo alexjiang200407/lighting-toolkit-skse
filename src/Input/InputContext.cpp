@@ -1,11 +1,6 @@
 #include "Input/InputContext.h"
 #include "ImGui/ImGuiInputAdapter.h"
 
-Input::InputContext::InputContext(InputFilter filter) :
-	starting(filter)
-{
-}
-
 void Input::InputContext::AddModifier(int slot, InputModifier* modifier)
 {
 	modifiers[slot] = std::move(InputModifierPtr(modifier));
@@ -24,14 +19,14 @@ void Input::InputContext::ClearAllModifiers()
 void Input::InputContext::Update()
 {
 	auto* adapter = ImGui::ImGuiInputAdapter::GetSingleton();
-	adapter->EnableSupression(AggregateModifiers(starting));
+	adapter->EnableSupression(*this);
 }
 
-Input::InputFilter Input::InputContext::AggregateModifiers(InputFilter data) const
+void Input::InputContext::TransformInputFilter(InputFilter& data) const
 {
+	data.Clear();
 	for (const auto& [_, modifier] : modifiers)
 	{
-		data = modifier->ApplyModifier(data);
+		modifier->ApplyModifier(data);
 	}
-	return data;
 }
