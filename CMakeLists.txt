@@ -72,7 +72,7 @@ set(Boost_USE_STATIC_RUNTIME OFF CACHE BOOL "")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 
 # Set your project name. This will be the name of your SKSE .dll file.
-project(Chiaroscuro VERSION 0.0.0 LANGUAGES CXX)
+project(Chiaroscuro VERSION 1.0.0 LANGUAGES CXX)
 
 configure_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/cmake/Version.h.in
