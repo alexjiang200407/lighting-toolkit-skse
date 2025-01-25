@@ -33,7 +33,7 @@ namespace ImGui
 		ImGuiRenderer& operator=(ImGuiRenderer&&)      = delete;
 
 	public:
-		void                  Init(ImGuiStyle a_style);
+		void                  Init(ImGuiStyle a_style, const char* a_font = nullptr, float a_fontSz = 10.0f);
 		void                  RegisterRenderTarget(ImGuiRenderTarget* target);
 		void                  UnregisterRenderTarget(ImGuiRenderTarget* target);
 		static ImGuiRenderer* GetSingleton();
@@ -41,10 +41,12 @@ namespace ImGui
 
 	private:
 		bool                         hasPreexistingIni = false;
+		float                        fontSz            = 10.0f;
 		ImGuiStyle                   style;
 		std::set<ImGuiRenderTarget*> targets;
 		std::atomic<bool>            installedHooks;
 		std::string                  iniFile = fmt::format("./Data/SKSE/Plugins/{}ImGui", Version::PROJECT);
+		std::optional<std::string>   font;
 		static ImGuiRenderer         singleton;
 	};
 }

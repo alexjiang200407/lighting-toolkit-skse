@@ -11,7 +11,7 @@ Chiaroscuro Chiaroscuro::singleton;
 
 void Chiaroscuro::Init()
 {
-	ImGui::ImGuiRenderer::GetSingleton()->Init(Style());
+	ImGui::ImGuiRenderer::GetSingleton()->Init(Style(), "./Data/Interface/Fonts/Futura-Condensed-Normal.ttf", 15.0f);
 	ImGui::ImGuiInputAdapter::GetSingleton()->Init();
 	ImGui::ImGuiRenderer::GetSingleton()->RegisterRenderTarget(&singleton);
 	presetSerializationControl.Deserialize(config);
@@ -50,7 +50,7 @@ void Chiaroscuro::DoFrame()
 	if (firstRender && !ImGui::ImGuiRenderer::GetSingleton()->HasPreexistingIni())
 	{
 		const auto& io = ImGui::GetIO();
-		ImGui::SetNextWindowSize({ 500.0f * io.FontGlobalScale, 600.0f * io.FontGlobalScale });
+		ImGui::SetNextWindowSize({ io.DisplaySize.x * 0.35f, io.DisplaySize.y * 0.97f });
 	}
 	firstRender = false;
 	menuState->DoFrame(this);
