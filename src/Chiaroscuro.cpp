@@ -264,6 +264,7 @@ void Chiaroscuro::DeserializeItems(SKSE::CoSaveIO io)
 
 void Chiaroscuro::Revert(SKSE::CoSaveIO)
 {
+	logger::info("Reverting Save");
 	items.clear();
 }
 

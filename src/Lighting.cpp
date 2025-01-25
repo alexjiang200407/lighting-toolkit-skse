@@ -78,30 +78,33 @@ void Lighting::UpdateLightTemplate()
 
 void Lighting::MoveToCameraLookingAt(bool resetOffset)
 {
-	assert(RE::PlayerCharacter::GetSingleton());
-	assert(RE::PlayerCharacter::GetSingleton()->GetParentCell());
-
-	if (GetCellID() != RE::PlayerCharacter::GetSingleton()->GetParentCell()->formID)
-	{
-		auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
-		ref->SetParentCell(RE::PlayerCharacter::GetSingleton()->GetParentCell());
-		shadowSceneNode->RemoveLight(bsLight);
-		shadowSceneNode->RemoveLight(niLight.get());
-		Attach3D();
-		UpdateLightTemplate();
-	}
-	if (resetOffset)
-	{
-		cameraOffset.y = 0;
-		cameraOffset.z = 0;
-	}
-
 	auto cameraNode = RE::PlayerCamera::GetSingleton()->cameraRoot.get()->AsNode();
 	auto cameraNI   = reinterpret_cast<RE::NiCamera*>((cameraNode->children.size() == 0) ? nullptr : cameraNode->children[0].get());
 
 	if (cameraNI)
 	{
+		bool doReset = GetCellID() != RE::PlayerCharacter::GetSingleton()->GetParentCell()->formID;
+		ref->MoveTo(RE::PlayerCharacter::GetSingleton());
 		MoveTo(GetCameraPosition() + (cameraNI->world.rotate * cameraOffset));
+
+		assert(RE::PlayerCharacter::GetSingleton());
+		assert(RE::PlayerCharacter::GetSingleton()->GetParentCell());
+
+		if (doReset)
+		{
+			auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
+			shadowSceneNode->RemoveLight(bsLight);
+			shadowSceneNode->RemoveLight(niLight.get());
+			Attach3D();
+			UpdateLightColor();
+			UpdateLightTemplate();
+		}
+
+		if (resetOffset)
+		{
+			cameraOffset.y = 0;
+			cameraOffset.z = 0;
+		}
 	}
 }
 
