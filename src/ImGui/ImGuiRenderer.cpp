@@ -50,6 +50,7 @@ void ImGui::ImGuiRenderer::CreateD3DAndSwapChain::thunk()
 	}
 
 	io.ConfigFlags |= (ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad | ImGuiConfigFlags_NoMouseCursorChange);
+	io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
 
 	singleton.hasPreexistingIni          = std::filesystem::exists(singleton.iniFile);
 	io.IniFilename                       = singleton.iniFile.c_str();
