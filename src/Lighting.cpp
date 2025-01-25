@@ -228,7 +228,8 @@ RE::BSFadeNode* Lighting::Attach3D()
 void Lighting::Init3D()
 {
 	Attach3D();
-	//MoveTo(worldTranslate); Causes the EXCEPTION_ACCESS_VIOLATION bug?
+	//MoveTo(worldTranslate); // Moving causes the EXCEPTION_ACCESS_VIOLATION bug
+	niLight->world.translate = worldTranslate;
 	UpdateLightColor();
 	UpdateLightTemplate();
 }
