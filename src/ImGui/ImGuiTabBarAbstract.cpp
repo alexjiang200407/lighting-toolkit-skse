@@ -1,4 +1,4 @@
-#include "ImGui/ImGuiTabBarAbstract.h"
+#include "ImGuiTabBarAbstract.h"
 
 bool ImGui::ImGuiTabBarItem::operator==(const ImGuiTabBarItem& rhs) const { return id == rhs.id; }
 

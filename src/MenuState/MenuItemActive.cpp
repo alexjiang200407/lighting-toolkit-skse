@@ -1,5 +1,5 @@
-#include "MenuState/MenuItemActive.h"
-#include "MenuState/MenuOpen.h"
+#include "MenuItemActive.h"
+#include "MenuOpen.h"
 
 MenuItemActive::MenuItemActive(Input::MenuInputContext* inputCtx) { inputCtx->StartTextInput(); }
 

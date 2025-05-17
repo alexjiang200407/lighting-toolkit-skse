@@ -1,4 +1,4 @@
-#include "Input/InputModifier/CanCharInput.h"
+#include "../InputModifier/CanCharInput.h"
 
 Input::CanCharInput::CanCharInput(bool blockCharModifer) : blockCharModifer(blockCharModifer) {}
 

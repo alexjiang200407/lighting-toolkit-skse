@@ -1,6 +1,6 @@
-#include "MenuState/MenuLookingAround.h"
-#include "ImGui/ImGuiInputAdapter.h"
-#include "MenuState/MenuOpen.h"
+#include "MenuLookingAround.h"
+#include "../ImGui/ImGuiInputAdapter.h"
+#include "MenuOpen.h"
 
 MenuLookingAround::MenuLookingAround(Input::MenuInputContext* inputCtx)
 {

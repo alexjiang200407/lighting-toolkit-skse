@@ -1,4 +1,4 @@
-#include "Input/DeviceKeyMapping.h"
+#include "DeviceKeyMapping.h"
 
 bool Input::DeviceKeyMapping::operator<(const DeviceKeyMapping& rhs) const
 {

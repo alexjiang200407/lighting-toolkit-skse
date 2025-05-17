@@ -1,6 +1,6 @@
 #pragma once
-#include "LightingToolkit.h"
-#include "MenuInputContext.h"
+#include "../LightingToolkit.h"
+#include "../MenuInputContext.h"
 
 class LightingToolkit;
 class MenuState;

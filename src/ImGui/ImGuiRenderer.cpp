@@ -1,5 +1,5 @@
-#include "ImGui/ImGuiRenderer.h"
-#include "ImGui/ImGuiInputAdapter.h"
+#include "ImGuiRenderer.h"
+#include "ImGuiInputAdapter.h"
 #include <dxgi.h>
 
 ImGui::ImGuiRenderer ImGui::ImGuiRenderer::singleton;

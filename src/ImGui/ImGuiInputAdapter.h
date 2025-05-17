@@ -1,7 +1,7 @@
 #pragma once
-#include "Input/DeviceKeyMapping.h"
-#include "Input/InputContext.h"
-#include "Input/InputFilter.h"
+#include "../Input/DeviceKeyMapping.h"
+#include "../Input/InputContext.h"
+#include "../Input/InputFilter.h"
 
 namespace ImGui
 {

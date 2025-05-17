@@ -1,6 +1,6 @@
-#include "Preset/PresetSerializationControl.h"
-#include "Color.h"
-#include "LightingPreset.h"
+#include "../Preset/PresetSerializationControl.h"
+#include "../Color.h"
+#include "../LightingPreset.h"
 #include <fstream>
 
 using namespace preset;

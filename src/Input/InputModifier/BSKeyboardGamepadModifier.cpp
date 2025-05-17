@@ -1,4 +1,4 @@
-#include "Input/InputModifier/BSKeyboardGamepadModifier.h"
+#include "../InputModifier/BSKeyboardGamepadModifier.h"
 
 void Input::BSKeyboardGamepadModifier::ApplyKeySuppressionModifier(InputFilter& filter) const
 {

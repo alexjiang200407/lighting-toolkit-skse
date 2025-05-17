@@ -1,4 +1,4 @@
-#include "SKSE/SerializationControl.h"
+#include "SerializationControl.h"
 
 SKSE::SerializationControl SKSE::SerializationControl::singleton;
 

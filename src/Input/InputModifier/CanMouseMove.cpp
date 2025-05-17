@@ -1,4 +1,4 @@
-#include "Input/InputModifier/CanMouseMove.h"
+#include "../InputModifier/CanMouseMove.h"
 
 Input::CanMouseMove::CanMouseMove(bool blockLookAround) : blockLookAround(blockLookAround) {}
 

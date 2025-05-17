@@ -1,6 +1,6 @@
-#include "MenuState/MenuHidden.h"
-#include "ImGui/ImGuiInputAdapter.h"
-#include "MenuState/MenuOpen.h"
+#include "MenuHidden.h"
+#include "../ImGui/ImGuiInputAdapter.h"
+#include "MenuOpen.h"
 
 MenuHidden::MenuHidden(Input::MenuInputContext* inputCtx) { inputCtx->StartLookingAround(); }
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "Input/InputFilter.h"
+#include "../InputFilter.h"
 
 namespace Input
 {

@@ -1,4 +1,4 @@
-#include "ImGui/ImGuiRenderTarget.h"
+#include "ImGuiRenderTarget.h"
 
 bool ImGui::ImGuiRenderTarget::ShouldSkip() { return false; }
 

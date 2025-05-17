@@ -1,9 +1,9 @@
-#include "MenuState/MenuOpen.h"
-#include "ImGui/ImGuiInputAdapter.h"
-#include "MenuState/MenuHidden.h"
-#include "MenuState/MenuItemActive.h"
-#include "MenuState/MenuLookingAround.h"
-#include "MenuState/MenuPositioning.h"
+#include "MenuOpen.h"
+#include "../ImGui/ImGuiInputAdapter.h"
+#include "MenuHidden.h"
+#include "MenuItemActive.h"
+#include "MenuLookingAround.h"
+#include "MenuPositioning.h"
 
 MenuOpen::MenuOpen(Input::MenuInputContext* inputCtx)
 {

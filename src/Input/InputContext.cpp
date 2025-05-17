@@ -1,5 +1,5 @@
-#include "Input/InputContext.h"
-#include "ImGui/ImGuiInputAdapter.h"
+#include "./InputContext.h"
+#include "../ImGui/ImGuiInputAdapter.h"
 
 void Input::InputContext::AddModifier(int slot, InputModifier* modifier)
 {

@@ -157,7 +157,7 @@ target_link_libraries(
         nlohmann_json::nlohmann_json
 )
 
-target_precompile_headers(${PROJECT_NAME} PRIVATE include/PCH.h)
+target_precompile_headers(${PROJECT_NAME} PRIVATE src/PCH.h)
 
 
 if(DEFINED SkyrimModsPath)

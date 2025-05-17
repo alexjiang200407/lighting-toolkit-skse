@@ -1,4 +1,4 @@
-#include "Input/InputModifier/FreeCameraControl.h"
+#include "../InputModifier/FreeCameraControl.h"
 
 Input::FreeCameraControl::FreeCameraControl() : FreeCameraControl(false) {}
 

@@ -1,4 +1,4 @@
-#include "MenuState/MenuState.h"
+#include "MenuState.h"
 
 void MenuState::DoFrame(LightingToolkit*) {}
 
