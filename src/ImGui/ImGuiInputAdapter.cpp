@@ -463,8 +463,8 @@ void ImGui::ImGuiInputAdapter::Adapt(
 
 bool ImGui::ImGuiInputAdapter::IsKeyPressed(const char* keyID, bool repeat)
 {
-	uint32_t dInputkey;
-	if (MCM::Settings::GetSingleton()->Get("Controls", keyID, dInputkey))
+	int32_t dInputkey;
+	if (MCM::Settings::Get_s("Controls", keyID, dInputkey))
 	{
 		ImGuiKey key =
 			ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32KeyboardDevice::Key(dInputkey));
@@ -476,8 +476,8 @@ bool ImGui::ImGuiInputAdapter::IsKeyPressed(const char* keyID, bool repeat)
 
 bool ImGui::ImGuiInputAdapter::IsKeyDown(const char* keyID)
 {
-	uint32_t dInputkey;
-	if (MCM::Settings::GetSingleton()->Get("Controls", keyID, dInputkey))
+	int32_t dInputkey;
+	if (MCM::Settings::Get_s("Controls", keyID, dInputkey))
 	{
 		ImGuiKey key =
 			ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32KeyboardDevice::Key(dInputkey));

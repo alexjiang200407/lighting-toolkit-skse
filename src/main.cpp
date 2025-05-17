@@ -76,8 +76,8 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	InitializeLog();
 
 	logger::info("Game version : {}", a_skse->RuntimeVersion().string());
-	LightingToolkit::GetSingleton()->Init();
 	MCM::Settings::GetSingleton()->Init();
+	LightingToolkit::GetSingleton()->Init();
 
 	SKSE::GetMessagingInterface()->RegisterListener([](SKSE::MessagingInterface::Message* message) {
 		if (message->type == SKSE::MessagingInterface::kDataLoaded)
