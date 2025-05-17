@@ -1,8 +1,7 @@
 #pragma once
 #include "MenuState.h"
 
-class MenuHidden :
-	public MenuState
+class MenuHidden : public MenuState
 {
 public:
 	MenuHidden(Input::MenuInputContext* inputCtx);

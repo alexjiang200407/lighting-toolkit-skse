@@ -37,10 +37,10 @@ void ImGui::ImGuiRenderer::CreateD3DAndSwapChain::thunk()
 	auto& io = ImGui::GetIO();
 
 	{
-		static const auto screenSize         = RE::BSGraphics::Renderer::GetSingleton()->GetScreenSize();
-		io.DisplaySize.x                     = static_cast<float>(screenSize.width);
-		io.DisplaySize.y                     = static_cast<float>(screenSize.height);
-		io.FontGlobalScale                   = screenSize.height / 1080.0f * 1.5f;
+		static const auto screenSize = RE::BSGraphics::Renderer::GetSingleton()->GetScreenSize();
+		io.DisplaySize.x             = static_cast<float>(screenSize.width);
+		io.DisplaySize.y             = static_cast<float>(screenSize.height);
+		io.FontGlobalScale           = screenSize.height / 1080.0f * 1.5f;
 		io.ConfigWindowsMoveFromTitleBarOnly = true;
 		io.WantCaptureMouse                  = false;
 		io.MouseDrawCursor                   = false;
@@ -49,7 +49,9 @@ void ImGui::ImGuiRenderer::CreateD3DAndSwapChain::thunk()
 		singleton.iniFile += ".ini";
 	}
 
-	io.ConfigFlags |= (ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad | ImGuiConfigFlags_NoMouseCursorChange);
+	io.ConfigFlags |=
+		(ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad |
+	     ImGuiConfigFlags_NoMouseCursorChange);
 	io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
 
 	singleton.hasPreexistingIni          = std::filesystem::exists(singleton.iniFile);
@@ -71,11 +73,10 @@ void ImGui::ImGuiRenderer::CreateD3DAndSwapChain::thunk()
 	logger::info("ImGui initialized.");
 	singleton.installedHooks.store(true);
 
-	WndProc::func = reinterpret_cast<WNDPROC>(
-		SetWindowLongPtrA(
-			desc.OutputWindow,
-			GWLP_WNDPROC,
-			reinterpret_cast<LONG_PTR>(WndProc::thunk)));
+	WndProc::func = reinterpret_cast<WNDPROC>(SetWindowLongPtrA(
+		desc.OutputWindow,
+		GWLP_WNDPROC,
+		reinterpret_cast<LONG_PTR>(WndProc::thunk)));
 
 	if (!WndProc::func)
 	{
@@ -152,16 +153,18 @@ void ImGui::ImGuiRenderer::StopTimer::thunk(std::uint32_t timer)
 
 void ImGui::ImGuiRenderer::Init(ImGuiStyle a_style, const char* a_font, float a_fontSz)
 {
-	REL::Relocation<std::uintptr_t> target{ RELOCATION_ID(75595, 77226), OFFSET(0x9, 0x275) };  // BSGraphics::InitD3D
+	REL::Relocation<std::uintptr_t> target{ RELOCATION_ID(75595, 77226),
+		                                    OFFSET(0x9, 0x275) };  // BSGraphics::InitD3D
 	stl::write_thunk_call<CreateD3DAndSwapChain>(target.address());
 
-	REL::Relocation<std::uintptr_t> target2{ RELOCATION_ID(75461, 77246), 0x9 };  // BSGraphics::Renderer::End
+	REL::Relocation<std::uintptr_t> target2{ RELOCATION_ID(75461, 77246),
+		                                     0x9 };  // BSGraphics::Renderer::End
 	stl::write_thunk_call<StopTimer>(target2.address());
 
 	style = a_style;
 
 	if (a_font)
-		font  = a_font;
+		font = a_font;
 
 	fontSz = a_fontSz;
 }
@@ -176,12 +179,6 @@ void ImGui::ImGuiRenderer::UnregisterRenderTarget(ImGuiRenderTarget* target)
 	targets.erase(target);
 }
 
-ImGui::ImGuiRenderer* ImGui::ImGuiRenderer::GetSingleton()
-{
-	return &singleton;
-}
+ImGui::ImGuiRenderer* ImGui::ImGuiRenderer::GetSingleton() { return &singleton; }
 
-bool ImGui::ImGuiRenderer::HasPreexistingIni() const
-{
-	return hasPreexistingIni;
-}
+bool ImGui::ImGuiRenderer::HasPreexistingIni() const { return hasPreexistingIni; }

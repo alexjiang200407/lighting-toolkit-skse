@@ -1,6 +1,6 @@
 #include "LightingToolkit.h"
-#include "SKSE/SerializationControl.h"
 #include "MCM/Settings.h"
+#include "SKSE/SerializationControl.h"
 
 void InitializeLog()
 {
@@ -40,7 +40,8 @@ extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
 	return v;
 }();
 #else
-extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
+extern "C" DLLEXPORT bool SKSEAPI
+	SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 {
 	a_info->infoVersion = SKSE::PluginInfo::kVersion;
 	a_info->name        = Version::PROJECT;

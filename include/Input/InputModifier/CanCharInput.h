@@ -3,8 +3,7 @@
 
 namespace Input
 {
-	class CanCharInput :
-		virtual public InputModifier
+	class CanCharInput : virtual public InputModifier
 	{
 	public:
 		CanCharInput(bool blockCharModifer);

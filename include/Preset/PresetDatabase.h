@@ -21,10 +21,7 @@ namespace preset
 		{
 			using is_transparent = void;
 
-			bool operator()(const PresetID& lhs, const PresetID& rhs) const
-			{
-				return lhs < rhs;
-			}
+			bool operator()(const PresetID& lhs, const PresetID& rhs) const { return lhs < rhs; }
 
 			bool operator()(const PresetPtr& lhs, const PresetID& rhs) const
 			{
@@ -41,10 +38,7 @@ namespace preset
 				return lhs->GetID() < rhs->GetID();
 			}
 
-			bool operator()(const PresetTID& lhs, const PresetTID& rhs) const
-			{
-				return lhs < rhs;
-			}
+			bool operator()(const PresetTID& lhs, const PresetTID& rhs) const { return lhs < rhs; }
 
 			bool operator()(const PresetTID& lhs, const PresetPtr& rhs) const
 			{
@@ -64,7 +58,9 @@ namespace preset
 		bool                          IsEnd(const iterator& it) const;
 		iterator                      Find(PresetID key) const;
 
-		template <typename T, typename std::enable_if<std::is_base_of<Preset, T>::value>::type* = nullptr>
+		template <
+			typename T,
+			typename std::enable_if<std::is_base_of<Preset, T>::value>::type* = nullptr>
 		PresetID FirstOfType() const
 		{
 			iterator lo = presets.lower_bound(T::TID);
@@ -79,6 +75,6 @@ namespace preset
 
 	private:
 		std::set<PresetPtr, PresetPtrComparator> presets;
-		static constexpr std::string_view        filePath = "./Data/SKSE/Plugins/Chiaroscuro.json"sv;
+		static constexpr std::string_view filePath = "./Data/SKSE/Plugins/Chiaroscuro.json"sv;
 	};
 }

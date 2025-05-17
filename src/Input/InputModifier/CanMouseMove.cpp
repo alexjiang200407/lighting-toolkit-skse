@@ -1,11 +1,5 @@
 #include "Input/InputModifier/CanMouseMove.h"
 
-Input::CanMouseMove::CanMouseMove(bool blockLookAround) :
-	blockLookAround(blockLookAround)
-{
-}
+Input::CanMouseMove::CanMouseMove(bool blockLookAround) : blockLookAround(blockLookAround) {}
 
-bool Input::CanMouseMove::ApplyBlockMouseMoveModifier(bool) const
-{
-	return blockLookAround;
-}
+bool Input::CanMouseMove::ApplyBlockMouseMoveModifier(bool) const { return blockLookAround; }

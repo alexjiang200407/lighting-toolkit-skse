@@ -6,8 +6,7 @@
 
 namespace preset
 {
-	struct LightingPreset :
-		Preset
+	struct LightingPreset : Preset
 	{
 		class Deserializer : public DeserializationStrategy
 		{
@@ -28,7 +27,14 @@ namespace preset
 
 		typedef lib::EnumSet<Flags, uint32_t> LightFlags;
 		LightingPreset() = default;
-		LightingPreset(PresetID id, LightFlags flags, float fov, float depthBias, float nearDistance, float intensity, float radius);
+		LightingPreset(
+			PresetID   id,
+			LightFlags flags,
+			float      fov,
+			float      depthBias,
+			float      nearDistance,
+			float      intensity,
+			float      radius);
 		LightingPreset(std::string name, LightFlags flags);
 
 		bool                                     IsShadowLight() const;

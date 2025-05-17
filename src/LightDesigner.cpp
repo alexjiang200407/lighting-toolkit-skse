@@ -1,18 +1,20 @@
 #include "LightDesigner.h"
 
 LightDesigner::LightDesigner(preset::PresetDatabase* presetDB) :
-	ImGui::ImGuiSelector<preset::LightingPreset>("Light Designer##LightDesigner", preset::LightingPreset()),
+	ImGui::ImGuiSelector<preset::LightingPreset>(
+		"Light Designer##LightDesigner",
+		preset::LightingPreset()),
 	presetDB(presetDB)
-{
-}
+{}
 
 bool LightDesigner::DrawValueEditor()
 {
 	if (!ImGui::ImGuiSelector<preset::LightingPreset>::selection.has_value())
 		return false;
 
-	bool                    changed     = false;
-	preset::LightingPreset& lightPreset = ImGui::ImGuiSelector<preset::LightingPreset>::selection.value();
+	bool                    changed = false;
+	preset::LightingPreset& lightPreset =
+		ImGui::ImGuiSelector<preset::LightingPreset>::selection.value();
 
 	using FLAGS = preset::LightingPreset::Flags;
 
@@ -22,7 +24,6 @@ bool LightDesigner::DrawValueEditor()
 	ImGui::CheckboxFlags("Affect Water", &flags, static_cast<uint32_t>(FLAGS::kAffectWater));
 	ImGui::SameLine();
 	ImGui::CheckboxFlags("Affect All", &flags, static_cast<uint32_t>(FLAGS::kAffectAll));
-
 
 	ImGui::CheckboxFlags("Has Shadow", &flags, static_cast<uint32_t>(FLAGS::kCastsShadow));
 	ImGui::SameLine();

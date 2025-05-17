@@ -2,20 +2,24 @@
 
 using namespace preset;
 
-LightingPreset::LightingPreset(PresetID id, LightFlags flags, float fov, float depthBias, float nearDistance, float intensity, float radius) :
-	Preset(id), flags(flags), fov(fov * (RE::NI_PI / 180.0f)), depthBias(depthBias), nearDistance(nearDistance), intensity(intensity), radius(radius)
-{
-}
+LightingPreset::LightingPreset(
+	PresetID   id,
+	LightFlags flags,
+	float      fov,
+	float      depthBias,
+	float      nearDistance,
+	float      intensity,
+	float      radius) :
+	Preset(id),
+	flags(flags), fov(fov * (RE::NI_PI / 180.0f)), depthBias(depthBias), nearDistance(nearDistance),
+	intensity(intensity), radius(radius)
+{}
 
 LightingPreset::LightingPreset(std::string name, LightFlags flags) :
 	Preset(PresetID::GenID<LightingPreset>(name)), flags(flags)
-{
-}
+{}
 
-bool preset::LightingPreset::IsShadowLight() const
-{
-	return flags.all(Flags::kCastsShadow);
-}
+bool preset::LightingPreset::IsShadowLight() const { return flags.all(Flags::kCastsShadow); }
 
 RE::ShadowSceneNode::LIGHT_CREATE_PARAMS LightingPreset::ToLightCreateParams() const
 {
@@ -59,15 +63,8 @@ LightingPreset::operator RE::ShadowSceneNode::LIGHT_CREATE_PARAMS() const
 
 PresetPtr LightingPreset::Deserializer::operator()(PresetID a_id, json json) const
 {
-	static constexpr const char* requiredKeys[] = {
-		"flags",
-		"intensity",
-		"radius",
-		"fov",
-		"depthBias",
-		"falloff",
-		"nearDistance"
-	};
+	static constexpr const char* requiredKeys[] = { "flags",     "intensity", "radius",      "fov",
+		                                            "depthBias", "falloff",   "nearDistance" };
 
 	for (auto key : requiredKeys)
 	{
@@ -79,13 +76,12 @@ PresetPtr LightingPreset::Deserializer::operator()(PresetID a_id, json json) con
 	}
 
 	uint32_t lightFlags = json["flags"];
-	return std::make_unique<LightingPreset>(
-		LightingPreset(
-			a_id,
-			LightFlags(lightFlags),
-			json["fov"],
-			json["depthBias"],
-			json["nearDistance"],
-			json["intensity"],
-			json["radius"]));
+	return std::make_unique<LightingPreset>(LightingPreset(
+		a_id,
+		LightFlags(lightFlags),
+		json["fov"],
+		json["depthBias"],
+		json["nearDistance"],
+		json["intensity"],
+		json["radius"]));
 }

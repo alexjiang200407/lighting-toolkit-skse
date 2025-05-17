@@ -5,14 +5,10 @@
 namespace ImGui
 {
 	template <typename V>
-	class ImGuiValueEditorMode :
-		public ImGuiNavBarItem
+	class ImGuiValueEditorMode : public ImGuiNavBarItem
 	{
 	public:
-		ImGuiValueEditorMode(const char* label) :
-			ImGuiNavBarItem(label)
-		{
-		}
+		ImGuiValueEditorMode(const char* label) : ImGuiNavBarItem(label) {}
 		virtual bool DrawValueEditor() = 0;
 		virtual V*   GetSelection()    = 0;
 	};
@@ -21,8 +17,7 @@ namespace ImGui
 		typename T,
 		typename V,  // Value type that is being edited
 		size_t SZ>
-	class ImGuiValueEditor :
-		private ImGuiNavBar<T, SZ>
+	class ImGuiValueEditor : private ImGuiNavBar<T, SZ>
 	{
 	public:
 		ImGuiValueEditor(const char* label, std::array<T*, SZ> elements) :
@@ -32,7 +27,7 @@ namespace ImGui
 	public:
 		bool DrawEditor()
 		{
-			bool tabChanged = ImGuiNavBar<T, SZ>::DrawNavBar();
+			bool tabChanged   = ImGuiNavBar<T, SZ>::DrawNavBar();
 			bool valueChanged = ImGuiNavBar<T, SZ>::GetSelected()->DrawValueEditor();
 			return tabChanged || valueChanged;
 		}
@@ -44,7 +39,7 @@ namespace ImGui
 
 			return nullptr;
 		}
-	
+
 	protected:
 		using ImGuiNavBar<T, SZ>::SetSelected;
 	};

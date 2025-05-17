@@ -1,21 +1,42 @@
 #pragma once
 #include "ColorPalette.h"
+#include "ImGui/ImGuiTabBar.h"
 #include "LightingPreset.h"
 #include "Preset/PresetDatabase.h"
-#include "ImGui/ImGuiTabBar.h"
 #include "SKSE/CoSaveIO.h"
 
 class Lighting;
 typedef std::unique_ptr<Lighting> LightingPtr;
 
-class Lighting :
-	public ImGui::ImGuiTabBarItemRemovable
+class Lighting : public ImGui::ImGuiTabBarItemRemovable
 {
 public:
-	Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset);
-	Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset);
-	Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset, float fade, float radius, bool hideLight = false, bool hideMarker = false);
-	Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset, float fade, float radius, bool hideLight = false, bool hideMarker = false);
+	Lighting(
+		RE::TESObjectREFRPtr    ref,
+		preset::PresetDatabase* presetDB,
+		preset::LightingPreset  lightPreset);
+	Lighting(
+		RE::TESObjectREFRPtr    ref,
+		preset::Color           color,
+		preset::PresetDatabase* presetDB,
+		preset::LightingPreset  lightPreset);
+	Lighting(
+		RE::TESObjectREFRPtr                     ref,
+		preset::PresetDatabase*                  presetDB,
+		RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset,
+		float                                    fade,
+		float                                    radius,
+		bool                                     hideLight  = false,
+		bool                                     hideMarker = false);
+	Lighting(
+		RE::TESObjectREFRPtr                     ref,
+		preset::Color                            color,
+		preset::PresetDatabase*                  presetDB,
+		RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset,
+		float                                    fade,
+		float                                    radius,
+		bool                                     hideLight  = false,
+		bool                                     hideMarker = false);
 
 public:
 	virtual bool            DrawTabItem(bool& active) override;

@@ -12,7 +12,8 @@ preset::PresetDatabase::const_iterator preset::PresetDatabase::cend() const
 	return presets.cend();
 }
 
-std::pair<PresetDatabase::iterator, PresetDatabase::iterator> PresetDatabase::GetAllPresetsOfType(PresetTID type) const
+std::pair<PresetDatabase::iterator, PresetDatabase::iterator>
+	PresetDatabase::GetAllPresetsOfType(PresetTID type) const
 {
 	std::pair<iterator, iterator> ret;
 	ret.first  = presets.lower_bound(type);
@@ -20,17 +21,8 @@ std::pair<PresetDatabase::iterator, PresetDatabase::iterator> PresetDatabase::Ge
 	return ret;
 }
 
-bool PresetDatabase::IsEnd(const iterator& it) const
-{
-	return it == presets.end();
-}
+bool PresetDatabase::IsEnd(const iterator& it) const { return it == presets.end(); }
 
-PresetDatabase::iterator PresetDatabase::Find(PresetID key) const
-{
-	return presets.find(key);
-}
+PresetDatabase::iterator PresetDatabase::Find(PresetID key) const { return presets.find(key); }
 
-void PresetDatabase::Insert(PresetPtr preset)
-{
-	presets.insert(std::move(preset));
-}
+void PresetDatabase::Insert(PresetPtr preset) { presets.insert(std::move(preset)); }

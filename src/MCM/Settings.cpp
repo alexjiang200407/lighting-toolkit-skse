@@ -9,10 +9,7 @@ void MCM::Settings::Init()
 	ReadAllSettings();
 }
 
-void MCM::Settings::OnConfigClosed(RE::TESQuest*)
-{
-	singleton.ReadAllSettings();
-}
+void MCM::Settings::OnConfigClosed(RE::TESQuest*) { singleton.ReadAllSettings(); }
 
 void MCM::Settings::ReadAllSettings()
 {
@@ -22,10 +19,7 @@ void MCM::Settings::ReadAllSettings()
 	ReadSettings(userIniFilePath);
 }
 
-MCM::Settings* MCM::Settings::GetSingleton()
-{
-	return &singleton;
-}
+MCM::Settings* MCM::Settings::GetSingleton() { return &singleton; }
 
 bool MCM::Settings::RegisterPapyrus(RE::BSScript::IVirtualMachine* a_vm)
 {
@@ -72,5 +66,4 @@ void MCM::Settings::ReadSettings(const wchar_t* filePath)
 			iniSectionMap[sectionName][key] = std::string(value);
 		}
 	}
-
 }

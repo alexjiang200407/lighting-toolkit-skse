@@ -7,23 +7,24 @@
 namespace ImGui
 {
 	template <typename T>
-	class ImGuiPresetSelector :
-		public ImGuiSelector<T>
+	class ImGuiPresetSelector : public ImGuiSelector<T>
 	{
 		ASSERT_BASE(T, preset::Preset);
+
 	public:
 		ImGuiPresetSelector(const char* selectionID, preset::PresetDatabase* presetDB) :
 			ImGuiSelector<T>(selectionID), presetDB(presetDB){};
 		ImGuiPresetSelector(const char* selectionID, preset::PresetDatabase* presetDB, T current) :
-			ImGuiSelector<T>(selectionID, current),
-			presetDB(presetDB)
-		{
-		}
+			ImGuiSelector<T>(selectionID, current), presetDB(presetDB)
+		{}
 
 	public:
 		bool DrawValueEditor() override
 		{
-			ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(ImGuiNavBarItem::GetLabel()).x - ImGui::GetStyle().ItemSpacing.x);
+			ImGui::PushItemWidth(
+				ImGui::GetContentRegionAvail().x -
+				ImGui::CalcTextSize(ImGuiNavBarItem::GetLabel()).x -
+				ImGui::GetStyle().ItemSpacing.x);
 
 			auto [st, end] = presetDB->GetAllPresetsOfType(T::TID);
 
@@ -72,7 +73,10 @@ namespace ImGui
 
 			if (!ans)
 			{
-				logger::error("DrawSelectionComboBox could not cast {} to {}", typeid(*selected).name(), typeid(T).name());
+				logger::error(
+					"DrawSelectionComboBox could not cast {} to {}",
+					typeid(*selected).name(),
+					typeid(T).name());
 				return false;
 			}
 

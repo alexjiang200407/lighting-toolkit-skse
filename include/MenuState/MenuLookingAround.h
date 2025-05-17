@@ -1,9 +1,8 @@
 #pragma once
-#include "MenuState.h"
 #include "MenuOpen.h"
+#include "MenuState.h"
 
-class MenuLookingAround :
-	public MenuOpen
+class MenuLookingAround : public MenuOpen
 {
 public:
 	MenuLookingAround(Input::MenuInputContext* inputCtx);

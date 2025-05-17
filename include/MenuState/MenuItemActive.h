@@ -1,9 +1,8 @@
 #pragma once
-#include "MenuState.h"
 #include "MenuOpen.h"
+#include "MenuState.h"
 
-class MenuItemActive :
-	public MenuOpen
+class MenuItemActive : public MenuOpen
 {
 public:
 	MenuItemActive(Input::MenuInputContext* inputCtx);

@@ -7,12 +7,11 @@ namespace ImGui
 	class ImGuiNavBarItem;
 	typedef std::unique_ptr<ImGuiNavBarItem> ImGuiNavBarItemPtr;
 
-	class ImGuiNavBarItem :
-		public ImGuiTabBarItem
+	class ImGuiNavBarItem : public ImGuiTabBarItem
 	{
 	public:
 		ImGuiNavBarItem(const char* label);
-		bool DrawTabItem();
+		bool        DrawTabItem();
 		const char* GetLabel() const;
 
 	private:
@@ -24,14 +23,13 @@ namespace ImGui
 		size_t SZ,
 		typename TPtr = typename std::unique_ptr<T>,
 		typename It   = typename std::array<TPtr, SZ>::iterator>
-	class ImGuiNavBar :
-		private ImGuiTabBarAbstract<T, It>
+	class ImGuiNavBar : private ImGuiTabBarAbstract<T, It>
 	{
 		ASSERT_BASE(T, ImGuiNavBarItem);
 		static_assert(SZ >= 1);
+
 	public:
-		ImGuiNavBar(const char* id, std::array<T*, SZ> nav) :
-			ImGuiTabBarAbstract<T, It>(id, 0)
+		ImGuiNavBar(const char* id, std::array<T*, SZ> nav) : ImGuiTabBarAbstract<T, It>(id, 0)
 		{
 			for (size_t i = 0; i < SZ; i++)
 			{
@@ -40,13 +38,9 @@ namespace ImGui
 			ImGuiTabBarAbstract<T, It>::currentTab = navBarItems[0].get();
 		}
 
-		bool DrawNavBar()
-		{
-			return ImGuiTabBarAbstract<T, It>::DrawTabBar();
-		}
+		bool DrawNavBar() { return ImGuiTabBarAbstract<T, It>::DrawTabBar(); }
 
 		using ImGuiTabBarAbstract<T, It>::GetLabel;
-
 
 	protected:
 		T* DrawTabBarItem(It& it) override
@@ -64,10 +58,7 @@ namespace ImGui
 		It begin() { return navBarItems.begin(); }
 		It end() { return navBarItems.end(); }
 
-		T* GetSelected() const
-		{
-			return ImGuiTabBarAbstract<T, It>::currentTab;
-		}
+		T* GetSelected() const { return ImGuiTabBarAbstract<T, It>::currentTab; }
 
 		void SetSelected(int idx)
 		{

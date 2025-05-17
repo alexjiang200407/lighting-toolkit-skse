@@ -2,8 +2,7 @@
 #include "Input/InputContext.h"
 namespace Input
 {
-	class MenuInputContext :
-		public InputContext
+	class MenuInputContext : public InputContext
 	{
 	private:
 		enum ModifierSlots : int

@@ -5,13 +5,10 @@
 
 namespace preset
 {
-	class Color :
-		public Preset,
-		public RE::NiColor
+	class Color : public Preset, public RE::NiColor
 	{
 	public:
-		class Deserializer :
-			public DeserializationStrategy
+		class Deserializer : public DeserializationStrategy
 		{
 		public:
 			PresetPtr operator()(PresetID a_id, json json) const override;
@@ -31,6 +28,7 @@ namespace preset
 		Color       Clone(std::string newName, bool isCustom) const;
 		json        Serialize() const override;
 		bool        IsCustom() const;
+
 	public:
 		static constexpr PresetTID TID = PresetTID::kColor;
 

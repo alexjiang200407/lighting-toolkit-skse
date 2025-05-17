@@ -11,17 +11,17 @@ LightingToolkit LightingToolkit::singleton;
 
 void LightingToolkit::Init()
 {
-	ImGui::ImGuiRenderer::GetSingleton()->Init(Style(), "./Data/Interface/Fonts/Futura-Condensed-Normal.ttf", 15.0f);
+	ImGui::ImGuiRenderer::GetSingleton()->Init(
+		Style(),
+		"./Data/Interface/Fonts/Futura-Condensed-Normal.ttf",
+		15.0f);
 	ImGui::ImGuiInputAdapter::GetSingleton()->Init();
 	ImGui::ImGuiRenderer::GetSingleton()->RegisterRenderTarget(&singleton);
 	presetSerializationControl.Deserialize(config);
 	SKSE::SerializationControl::GetSingleton()->RegisterSerializer(this);
 }
 
-void LightingToolkit::OnDataLoaded()
-{
-	RE::PlayerCharacter::GetSingleton()->AddEventSink(this);
-}
+void LightingToolkit::OnDataLoaded() { RE::PlayerCharacter::GetSingleton()->AddEventSink(this); }
 
 void LightingToolkit::OnSavePostLoaded()
 {
@@ -59,15 +59,9 @@ void LightingToolkit::DoFrame()
 	currentTab = nullptr;
 }
 
-LightingToolkit* LightingToolkit::GetSingleton()
-{
-	return &singleton;
-}
+LightingToolkit* LightingToolkit::GetSingleton() { return &singleton; }
 
-LightingToolkit::LightingToolkit() :
-	ImGuiTabBar<Lighting>("##propstabbar")
-{
-}
+LightingToolkit::LightingToolkit() : ImGuiTabBar<Lighting>("##propstabbar") {}
 
 void LightingToolkit::ToggleMenu()
 {
@@ -91,7 +85,8 @@ void LightingToolkit::ToggleMenu()
 		if (!previouslyInFreeCameraMode)
 		{
 			RE::PlayerCamera::GetSingleton()->ToggleFreeCameraMode(true);
-			RE::ControlMap::GetSingleton()->PushInputContext(RE::ControlMap::InputContextID::kTFCMode);
+			RE::ControlMap::GetSingleton()->PushInputContext(
+				RE::ControlMap::InputContextID::kTFCMode);
 		}
 
 		RE::UI::GetSingleton()->ShowMenus(false);
@@ -108,24 +103,27 @@ void LightingToolkit::ToggleMenu()
 		if (!previouslyInFreeCameraMode)
 		{
 			RE::PlayerCamera::GetSingleton()->ToggleFreeCameraMode(false);
-			RE::ControlMap::GetSingleton()->PopInputContext(RE::ControlMap::InputContextID::kTFCMode);
+			RE::ControlMap::GetSingleton()->PopInputContext(
+				RE::ControlMap::InputContextID::kTFCMode);
 		}
 	}
 }
 
 bool LightingToolkit::CanOpenWindow()
 {
-	static constexpr std::array badMenus{
-		RE::MainMenu::MENU_NAME,
-		RE::MistMenu::MENU_NAME,
-		RE::LoadingMenu::MENU_NAME,
-		RE::FaderMenu::MENU_NAME,
-		"LootMenu"sv,
-		"CustomMenu"sv
-	};
+	static constexpr std::array badMenus{ RE::MainMenu::MENU_NAME,
+		                                  RE::MistMenu::MENU_NAME,
+		                                  RE::LoadingMenu::MENU_NAME,
+		                                  RE::FaderMenu::MENU_NAME,
+		                                  "LootMenu"sv,
+		                                  "CustomMenu"sv };
 
 	if (const auto UI = RE::UI::GetSingleton();
-	    !UI || std::ranges::any_of(badMenus, [&](const auto& menuName) { return UI->IsMenuOpen(menuName); }) || UI->IsItemMenuOpen())
+	    !UI ||
+	    std::ranges::any_of(
+			badMenus,
+			[&](const auto& menuName) { return UI->IsMenuOpen(menuName); }) ||
+	    UI->IsItemMenuOpen())
 	{
 		return false;
 	}
@@ -137,12 +135,15 @@ bool LightingToolkit::CanOpenWindow()
 	}
 
 	auto context_id = controlMap->contextPriorityStack.back();
-	if (context_id != RE::UserEvents::INPUT_CONTEXT_ID::kGameplay && context_id != RE::UserEvents::INPUT_CONTEXT_ID::kTFCMode && context_id != RE::UserEvents::INPUT_CONTEXT_ID::kConsole)
+	if (context_id != RE::UserEvents::INPUT_CONTEXT_ID::kGameplay &&
+	    context_id != RE::UserEvents::INPUT_CONTEXT_ID::kTFCMode &&
+	    context_id != RE::UserEvents::INPUT_CONTEXT_ID::kConsole)
 	{
 		return false;
 	}
 
-	if (RE::MenuControls::GetSingleton()->InBeastForm() || RE::VATS::GetSingleton()->mode == RE::VATS::VATS_MODE::kKillCam)
+	if (RE::MenuControls::GetSingleton()->InBeastForm() ||
+	    RE::VATS::GetSingleton()->mode == RE::VATS::VATS_MODE::kKillCam)
 	{
 		return false;
 	}
@@ -150,10 +151,7 @@ bool LightingToolkit::CanOpenWindow()
 	return true;
 }
 
-bool LightingToolkit::ShouldDrawCursor()
-{
-	return doProcess && menuState->ShouldDrawCursor();
-}
+bool LightingToolkit::ShouldDrawCursor() { return doProcess && menuState->ShouldDrawCursor(); }
 
 float* LightingToolkit::GetCameraMoveSpeed()
 {
@@ -170,7 +168,10 @@ void LightingToolkit::DrawPropControlWindow()
 		if (ImGui::ImGuiInputAdapter::IsKeyDown("iRotateRightKey"))
 			currentTab->Rotate(0.1f);
 
-		ImGui::BeginChild("##PropControlPanel", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
+		ImGui::BeginChild(
+			"##PropControlPanel",
+			ImVec2(0, 0),
+			ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
 		{
 			currentTab->DrawControlPanel();
 		}
@@ -181,7 +182,10 @@ void LightingToolkit::DrawPropControlWindow()
 
 void LightingToolkit::DrawCameraControlWindow()
 {
-	ImGui::BeginChild("###CameraControlWindow", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
+	ImGui::BeginChild(
+		"###CameraControlWindow",
+		ImVec2(0, 0),
+		ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
 	{
 		ImGui::Text("Camera Settings:");
 		ImGui::Checkbox("Freeze Time", &RE::Main::GetSingleton()->freezeTime);
@@ -192,7 +196,10 @@ void LightingToolkit::DrawCameraControlWindow()
 
 void LightingToolkit::DrawSceneControlWindow()
 {
-	ImGui::BeginChild("###SceneControlWindow", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
+	ImGui::BeginChild(
+		"###SceneControlWindow",
+		ImVec2(0, 0),
+		ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
 	{
 		ImGui::Text("Scene Settings:");
 		if (ImGui::Button("Save Presets"))
@@ -204,12 +211,25 @@ void LightingToolkit::DrawSceneControlWindow()
 		if (ImGui::Button("Add Light"))
 		{
 			const auto       dataHandler = RE::TESDataHandler::GetSingleton();
-			const RE::FormID id          = dataHandler->LookupFormID(0x801, "InGameLightingToolkit.esp");
+			const RE::FormID id = dataHandler->LookupFormID(0x801, "InGameLightingToolkit.esp");
 
 			if (auto* boundObj = RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>())
 			{
-				const auto                ref     = dataHandler->CreateReferenceAtLocation(boundObj, Lighting::GetCameraLookingAt(50.0f), RE::NiPoint3(), RE::PlayerCharacter::GetSingleton()->GetParentCell(), RE::PlayerCharacter::GetSingleton()->GetWorldspace(), nullptr, nullptr, RE::ObjectRefHandle(), true, true).get();
-				std::unique_ptr<Lighting> newProp = std::make_unique<Lighting>(ref, &config, *lightSelector.GetSelection());
+				const auto ref = dataHandler
+				                     ->CreateReferenceAtLocation(
+										 boundObj,
+										 Lighting::GetCameraLookingAt(50.0f),
+										 RE::NiPoint3(),
+										 RE::PlayerCharacter::GetSingleton()->GetParentCell(),
+										 RE::PlayerCharacter::GetSingleton()->GetWorldspace(),
+										 nullptr,
+										 nullptr,
+										 RE::ObjectRefHandle(),
+										 true,
+										 true)
+				                     .get();
+				std::unique_ptr<Lighting> newProp =
+					std::make_unique<Lighting>(ref, &config, *lightSelector.GetSelection());
 
 				newProp->Init3D();
 				AddItem(std::move(newProp));
@@ -223,7 +243,9 @@ void LightingToolkit::DrawSceneControlWindow()
 	ImGui::EndChild();
 }
 
-RE::BSEventNotifyControl LightingToolkit::ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>*)
+RE::BSEventNotifyControl LightingToolkit::ProcessEvent(
+	const RE::BGSActorCellEvent* a_event,
+	RE::BSTEventSource<RE::BGSActorCellEvent>*)
 {
 	if (!a_event || a_event->flags == RE::BGSActorCellEvent::CellFlag::kLeave)
 	{
@@ -274,10 +296,7 @@ void LightingToolkit::Revert(SKSE::CoSaveIO)
 	items.clear();
 }
 
-constexpr uint32_t LightingToolkit::GetKey()
-{
-	return serializationKey;
-}
+constexpr uint32_t LightingToolkit::GetKey() { return serializationKey; }
 
 void LightingToolkit::PositionLight()
 {

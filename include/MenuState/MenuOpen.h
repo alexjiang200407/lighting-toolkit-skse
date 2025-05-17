@@ -2,8 +2,7 @@
 #include "LightingToolkit.h"
 #include "MenuState.h"
 
-class MenuOpen :
-	public MenuState
+class MenuOpen : public MenuState
 {
 public:
 	MenuOpen() = default;
@@ -15,7 +14,8 @@ public:
 	virtual void DrawMenu(LightingToolkit* menu);
 
 private:
-	static constexpr ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
-	bool                              previouslyInFreeCameraMode;
-	bool                              previouslyFreezeTime;
+	static constexpr ImGuiWindowFlags windowFlags =
+		ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
+	bool previouslyInFreeCameraMode;
+	bool previouslyFreezeTime;
 };

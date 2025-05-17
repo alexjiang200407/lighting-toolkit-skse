@@ -1,14 +1,11 @@
 #pragma once
-#include "FreeCameraZTranslate.h"
 #include "CanMouseMove.h"
 #include "CanMoveAround.h"
+#include "FreeCameraZTranslate.h"
 
 namespace Input
 {
-	class FreeCameraControl :
-		public CanMouseMove,
-		public FreeCameraZTranslate,
-		public CanMoveAround
+	class FreeCameraControl : public CanMouseMove, public FreeCameraZTranslate, public CanMoveAround
 	{
 	public:
 		FreeCameraControl();

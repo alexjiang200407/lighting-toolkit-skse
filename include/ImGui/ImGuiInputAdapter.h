@@ -10,7 +10,8 @@ namespace ImGui
 	private:
 		struct SendInputEvent
 		{
-			static void                                    thunk(RE::BSTEventSource<RE::InputEvent*>* dispatcher, RE::InputEvent** ppEvents);
+			static void
+				thunk(RE::BSTEventSource<RE::InputEvent*>* dispatcher, RE::InputEvent** ppEvents);
 			static inline REL::Relocation<decltype(thunk)> func;
 		};
 
@@ -20,9 +21,9 @@ namespace ImGui
 		void                      DisableSupression();
 		static ImGuiInputAdapter* GetSingleton();
 		void                      DispatchImGuiInputEvents();
-		void                      Adapt(RE::BSTEventSource<RE::InputEvent*>* dispatcher, RE::InputEvent** ppEvents);
-		static bool               IsKeyPressed(const char* keyID, bool repeat);
-		static bool               IsKeyDown(const char* keyID);
+		void Adapt(RE::BSTEventSource<RE::InputEvent*>* dispatcher, RE::InputEvent** ppEvents);
+		static bool IsKeyPressed(const char* keyID, bool repeat);
+		static bool IsKeyDown(const char* keyID);
 
 	private:
 		ImGuiInputAdapter() = default;
@@ -32,10 +33,14 @@ namespace ImGui
 		static int      ToImGuiKey(RE::BSWin32MouseDevice::Key key);
 
 		typedef std::pair<RE::InputEvent*, RE::InputEvent*> InputList;
-		bool                                                AddButtonEvent(InputList& list, InputList& removed, RE::ButtonEvent* const event);
-		bool                                                AddIDEvent(InputList& list, InputList& removed, RE::IDEvent* const event);
-		bool                                                AddInputEvent(bool cond, InputList& list, InputList& removed, RE::InputEvent* const event);
-		static void                                         AddToInputList(InputList& list, RE::InputEvent* const event)
+		bool AddButtonEvent(InputList& list, InputList& removed, RE::ButtonEvent* const event);
+		bool AddIDEvent(InputList& list, InputList& removed, RE::IDEvent* const event);
+		bool AddInputEvent(
+			bool                  cond,
+			InputList&            list,
+			InputList&            removed,
+			RE::InputEvent* const event);
+		static void AddToInputList(InputList& list, RE::InputEvent* const event)
 		{
 			list.second       = list.first ? list.second->next = event : list.first = event;
 			list.second->next = nullptr;

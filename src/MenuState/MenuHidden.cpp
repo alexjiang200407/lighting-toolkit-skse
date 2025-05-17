@@ -1,11 +1,8 @@
 #include "MenuState/MenuHidden.h"
-#include "MenuState/MenuOpen.h"
 #include "ImGui/ImGuiInputAdapter.h"
+#include "MenuState/MenuOpen.h"
 
-MenuHidden::MenuHidden(Input::MenuInputContext* inputCtx)
-{
-	inputCtx->StartLookingAround();
-}
+MenuHidden::MenuHidden(Input::MenuInputContext* inputCtx) { inputCtx->StartLookingAround(); }
 
 MenuStatePtr MenuHidden::Transition(Input::MenuInputContext* inputCtx)
 {
@@ -17,7 +14,4 @@ MenuStatePtr MenuHidden::Transition(Input::MenuInputContext* inputCtx)
 	return nullptr;
 }
 
-bool MenuHidden::ShouldDrawCursor() const
-{
-	return false;
-}
+bool MenuHidden::ShouldDrawCursor() const { return false; }

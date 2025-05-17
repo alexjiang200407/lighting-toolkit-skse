@@ -1,11 +1,8 @@
 #include "ImGui/ImGuiNavBar.h"
 
-
 typedef ImGui::ImGuiTabBarAbstract<std::string, std::vector<std::string>::iterator> abc;
 
-
-ImGui::ImGuiNavBarItem::ImGuiNavBarItem(const char* label) :
-	label(label)
+ImGui::ImGuiNavBarItem::ImGuiNavBarItem(const char* label) : label(label)
 {
 	//abc a{ "asdasd", 0 };
 }
@@ -26,7 +23,4 @@ bool ImGui::ImGuiNavBarItem::DrawTabItem()
 	return false;
 }
 
-const char* ImGui::ImGuiNavBarItem::GetLabel() const
-{
-	return label.c_str();
-}
+const char* ImGui::ImGuiNavBarItem::GetLabel() const { return label.c_str(); }

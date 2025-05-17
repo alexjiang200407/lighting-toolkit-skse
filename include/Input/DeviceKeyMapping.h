@@ -13,6 +13,5 @@ namespace Input
 		DeviceKeyMapping(RE::IDEvent* idEvt);
 		DeviceKeyMapping(const char* userEvt, RE::INPUT_DEVICE device);
 		DeviceKeyMapping(const char* userEvt, RE::INPUT_DEVICE device, uint32_t idCode);
-
 	};
 }

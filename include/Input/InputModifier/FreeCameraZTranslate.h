@@ -3,8 +3,7 @@
 
 namespace Input
 {
-	class FreeCameraZTranslate :
-		public BSControlModifier<RE::INPUT_DEVICE::kMouse>
+	class FreeCameraZTranslate : public BSControlModifier<RE::INPUT_DEVICE::kMouse>
 	{
 	public:
 		FreeCameraZTranslate(bool blockMouseButtons);

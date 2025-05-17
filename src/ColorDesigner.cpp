@@ -1,14 +1,13 @@
 #include "ColorDesigner.h"
 
 ColorDesigner::ColorDesigner(preset::PresetDatabase* presetDB) :
-	ImGui::ImGuiSelector<preset::Color>("Color Designer##ColorDesigner", preset::Color(true)), presetDB(presetDB)
-{
-}
+	ImGui::ImGuiSelector<preset::Color>("Color Designer##ColorDesigner", preset::Color(true)),
+	presetDB(presetDB)
+{}
 
 ColorDesigner::ColorDesigner(preset::PresetDatabase* presetDB, preset::Color color) :
 	ImGui::ImGuiSelector<preset::Color>("Color Designer##ColorDesigner", color), presetDB(presetDB)
-{
-}
+{}
 
 bool ColorDesigner::DrawValueEditor()
 {

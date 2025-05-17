@@ -3,8 +3,7 @@
 #include "ImGui/ImGuiPresetSelector.h"
 #include "Preset/PresetDatabase.h"
 
-class ColorDesigner :
-	public ImGui::ImGuiSelector<preset::Color>
+class ColorDesigner : public ImGui::ImGuiSelector<preset::Color>
 {
 public:
 	ColorDesigner(preset::PresetDatabase* presetDB);

@@ -3,8 +3,7 @@
 
 namespace Input
 {
-	class CanRun :
-		public BSKeyboardGamepadModifier
+	class CanRun : public BSKeyboardGamepadModifier
 	{
 	public:
 		CanRun(bool blockRun);

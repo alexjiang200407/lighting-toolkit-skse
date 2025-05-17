@@ -12,14 +12,14 @@ namespace Input
 		BSKeyboardGamepadModifier(const char* const (&inputIDs)[SZ], bool blockControls) :
 			BSControlModifier<RE::INPUT_DEVICE::kKeyboard>(inputIDs, blockControls),
 			BSControlModifier<RE::INPUT_DEVICE::kGamepad>(inputIDs, blockControls)
-		{
-		}
+		{}
 
-		BSKeyboardGamepadModifier(std::initializer_list<DeviceKeyMapping> inputIDs, bool blockControls) :
+		BSKeyboardGamepadModifier(
+			std::initializer_list<DeviceKeyMapping> inputIDs,
+			bool                                    blockControls) :
 			BSControlModifier<RE::INPUT_DEVICE::kKeyboard>(inputIDs, blockControls),
 			BSControlModifier<RE::INPUT_DEVICE::kGamepad>(inputIDs, blockControls)
-		{
-		}
+		{}
 
 	public:
 		void ApplyKeySuppressionModifier(InputFilter& filter) const override;

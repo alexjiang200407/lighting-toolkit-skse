@@ -1,8 +1,6 @@
 namespace lib
 {
-	template <
-		class E,
-		class U = std::underlying_type_t<E>>
+	template <class E, class U = std::underlying_type_t<E>>
 	class EnumSet
 	{
 	public:
@@ -15,19 +13,16 @@ namespace lib
 		constexpr EnumSet() noexcept               = default;
 		constexpr EnumSet(const EnumSet&) noexcept = default;
 		constexpr EnumSet(EnumSet&&) noexcept      = default;
-		constexpr EnumSet(U underlying) noexcept :
-			_impl(underlying){};
+		constexpr EnumSet(U underlying) noexcept : _impl(underlying){};
 
 		template <class U2>  // NOLINTNEXTLINE(google-explicit-constructor)
-		constexpr EnumSet(EnumSet<E, U2> a_rhs) noexcept :
-			_impl(static_cast<U>(a_rhs.get()))
+		constexpr EnumSet(EnumSet<E, U2> a_rhs) noexcept : _impl(static_cast<U>(a_rhs.get()))
 		{}
 
 		template <class... Args>
 		constexpr EnumSet(Args... a_values) noexcept
 			requires(std::same_as<Args, E> && ...)
-			:
-			_impl((static_cast<U>(a_values) | ...))
+			: _impl((static_cast<U>(a_values) | ...))
 		{}
 
 		~EnumSet() noexcept = default;
@@ -48,7 +43,10 @@ namespace lib
 		}
 
 	public:
-		[[nodiscard]] explicit constexpr operator bool() const noexcept { return _impl != static_cast<U>(0); }
+		[[nodiscard]] explicit constexpr operator bool() const noexcept
+		{
+			return _impl != static_cast<U>(0);
+		}
 
 		[[nodiscard]] constexpr E operator*() const noexcept { return get(); }
 		[[nodiscard]] constexpr E get() const noexcept { return static_cast<E>(_impl); }
@@ -112,64 +110,190 @@ namespace lib
 		}
 
 	public:
-		friend constexpr bool operator==(EnumSet a_lhs, EnumSet a_rhs) noexcept { return a_lhs.underlying() == a_rhs.underlying(); }
-		friend constexpr bool operator==(EnumSet a_lhs, E a_rhs) noexcept { return a_lhs.underlying() == static_cast<U>(a_rhs); }
-		friend constexpr bool operator==(E a_lhs, EnumSet a_rhs) noexcept { return static_cast<U>(a_lhs) == a_rhs.underlying(); }
+		friend constexpr bool operator==(EnumSet a_lhs, EnumSet a_rhs) noexcept
+		{
+			return a_lhs.underlying() == a_rhs.underlying();
+		}
+		friend constexpr bool operator==(EnumSet a_lhs, E a_rhs) noexcept
+		{
+			return a_lhs.underlying() == static_cast<U>(a_rhs);
+		}
+		friend constexpr bool operator==(E a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<U>(a_lhs) == a_rhs.underlying();
+		}
 
-		friend constexpr std::strong_ordering operator<=>(EnumSet a_lhs, EnumSet a_rhs) noexcept { return a_lhs.underlying() <=> a_rhs.underlying(); }
-		friend constexpr std::strong_ordering operator<=>(EnumSet a_lhs, E a_rhs) noexcept { return a_lhs.underlying() <=> static_cast<U>(a_rhs); }
-		friend constexpr std::strong_ordering operator<=>(E a_lhs, EnumSet a_rhs) noexcept { return static_cast<U>(a_lhs) <=> a_rhs.underlying(); }
+		friend constexpr std::strong_ordering operator<=>(EnumSet a_lhs, EnumSet a_rhs) noexcept
+		{
+			return a_lhs.underlying() <=> a_rhs.underlying();
+		}
+		friend constexpr std::strong_ordering operator<=>(EnumSet a_lhs, E a_rhs) noexcept
+		{
+			return a_lhs.underlying() <=> static_cast<U>(a_rhs);
+		}
+		friend constexpr std::strong_ordering operator<=>(E a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<U>(a_lhs) <=> a_rhs.underlying();
+		}
 
-		friend constexpr EnumSet operator&(EnumSet a_lhs, EnumSet a_rhs) noexcept { return static_cast<E>(a_lhs.underlying() & a_rhs.underlying()); }
-		friend constexpr EnumSet operator&(EnumSet a_lhs, E a_rhs) noexcept { return static_cast<E>(a_lhs.underlying() & static_cast<U>(a_rhs)); }
-		friend constexpr EnumSet operator&(E a_lhs, EnumSet a_rhs) noexcept { return static_cast<E>(static_cast<U>(a_lhs) & a_rhs.underlying()); }
+		friend constexpr EnumSet operator&(EnumSet a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<E>(a_lhs.underlying() & a_rhs.underlying());
+		}
+		friend constexpr EnumSet operator&(EnumSet a_lhs, E a_rhs) noexcept
+		{
+			return static_cast<E>(a_lhs.underlying() & static_cast<U>(a_rhs));
+		}
+		friend constexpr EnumSet operator&(E a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<E>(static_cast<U>(a_lhs) & a_rhs.underlying());
+		}
 
-		friend constexpr EnumSet& operator&=(EnumSet& a_lhs, EnumSet a_rhs) noexcept { return a_lhs = a_lhs & a_rhs; }
-		friend constexpr EnumSet& operator&=(EnumSet& a_lhs, E a_rhs) noexcept { return a_lhs = a_lhs & a_rhs; }
+		friend constexpr EnumSet& operator&=(EnumSet& a_lhs, EnumSet a_rhs) noexcept
+		{
+			return a_lhs = a_lhs & a_rhs;
+		}
+		friend constexpr EnumSet& operator&=(EnumSet& a_lhs, E a_rhs) noexcept
+		{
+			return a_lhs = a_lhs & a_rhs;
+		}
 
-		friend constexpr EnumSet operator|(EnumSet a_lhs, EnumSet a_rhs) noexcept { return static_cast<E>(a_lhs.underlying() | a_rhs.underlying()); }
-		friend constexpr EnumSet operator|(EnumSet a_lhs, E a_rhs) noexcept { return static_cast<E>(a_lhs.underlying() | static_cast<U>(a_rhs)); }
-		friend constexpr EnumSet operator|(E a_lhs, EnumSet a_rhs) noexcept { return static_cast<E>(static_cast<U>(a_lhs) | a_rhs.underlying()); }
+		friend constexpr EnumSet operator|(EnumSet a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<E>(a_lhs.underlying() | a_rhs.underlying());
+		}
+		friend constexpr EnumSet operator|(EnumSet a_lhs, E a_rhs) noexcept
+		{
+			return static_cast<E>(a_lhs.underlying() | static_cast<U>(a_rhs));
+		}
+		friend constexpr EnumSet operator|(E a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<E>(static_cast<U>(a_lhs) | a_rhs.underlying());
+		}
 
-		friend constexpr EnumSet& operator|=(EnumSet& a_lhs, EnumSet a_rhs) noexcept { return a_lhs = a_lhs | a_rhs; }
-		friend constexpr EnumSet& operator|=(EnumSet& a_lhs, E a_rhs) noexcept { return a_lhs = a_lhs | a_rhs; }
+		friend constexpr EnumSet& operator|=(EnumSet& a_lhs, EnumSet a_rhs) noexcept
+		{
+			return a_lhs = a_lhs | a_rhs;
+		}
+		friend constexpr EnumSet& operator|=(EnumSet& a_lhs, E a_rhs) noexcept
+		{
+			return a_lhs = a_lhs | a_rhs;
+		}
 
-		friend constexpr EnumSet operator^(EnumSet a_lhs, EnumSet a_rhs) noexcept { return static_cast<E>(a_lhs.underlying() ^ a_rhs.underlying()); }
-		friend constexpr EnumSet operator^(EnumSet a_lhs, E a_rhs) noexcept { return static_cast<E>(a_lhs.underlying() ^ static_cast<U>(a_rhs)); }
-		friend constexpr EnumSet operator^(E a_lhs, EnumSet a_rhs) noexcept { return static_cast<E>(static_cast<U>(a_lhs) ^ a_rhs.underlying()); }
+		friend constexpr EnumSet operator^(EnumSet a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<E>(a_lhs.underlying() ^ a_rhs.underlying());
+		}
+		friend constexpr EnumSet operator^(EnumSet a_lhs, E a_rhs) noexcept
+		{
+			return static_cast<E>(a_lhs.underlying() ^ static_cast<U>(a_rhs));
+		}
+		friend constexpr EnumSet operator^(E a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<E>(static_cast<U>(a_lhs) ^ a_rhs.underlying());
+		}
 
-		friend constexpr EnumSet& operator^=(EnumSet& a_lhs, EnumSet a_rhs) noexcept { return a_lhs = a_lhs ^ a_rhs; }
-		friend constexpr EnumSet& operator^=(EnumSet& a_lhs, E a_rhs) noexcept { return a_lhs = a_lhs ^ a_rhs; }
+		friend constexpr EnumSet& operator^=(EnumSet& a_lhs, EnumSet a_rhs) noexcept
+		{
+			return a_lhs = a_lhs ^ a_rhs;
+		}
+		friend constexpr EnumSet& operator^=(EnumSet& a_lhs, E a_rhs) noexcept
+		{
+			return a_lhs = a_lhs ^ a_rhs;
+		}
 
-		friend constexpr EnumSet operator+(EnumSet a_lhs, EnumSet a_rhs) noexcept { return static_cast<E>(a_lhs.underlying() + a_rhs.underlying()); }
-		friend constexpr EnumSet operator+(EnumSet a_lhs, E a_rhs) noexcept { return static_cast<E>(a_lhs.underlying() + static_cast<U>(a_rhs)); }
-		friend constexpr EnumSet operator+(E a_lhs, EnumSet a_rhs) noexcept { return static_cast<E>(static_cast<U>(a_lhs) + a_rhs.underlying()); }
+		friend constexpr EnumSet operator+(EnumSet a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<E>(a_lhs.underlying() + a_rhs.underlying());
+		}
+		friend constexpr EnumSet operator+(EnumSet a_lhs, E a_rhs) noexcept
+		{
+			return static_cast<E>(a_lhs.underlying() + static_cast<U>(a_rhs));
+		}
+		friend constexpr EnumSet operator+(E a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<E>(static_cast<U>(a_lhs) + a_rhs.underlying());
+		}
 
-		friend constexpr EnumSet& operator+=(EnumSet& a_lhs, EnumSet a_rhs) noexcept { return a_lhs = a_lhs + a_rhs; }
-		friend constexpr EnumSet& operator+=(EnumSet& a_lhs, E a_rhs) noexcept { return a_lhs = a_lhs + a_rhs; }
+		friend constexpr EnumSet& operator+=(EnumSet& a_lhs, EnumSet a_rhs) noexcept
+		{
+			return a_lhs = a_lhs + a_rhs;
+		}
+		friend constexpr EnumSet& operator+=(EnumSet& a_lhs, E a_rhs) noexcept
+		{
+			return a_lhs = a_lhs + a_rhs;
+		}
 
-		friend constexpr EnumSet operator-(EnumSet a_lhs, EnumSet a_rhs) noexcept { return static_cast<E>(a_lhs.underlying() - a_rhs.underlying()); }
-		friend constexpr EnumSet operator-(EnumSet a_lhs, E a_rhs) noexcept { return static_cast<E>(a_lhs.underlying() - static_cast<U>(a_rhs)); }
-		friend constexpr EnumSet operator-(E a_lhs, EnumSet a_rhs) noexcept { return static_cast<E>(static_cast<U>(a_lhs) - a_rhs.underlying()); }
+		friend constexpr EnumSet operator-(EnumSet a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<E>(a_lhs.underlying() - a_rhs.underlying());
+		}
+		friend constexpr EnumSet operator-(EnumSet a_lhs, E a_rhs) noexcept
+		{
+			return static_cast<E>(a_lhs.underlying() - static_cast<U>(a_rhs));
+		}
+		friend constexpr EnumSet operator-(E a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<E>(static_cast<U>(a_lhs) - a_rhs.underlying());
+		}
 
-		friend constexpr EnumSet& operator-=(EnumSet& a_lhs, EnumSet a_rhs) noexcept { return a_lhs = a_lhs - a_rhs; }
-		friend constexpr EnumSet& operator-=(EnumSet& a_lhs, E a_rhs) noexcept { return a_lhs = a_lhs - a_rhs; }
+		friend constexpr EnumSet& operator-=(EnumSet& a_lhs, EnumSet a_rhs) noexcept
+		{
+			return a_lhs = a_lhs - a_rhs;
+		}
+		friend constexpr EnumSet& operator-=(EnumSet& a_lhs, E a_rhs) noexcept
+		{
+			return a_lhs = a_lhs - a_rhs;
+		}
 
-		friend constexpr EnumSet operator<<(EnumSet a_lhs, EnumSet a_rhs) noexcept { return static_cast<E>(a_lhs.underlying() << a_rhs.underlying()); }
-		friend constexpr EnumSet operator<<(EnumSet a_lhs, E a_rhs) noexcept { return static_cast<E>(a_lhs.underlying() << static_cast<U>(a_rhs)); }
-		friend constexpr EnumSet operator<<(E a_lhs, EnumSet a_rhs) noexcept { return static_cast<E>(static_cast<U>(a_lhs) << a_rhs.underlying()); }
+		friend constexpr EnumSet operator<<(EnumSet a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<E>(a_lhs.underlying() << a_rhs.underlying());
+		}
+		friend constexpr EnumSet operator<<(EnumSet a_lhs, E a_rhs) noexcept
+		{
+			return static_cast<E>(a_lhs.underlying() << static_cast<U>(a_rhs));
+		}
+		friend constexpr EnumSet operator<<(E a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<E>(static_cast<U>(a_lhs) << a_rhs.underlying());
+		}
 
-		friend constexpr EnumSet& operator<<=(EnumSet& a_lhs, EnumSet a_rhs) noexcept { return a_lhs = a_lhs << a_rhs; }
-		friend constexpr EnumSet& operator<<=(EnumSet& a_lhs, E a_rhs) noexcept { return a_lhs = a_lhs << a_rhs; }
+		friend constexpr EnumSet& operator<<=(EnumSet& a_lhs, EnumSet a_rhs) noexcept
+		{
+			return a_lhs = a_lhs << a_rhs;
+		}
+		friend constexpr EnumSet& operator<<=(EnumSet& a_lhs, E a_rhs) noexcept
+		{
+			return a_lhs = a_lhs << a_rhs;
+		}
 
-		friend constexpr EnumSet operator>>(EnumSet a_lhs, EnumSet a_rhs) noexcept { return static_cast<E>(a_lhs.underlying() >> a_rhs.underlying()); }
-		friend constexpr EnumSet operator>>(EnumSet a_lhs, E a_rhs) noexcept { return static_cast<E>(a_lhs.underlying() >> static_cast<U>(a_rhs)); }
-		friend constexpr EnumSet operator>>(E a_lhs, EnumSet a_rhs) noexcept { return static_cast<E>(static_cast<U>(a_lhs) >> a_rhs.underlying()); }
+		friend constexpr EnumSet operator>>(EnumSet a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<E>(a_lhs.underlying() >> a_rhs.underlying());
+		}
+		friend constexpr EnumSet operator>>(EnumSet a_lhs, E a_rhs) noexcept
+		{
+			return static_cast<E>(a_lhs.underlying() >> static_cast<U>(a_rhs));
+		}
+		friend constexpr EnumSet operator>>(E a_lhs, EnumSet a_rhs) noexcept
+		{
+			return static_cast<E>(static_cast<U>(a_lhs) >> a_rhs.underlying());
+		}
 
-		friend constexpr EnumSet& operator>>=(EnumSet& a_lhs, EnumSet a_rhs) noexcept { return a_lhs = a_lhs >> a_rhs; }
-		friend constexpr EnumSet& operator>>=(EnumSet& a_lhs, E a_rhs) noexcept { return a_lhs = a_lhs >> a_rhs; }
+		friend constexpr EnumSet& operator>>=(EnumSet& a_lhs, EnumSet a_rhs) noexcept
+		{
+			return a_lhs = a_lhs >> a_rhs;
+		}
+		friend constexpr EnumSet& operator>>=(EnumSet& a_lhs, E a_rhs) noexcept
+		{
+			return a_lhs = a_lhs >> a_rhs;
+		}
 
-		friend constexpr EnumSet& operator~(EnumSet& a_lhs) noexcept { return a_lhs = ~a_lhs.underlying(); }
+		friend constexpr EnumSet& operator~(EnumSet& a_lhs) noexcept
+		{
+			return a_lhs = ~a_lhs.underlying();
+		}
 
 	private:
 		U _impl{ 0 };
@@ -178,7 +302,6 @@ namespace lib
 	template <class... Args>
 	EnumSet(Args...) -> EnumSet<
 		std::common_type_t<Args...>,
-		std::underlying_type_t<
-			std::common_type_t<Args...>>>;
+		std::underlying_type_t<std::common_type_t<Args...>>>;
 
 }

@@ -32,6 +32,7 @@ namespace SKSE
 		{
 			serial->WriteRecordData(buf, sz * sizeof(T));
 		}
+
 	private:
 		SerializationInterface* serial;
 	};

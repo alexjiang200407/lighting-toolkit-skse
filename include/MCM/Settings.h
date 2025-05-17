@@ -9,7 +9,6 @@ namespace MCM
 		void             ReadAllSettings();
 		static Settings* GetSingleton();
 
-
 		template <typename T>
 		bool Get(const char* section, const char* key, T& buf)
 		{
@@ -44,8 +43,10 @@ namespace MCM
 
 	private:
 		SectionMap                      iniSectionMap;
-		static constexpr const wchar_t* iniFilePath     = L"Data/MCM/Config/InGameLightingToolkit/settings.ini";
-		static constexpr const wchar_t* userIniFilePath = L"Data/MCM/Settings/InGameLightingToolkit.ini";
-		static Settings                 singleton;
+		static constexpr const wchar_t* iniFilePath =
+			L"Data/MCM/Config/InGameLightingToolkit/settings.ini";
+		static constexpr const wchar_t* userIniFilePath =
+			L"Data/MCM/Settings/InGameLightingToolkit.ini";
+		static Settings singleton;
 	};
 }

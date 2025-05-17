@@ -9,6 +9,8 @@
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
+
+// After imgui headers
 #include "ImGui/ImGuiWidgets.h"
 
 #include <spdlog/sinks/basic_file_sink.h>
@@ -45,14 +47,12 @@ namespace stl
 	}
 }
 
-#include "Version.h"
 #include "RE.h"
+#include "Version.h"
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-
 #define UUID_SYSTEM_GENERATOR
-#include "common/uuid.h"
 #include "common/util.h"
-
+#include "common/uuid.h"

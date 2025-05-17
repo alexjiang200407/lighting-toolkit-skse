@@ -2,5 +2,4 @@
 
 Input::FreeCameraZTranslate::FreeCameraZTranslate(bool blockMouseButtons) :
 	BSControlModifier(inputIDs, blockMouseButtons)
-{
-}
+{}

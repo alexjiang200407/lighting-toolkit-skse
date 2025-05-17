@@ -24,10 +24,7 @@ namespace ImGui
 		ASSERT_BASE(T, ImGuiTabBarItem);
 
 	public:
-		ImGuiTabBarAbstract(const char* id, ImGuiTabBarFlags flags) :
-			tabBarID(id), flags(flags)
-		{
-		}
+		ImGuiTabBarAbstract(const char* id, ImGuiTabBarFlags flags) : tabBarID(id), flags(flags) {}
 
 	public:
 		bool DrawTabBar()
@@ -41,10 +38,7 @@ namespace ImGui
 			return changed;
 		}
 
-		const char* GetLabel() const
-		{
-			return tabBarID.c_str();
-		}
+		const char* GetLabel() const { return tabBarID.c_str(); }
 
 	protected:
 		virtual bool DrawTabBarItems()

@@ -3,8 +3,7 @@
 
 namespace ImGui
 {
-	class ImGuiTabBarItemRemovable :
-		public ImGuiTabBarItem
+	class ImGuiTabBarItemRemovable : public ImGuiTabBarItem
 	{
 	public:
 		virtual bool DrawTabItem(bool& isActive) = 0;
@@ -13,28 +12,26 @@ namespace ImGui
 
 	template <
 		typename T,
-		typename TPtr  = std::unique_ptr<T>,
-		typename It    = std::vector<TPtr>::iterator,
-		typename CIt   = std::vector<TPtr>::const_iterator>
-	class ImGuiTabBar :
-		public ImGuiTabBarAbstract<T, It>
+		typename TPtr = std::unique_ptr<T>,
+		typename It   = std::vector<TPtr>::iterator,
+		typename CIt  = std::vector<TPtr>::const_iterator>
+	class ImGuiTabBar : public ImGuiTabBarAbstract<T, It>
 	{
 		ASSERT_BASE(T, ImGuiTabBarItemRemovable);
+
 	public:
 		typedef It  iterator;
 		typedef CIt const_iterator;
 
 	public:
 		ImGuiTabBar(const char* id) :
-			ImGuiTabBarAbstract<T, It>(id, (ImGuiTabBarFlags_AutoSelectNewTabs | ImGuiTabBarFlags_FittingPolicyScroll))
-		{
-		}
+			ImGuiTabBarAbstract<T, It>(
+				id,
+				(ImGuiTabBarFlags_AutoSelectNewTabs | ImGuiTabBarFlags_FittingPolicyScroll))
+		{}
 
 	public:
-		void AddItem(TPtr&& tabItem)
-		{
-			items.push_back(std::move(tabItem));
-		}
+		void AddItem(TPtr&& tabItem) { items.push_back(std::move(tabItem)); }
 
 	protected:
 		T* DrawTabBarItem(It& it) override

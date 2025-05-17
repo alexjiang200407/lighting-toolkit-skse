@@ -1,6 +1,6 @@
 #include "MenuState/MenuLookingAround.h"
-#include "MenuState/MenuOpen.h"
 #include "ImGui/ImGuiInputAdapter.h"
+#include "MenuState/MenuOpen.h"
 
 MenuLookingAround::MenuLookingAround(Input::MenuInputContext* inputCtx)
 {
@@ -25,7 +25,4 @@ void MenuLookingAround::DrawMenu(LightingToolkit* menu)
 	ImGui::EndDisabled();
 }
 
-bool MenuLookingAround::ShouldDrawCursor() const
-{
-	return false;
-}
+bool MenuLookingAround::ShouldDrawCursor() const { return false; }

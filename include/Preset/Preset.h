@@ -25,19 +25,25 @@ namespace preset
 		bool operator<(const PresetID& id) const;
 		bool operator<(const PresetTID& tid) const;
 
-		template <typename T, typename std::enable_if<std::is_base_of<Preset, T>::value>::type* = nullptr>
+		template <
+			typename T,
+			typename std::enable_if<std::is_base_of<Preset, T>::value>::type* = nullptr>
 		static PresetID GenID(const std::string& name)
 		{
 			return PresetID(T::TID, uuids::uuid_system_generator{}(), name);
 		}
 
-		template <typename T, typename std::enable_if<std::is_base_of<Preset, T>::value>::type* = nullptr>
+		template <
+			typename T,
+			typename std::enable_if<std::is_base_of<Preset, T>::value>::type* = nullptr>
 		static PresetID SIDToID(PresetSID sid)
 		{
 			return PresetID(T::TID, sid);
 		}
 
-		template <typename T, typename std::enable_if<std::is_base_of<Preset, T>::value>::type* = nullptr>
+		template <
+			typename T,
+			typename std::enable_if<std::is_base_of<Preset, T>::value>::type* = nullptr>
 		static PresetID SIDToID(std::string sid)
 		{
 			return SIDToID(T::TID, sid);

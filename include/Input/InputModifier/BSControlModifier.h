@@ -3,8 +3,7 @@
 namespace Input
 {
 	template <RE::INPUT_DEVICE DEVICE>
-	class BSControlModifier :
-		virtual public InputModifier
+	class BSControlModifier : virtual public InputModifier
 	{
 	public:
 		template <size_t SZ>
@@ -19,8 +18,7 @@ namespace Input
 
 		BSControlModifier(std::initializer_list<DeviceKeyMapping> inputIDs, bool blockControls) :
 			blockControls(blockControls), inputIDs(inputIDs)
-		{
-		}
+		{}
 
 	public:
 		void ApplyKeySuppressionModifier(InputFilter& filter) const override

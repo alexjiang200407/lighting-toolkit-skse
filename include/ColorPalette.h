@@ -10,8 +10,7 @@ typedef ImGui::ImGuiSelector<preset::Color>                           ImGuiColor
 typedef ImGui::ImGuiPresetSelector<preset::Color>                     ImGuiColorPresetSelector;
 typedef ImGui::ImGuiValueEditor<ImGuiColorSelector, preset::Color, 2> ImGuiColorEditor;
 
-class ColorPalette :
-	public ImGuiColorEditor
+class ColorPalette : public ImGuiColorEditor
 {
 public:
 	ColorPalette(preset::PresetDatabase* presetDB);
