@@ -44,8 +44,8 @@ namespace MCM
 
 	private:
 		SectionMap                      iniSectionMap;
-		static constexpr const wchar_t* iniFilePath     = L"Data/MCM/Config/Chiaroscuro/settings.ini";
-		static constexpr const wchar_t* userIniFilePath = L"Data/MCM/Settings/Chiaroscuro.ini";
+		static constexpr const wchar_t* iniFilePath     = L"Data/MCM/Config/InGameLightingToolkit/settings.ini";
+		static constexpr const wchar_t* userIniFilePath = L"Data/MCM/Settings/InGameLightingToolkit.ini";
 		static Settings                 singleton;
 	};
 }

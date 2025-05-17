@@ -1,5 +1,4 @@
 set(HEADERS ${HEADERS}
-	include/Chiaroscuro.h
 	include/Color.h
 	include/ColorDesigner.h
 	include/ColorPalette.h
@@ -31,6 +30,7 @@ set(HEADERS ${HEADERS}
 	include/LightEditor.h
 	include/Lighting.h
 	include/LightingPreset.h
+	include/LightingToolkit.h
 	include/MCM/Settings.h
 	include/MenuInputContext.h
 	include/MenuState/MenuHidden.h

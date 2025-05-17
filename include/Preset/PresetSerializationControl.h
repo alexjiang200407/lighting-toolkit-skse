@@ -14,6 +14,6 @@ namespace preset
 		void RegisterPresets(PresetDatabase& a_presetDB, PresetTID tid, json array) const;
 
 	private:
-		static const constexpr char* file = "./Data/SKSE/Plugins/ChiaroscuroPresets.json";
+		static const constexpr char* file = "./Data/SKSE/Plugins/LightingToolkitPresets.json";
 	};
 }

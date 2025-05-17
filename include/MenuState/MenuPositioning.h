@@ -11,7 +11,7 @@ public:
 
 public:
 	MenuStatePtr Transition(Input::MenuInputContext* inputCtx);
-	void         DrawMenu(Chiaroscuro* menu) override;
+	void         DrawMenu(LightingToolkit* menu) override;
 
 private:
 	bool prevFreezeTime;

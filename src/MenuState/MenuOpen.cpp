@@ -32,7 +32,7 @@ MenuStatePtr MenuOpen::Transition(Input::MenuInputContext* inputCtx)
 	return nullptr;
 }
 
-void MenuOpen::DoFrame(Chiaroscuro* menu)
+void MenuOpen::DoFrame(LightingToolkit* menu)
 {
 	ImGui::Begin("##SCMain", nullptr, windowFlags);
 	{
@@ -41,7 +41,7 @@ void MenuOpen::DoFrame(Chiaroscuro* menu)
 	ImGui::End();
 }
 
-void MenuOpen::DrawMenu(Chiaroscuro* menu)
+void MenuOpen::DrawMenu(LightingToolkit* menu)
 {
 	menu->DrawTabBar();
 	menu->DrawPropControlWindow();

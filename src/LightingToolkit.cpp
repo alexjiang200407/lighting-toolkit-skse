@@ -1,4 +1,4 @@
-#include "Chiaroscuro.h"
+#include "LightingToolkit.h"
 #include "ImGui/ImGuiInputAdapter.h"
 #include "ImGui/ImGuiRenderer.h"
 #include "ImGui/ImGuiTabBar.h"
@@ -7,9 +7,9 @@
 #include "MenuState/MenuOpen.h"
 #include "SKSE/SerializationControl.h"
 
-Chiaroscuro Chiaroscuro::singleton;
+LightingToolkit LightingToolkit::singleton;
 
-void Chiaroscuro::Init()
+void LightingToolkit::Init()
 {
 	ImGui::ImGuiRenderer::GetSingleton()->Init(Style(), "./Data/Interface/Fonts/Futura-Condensed-Normal.ttf", 15.0f);
 	ImGui::ImGuiInputAdapter::GetSingleton()->Init();
@@ -18,12 +18,12 @@ void Chiaroscuro::Init()
 	SKSE::SerializationControl::GetSingleton()->RegisterSerializer(this);
 }
 
-void Chiaroscuro::OnDataLoaded()
+void LightingToolkit::OnDataLoaded()
 {
 	RE::PlayerCharacter::GetSingleton()->AddEventSink(this);
 }
 
-void Chiaroscuro::OnSavePostLoaded()
+void LightingToolkit::OnSavePostLoaded()
 {
 	for (const auto& light : items)
 	{
@@ -31,7 +31,7 @@ void Chiaroscuro::OnSavePostLoaded()
 	}
 }
 
-void Chiaroscuro::DoFrame()
+void LightingToolkit::DoFrame()
 {
 	if (ImGui::ImGuiInputAdapter::IsKeyPressed("iOpenCloseMenuKey", false))
 	{
@@ -59,17 +59,17 @@ void Chiaroscuro::DoFrame()
 	currentTab = nullptr;
 }
 
-Chiaroscuro* Chiaroscuro::GetSingleton()
+LightingToolkit* LightingToolkit::GetSingleton()
 {
 	return &singleton;
 }
 
-Chiaroscuro::Chiaroscuro() :
+LightingToolkit::LightingToolkit() :
 	ImGuiTabBar<Lighting>("##propstabbar")
 {
 }
 
-void Chiaroscuro::ToggleMenu()
+void LightingToolkit::ToggleMenu()
 {
 	doProcess = !doProcess;
 
@@ -77,12 +77,13 @@ void Chiaroscuro::ToggleMenu()
 	{
 		if (!CanOpenWindow())
 		{
-			RE::DebugNotification("Cannot open Chiaroscuro menu at this time...", "UIMenuOK");
+			RE::DebugNotification("Cannot open LightingToolkit menu at this time...", "UIMenuOK");
 			doProcess = false;
 			return;
 		}
 
 		RE::PlaySound("UIMenuOK");
+		logger::info("Opening Menu...");
 		inputCtx.MenuOpen();
 		inputCtx.Update();
 		menuState                  = std::make_unique<MenuOpen>(&inputCtx);
@@ -99,6 +100,7 @@ void Chiaroscuro::ToggleMenu()
 	else
 	{
 		RE::PlaySound("UIMenuCancel");
+		logger::info("Closing Menu...");
 		menuState.reset();
 		inputCtx.MenuClose();
 		RE::UI::GetSingleton()->ShowMenus(true);
@@ -111,7 +113,7 @@ void Chiaroscuro::ToggleMenu()
 	}
 }
 
-bool Chiaroscuro::CanOpenWindow()
+bool LightingToolkit::CanOpenWindow()
 {
 	static constexpr std::array badMenus{
 		RE::MainMenu::MENU_NAME,
@@ -148,17 +150,17 @@ bool Chiaroscuro::CanOpenWindow()
 	return true;
 }
 
-bool Chiaroscuro::ShouldDrawCursor()
+bool LightingToolkit::ShouldDrawCursor()
 {
 	return doProcess && menuState->ShouldDrawCursor();
 }
 
-float* Chiaroscuro::GetCameraMoveSpeed()
+float* LightingToolkit::GetCameraMoveSpeed()
 {
 	return REL::Relocation<float*>{ RELOCATION_ID(509808, 382522) }.get();
 }
 
-void Chiaroscuro::DrawPropControlWindow()
+void LightingToolkit::DrawPropControlWindow()
 {
 	ImGui::PushID("###PropControlWindow");
 	if (currentTab)
@@ -177,7 +179,7 @@ void Chiaroscuro::DrawPropControlWindow()
 	ImGui::PopID();
 }
 
-void Chiaroscuro::DrawCameraControlWindow()
+void LightingToolkit::DrawCameraControlWindow()
 {
 	ImGui::BeginChild("###CameraControlWindow", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
 	{
@@ -188,7 +190,7 @@ void Chiaroscuro::DrawCameraControlWindow()
 	ImGui::EndChild();
 }
 
-void Chiaroscuro::DrawSceneControlWindow()
+void LightingToolkit::DrawSceneControlWindow()
 {
 	ImGui::BeginChild("###SceneControlWindow", ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
 	{
@@ -202,7 +204,7 @@ void Chiaroscuro::DrawSceneControlWindow()
 		if (ImGui::Button("Add Light"))
 		{
 			const auto       dataHandler = RE::TESDataHandler::GetSingleton();
-			const RE::FormID id          = dataHandler->LookupFormID(0x800, "Chiaroscuro.esp");
+			const RE::FormID id          = dataHandler->LookupFormID(0x801, "InGameLightingToolkit.esp");
 
 			if (auto* boundObj = RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>())
 			{
@@ -212,12 +214,16 @@ void Chiaroscuro::DrawSceneControlWindow()
 				newProp->Init3D();
 				AddItem(std::move(newProp));
 			}
+			else
+			{
+				logger::error("Could not find light reference in InGameLightingToolkit.esp");
+			}
 		}
 	}
 	ImGui::EndChild();
 }
 
-RE::BSEventNotifyControl Chiaroscuro::ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>*)
+RE::BSEventNotifyControl LightingToolkit::ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>*)
 {
 	if (!a_event || a_event->flags == RE::BGSActorCellEvent::CellFlag::kLeave)
 	{
@@ -240,7 +246,7 @@ RE::BSEventNotifyControl Chiaroscuro::ProcessEvent(const RE::BGSActorCellEvent* 
 	return RE::BSEventNotifyControl::kContinue;
 }
 
-void Chiaroscuro::SerializeItems(SKSE::CoSaveIO io) const
+void LightingToolkit::SerializeItems(SKSE::CoSaveIO io) const
 {
 	logger::info("Serializing Lights...");
 	io.Write(items.size());
@@ -250,7 +256,7 @@ void Chiaroscuro::SerializeItems(SKSE::CoSaveIO io) const
 	}
 }
 
-void Chiaroscuro::DeserializeItems(SKSE::CoSaveIO io)
+void LightingToolkit::DeserializeItems(SKSE::CoSaveIO io)
 {
 	size_t itemsCount;
 	io.Read(itemsCount);
@@ -262,24 +268,24 @@ void Chiaroscuro::DeserializeItems(SKSE::CoSaveIO io)
 	}
 }
 
-void Chiaroscuro::Revert(SKSE::CoSaveIO)
+void LightingToolkit::Revert(SKSE::CoSaveIO)
 {
 	logger::info("Reverting Save");
 	items.clear();
 }
 
-constexpr uint32_t Chiaroscuro::GetKey()
+constexpr uint32_t LightingToolkit::GetKey()
 {
 	return serializationKey;
 }
 
-void Chiaroscuro::PositionLight()
+void LightingToolkit::PositionLight()
 {
 	if (currentTab)
 		currentTab->MoveToCameraLookingAt(true);
 }
 
-ImGuiStyle Chiaroscuro::Style()
+ImGuiStyle LightingToolkit::Style()
 {
 	ImGuiStyle style;
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "Chiaroscuro.h"
+#include "LightingToolkit.h"
 #include "MenuState.h"
 
 class MenuOpen :
@@ -11,8 +11,8 @@ public:
 
 public:
 	MenuStatePtr Transition(Input::MenuInputContext* inputCtx) override;
-	void         DoFrame(Chiaroscuro* menu) final override;
-	virtual void DrawMenu(Chiaroscuro* menu);
+	void         DoFrame(LightingToolkit* menu) final override;
+	virtual void DrawMenu(LightingToolkit* menu);
 
 private:
 	static constexpr ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;

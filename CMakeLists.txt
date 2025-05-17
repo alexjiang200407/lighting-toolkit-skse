@@ -71,8 +71,7 @@ endif ()
 set(Boost_USE_STATIC_RUNTIME OFF CACHE BOOL "")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 
-# Set your project name. This will be the name of your SKSE .dll file.
-project(Chiaroscuro VERSION 1.0.0 LANGUAGES CXX)
+project(InGameLightingToolkit VERSION 0.9.0 LANGUAGES CXX)
 
 configure_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/cmake/Version.h.in
@@ -95,9 +94,8 @@ else ()
 	)
 endif()
 
-
-# CHANGE ME IF YOU DON'T USE MO2'!!!
-set(OUTPUT_FOLDER "C:/Modding/MO2/mods/${PROJECT_NAME}")
+set_from_environment(SkyrimModsPath)
+set(OUTPUT_FOLDER "C:/Modding/LOTF/mods/${PROJECT_NAME}")
 
 include(cmake/headerlist.cmake)
 include(cmake/sourcelist.cmake)
@@ -134,7 +132,7 @@ add_library(
 	.editorconfig
 )
 
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23) # <--- use C++23 standard
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
 
 target_compile_definitions(
 	${PROJECT_NAME}
@@ -150,8 +148,6 @@ target_include_directories(
 		${SIMPLEINI_INCLUDE_DIRS}
 )
 
-
-
 target_link_libraries(
 	${PROJECT_NAME}
     PRIVATE
@@ -161,17 +157,12 @@ target_link_libraries(
         nlohmann_json::nlohmann_json
 )
 
-target_precompile_headers(${PROJECT_NAME} PRIVATE include/PCH.h) # <--- PCH.h is required!
+target_precompile_headers(${PROJECT_NAME} PRIVATE include/PCH.h)
 
 
-# When your SKSE .dll is compiled, this will automatically copy the .dll into your mods folder.
-# Only works if you configure DEPLOY_ROOT above (or set the SKYRIM_MODS_FOLDER environment variable)
-if(DEFINED OUTPUT_FOLDER)
-    # If you specify an <OUTPUT_FOLDER> (including via environment variables)
-    # then we'll copy your mod files into Skyrim or a mod manager for you!
-
-    # Copy the SKSE plugin .dll files into the SKSE/Plugins/ folder
-    set(DLL_FOLDER "${OUTPUT_FOLDER}/SKSE/Plugins")
+if(DEFINED SkyrimModsPath)
+	set(OUTPUT_DIR "${SkyrimModsPath}/${PROJECT_NAME}")
+    set(DLL_FOLDER "${OUTPUT_DIR}/SKSE/Plugins")
 
     message(STATUS "SKSE plugin output folder: ${DLL_FOLDER}")
 
@@ -181,6 +172,7 @@ if(DEFINED OUTPUT_FOLDER)
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${DLL_FOLDER}"
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:${PROJECT_NAME}>" "${DLL_FOLDER}/$<TARGET_FILE_NAME:${PROJECT_NAME}>"
 		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_PDB_FILE:${PROJECT_NAME}>" "${DLL_FOLDER}/$<TARGET_PDB_FILE_NAME:${PROJECT_NAME}>"
+		COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_SOURCE_DIR}/Skyrim/Data" "${OUTPUT_DIR}"
         VERBATIM
     )
 endif()

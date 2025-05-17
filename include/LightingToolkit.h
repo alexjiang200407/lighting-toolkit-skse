@@ -12,7 +12,7 @@
 class MenuState;
 class MenuOpen;
 
-class Chiaroscuro :
+class LightingToolkit :
 	ImGui::ImGuiRenderTarget,
 	public RE::BSTEventSink<RE::BGSActorCellEvent>,
 	public ImGui::ImGuiTabBar<Lighting>,
@@ -24,14 +24,14 @@ public:
 	void                OnSavePostLoaded();
 	void                DoFrame();
 	ImGuiStyle          Style();
-	static Chiaroscuro* GetSingleton();
+	static LightingToolkit* GetSingleton();
 	void                DrawPropControlWindow();
 	void                DrawCameraControlWindow();
 	void                DrawSceneControlWindow();
 	void                PositionLight();
 
 private:
-	Chiaroscuro();
+	LightingToolkit();
 
 private:
 	void                     ToggleMenu();
@@ -55,5 +55,5 @@ private:
 	bool                               previouslyFreezeTime              = false;
 	bool                               doProcess                         = false;
 	static constexpr uint32_t          serializationKey                  = 'CHIA';
-	static Chiaroscuro                 singleton;
+	static LightingToolkit                 singleton;
 };

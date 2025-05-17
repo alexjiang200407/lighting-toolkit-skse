@@ -25,4 +25,6 @@ namespace ImGui
 	bool IsKeyDownA(ImGuiKey key);
 	bool IsKeyPressedA(ImGuiKey key, bool repeat = true);
 	bool ConditionalCheckbox(const char* label, bool cond, bool* v);
+
+	IMGUI_API bool InputText(const char* label, std::string* str, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = NULL, void* user_data = NULL);
 }

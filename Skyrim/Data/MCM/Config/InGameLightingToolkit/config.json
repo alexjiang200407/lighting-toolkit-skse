@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/Exit-9B/MCM-Helper/main/docs/config.schema.json",
-  "modName": "Chiaroscuro",
+  "modName": "Lighting Toolkit",
   "displayName": "$Title_Menu_Name",
   "minMcmVersion": 13,
-  "pluginRequirements": [ "Chiaroscuro.esp" ],
+  "pluginRequirements": [ "InGameLightingToolkit.esp" ],
   "cursorFillMode": "topToBottom",
   "content": [
     {

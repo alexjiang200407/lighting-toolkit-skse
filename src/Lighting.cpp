@@ -221,7 +221,7 @@ RE::BSFadeNode* Lighting::Attach3D()
 
 	if (hideLight)
 		niLight->SetAppCulled(true);
-	
+
 	if (hideMarker)
 		niRoot->GetObjectByName("Marker")->SetAppCulled(true);
 
@@ -259,7 +259,7 @@ LightingPtr Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* pre
 
 	auto* tesObjectREFR = tesForm->As<RE::TESObjectREFR>();
 	if (!tesObjectREFR)
-		return LightingPtr();	
+		return LightingPtr();
 
 	return std::make_unique<Lighting>(Lighting(tesObjectREFR->CreateRefHandle().get(), color, presetDB, lightCreateParams, fade, radius, hideLight, hideMarker));
 }

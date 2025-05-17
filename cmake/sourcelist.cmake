@@ -1,5 +1,4 @@
 set(SOURCES ${SOURCES}
-	src/Chiaroscuro.cpp
 	src/Color.cpp
 	src/ColorDesigner.cpp
 	src/ColorPalette.cpp
@@ -24,6 +23,7 @@ set(SOURCES ${SOURCES}
 	src/LightEditor.cpp
 	src/Lighting.cpp
 	src/LightingPreset.cpp
+	src/LightingToolkit.cpp
 	src/main.cpp
 	src/MCM/Settings.cpp
 	src/MenuInputContext.cpp

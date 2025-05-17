@@ -10,6 +10,6 @@ public:
 
 public:
 	MenuStatePtr Transition(Input::MenuInputContext* inputCtx) override;
-	void         DrawMenu(Chiaroscuro* menu) override;
+	void         DrawMenu(LightingToolkit* menu) override;
 	bool         ShouldDrawCursor() const override;
 };

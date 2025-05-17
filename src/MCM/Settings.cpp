@@ -34,8 +34,8 @@ bool MCM::Settings::RegisterPapyrus(RE::BSScript::IVirtualMachine* a_vm)
 		return false;
 	}
 
-	a_vm->RegisterFunction("OnConfigClose"sv, "Chiaroscuro_MCM"sv, OnConfigClosed);
-	logger::info("Registered {} class", "Chiaroscuro_MCM");
+	a_vm->RegisterFunction("OnConfigClose"sv, "InGameLightingToolkit_MCM"sv, OnConfigClosed);
+	logger::info("Registered {} class", "InGameLightingToolkit_MCM");
 
 	return true;
 }

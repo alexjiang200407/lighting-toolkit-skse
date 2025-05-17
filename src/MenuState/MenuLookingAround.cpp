@@ -16,7 +16,7 @@ MenuStatePtr MenuLookingAround::Transition(Input::MenuInputContext* inputCtx)
 	return MenuStatePtr(nullptr);
 }
 
-void MenuLookingAround::DrawMenu(Chiaroscuro* menu)
+void MenuLookingAround::DrawMenu(LightingToolkit* menu)
 {
 	ImGui::BeginDisabled();
 	{
