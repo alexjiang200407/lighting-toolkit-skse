@@ -1,18 +1,18 @@
 {
   "$schema": "https://raw.githubusercontent.com/Exit-9B/MCM-Helper/main/docs/config.schema.json",
-  "modName": "Lighting Toolkit",
-  "displayName": "$Title_Menu_Name",
+  "modName": "InGameLightingToolkit",
+  "displayName": "$IGLT_Title_Menu_Name",
   "minMcmVersion": 13,
   "pluginRequirements": [ "InGameLightingToolkit.esp" ],
   "cursorFillMode": "topToBottom",
   "content": [
     {
-      "text": "$Control_Config_Header",
+      "text": "$IGLT_Control_Config_Header",
       "type": "header"
     },
     {
       "id": "iOpenCloseMenuKey:Controls",
-      "text": "$Open_Close_Menu_Key",
+      "text": "$IGLT_Open_Close_Menu_Key",
       "type": "keymap",
       "ignoreConflicts": false,
       "valueOptions": {
@@ -21,7 +21,7 @@
     },
     {
       "id": "iPositionLightKey:Controls",
-      "text": "$Position_Light_Key",
+      "text": "$IGLT_Position_Light_Key",
       "type": "keymap",
       "ignoreConflicts": true,
       "valueOptions": {
@@ -32,7 +32,7 @@
     },
     {
       "id": "iLookAroundKey:Controls",
-      "text": "$Look_Around_Key",
+      "text": "$IGLT_Look_Around_Key",
       "type": "keymap",
       "ignoreConflicts": true,
       "valueOptions": {
@@ -41,7 +41,7 @@
     },
     {
       "id": "iRotateLeftKey:Controls",
-      "text": "$Rotate_Left_Key",
+      "text": "$IGLT_Rotate_Left_Key",
       "type": "keymap",
       "ignoreConflicts": true,
       "valueOptions": {
@@ -50,7 +50,7 @@
     },
     {
       "id": "iRotateRightKey:Controls",
-      "text": "$Rotate_Right_Key",
+      "text": "$IGLT_Rotate_Right_Key",
       "type": "keymap",
       "ignoreConflicts": true,
       "valueOptions": {
@@ -59,7 +59,7 @@
     },
     {
       "id": "iHideKey:Controls",
-      "text": "$Hide_Key",
+      "text": "$IGLT_Hide_Key",
       "type": "keymap",
       "ignoreConflicts": true,
       "valueOptions": {
