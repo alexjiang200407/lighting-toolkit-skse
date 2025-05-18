@@ -1,7 +1,7 @@
 #include "ColorPalette.h"
 
 ColorPalette::ColorPalette(preset::PresetDatabase* presetDB) :
-	presetSelector("Color Preset", presetDB), presetDB(presetDB)
+	presetSelector("Color Preset", presetDB), presetDB(presetDB), mode(ColorSelectionMode::kPreset)
 {}
 
 ColorPalette::ColorPalette(preset::PresetDatabase* presetDB, preset::Color color) :
@@ -54,21 +54,37 @@ bool ColorPalette::DrawEditor()
 	bool changedMode = false;
 	if (ImGui::BeginTabBar("Choose Color"))
 	{
-		if (ImGui::BeginTabItem("Presets"))
+		auto presetTabFlags = (firstRender && mode == ColorSelectionMode::kPreset) ?
+		                          ImGuiTabItemFlags_SetSelected :
+		                          ImGuiTabItemFlags_None;
+		auto customTabFlags = (firstRender && mode == ColorSelectionMode::kCustom) ?
+		                          ImGuiTabItemFlags_SetSelected :
+		                          ImGuiTabItemFlags_None;
+
+		if (ImGui::BeginTabItem("Presets", nullptr, presetTabFlags))
 		{
-			mode        = ColorSelectionMode::kPreset;
-			changedMode = true;
+			if (customTabFlags != ImGuiTabItemFlags_SetSelected)
+			{
+				mode        = ColorSelectionMode::kPreset;
+				changedMode = true;
+			}
+
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem("Custom"))
+		if (ImGui::BeginTabItem("Custom", nullptr, customTabFlags))
 		{
-			mode        = ColorSelectionMode::kCustom;
-			changedMode = true;
+			if (presetTabFlags != ImGuiTabItemFlags_SetSelected)
+			{
+				mode        = ColorSelectionMode::kCustom;
+				changedMode = true;
+			}
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();
 	}
+
+	firstRender = false;
 
 	switch (mode)
 	{

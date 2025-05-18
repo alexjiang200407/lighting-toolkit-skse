@@ -193,6 +193,46 @@ void LightingToolkit::DrawCameraControlWindow()
 	ImGui::EndChild();
 }
 
+static RE::TESObjectREFRPtr PlaceLight()
+{
+	const auto dataHandler = RE::TESDataHandler::GetSingleton();
+
+	if (!dataHandler)
+	{
+		logger::error("Data Handler singleton not found");
+		return nullptr;
+	}
+
+	const RE::FormID id = dataHandler->LookupFormID(0x801, "InGameLightingToolkit.esp");
+
+	if (!id)
+	{
+		logger::error("Data Handler could not find ID");
+		return nullptr;
+	}
+
+	if (auto* boundObj = RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>())
+	{
+		const auto ref = dataHandler
+		                     ->CreateReferenceAtLocation(
+								 boundObj,
+								 Lighting::GetCameraLookingAt(50.0f),
+								 RE::NiPoint3(),
+								 RE::PlayerCharacter::GetSingleton()->GetParentCell(),
+								 RE::PlayerCharacter::GetSingleton()->GetWorldspace(),
+								 nullptr,
+								 nullptr,
+								 RE::ObjectRefHandle(),
+								 true,
+								 true)
+		                     .get();
+		return ref;
+	}
+
+	logger::error("Could not find light reference in InGameLightingToolkit.esp");
+	return nullptr;
+}
+
 void LightingToolkit::DrawSceneControlWindow()
 {
 	ImGui::BeginChild(
@@ -209,32 +249,11 @@ void LightingToolkit::DrawSceneControlWindow()
 		lightSelector.DrawValueEditor();
 		if (ImGui::Button("Add Light"))
 		{
-			const auto       dataHandler = RE::TESDataHandler::GetSingleton();
-			const RE::FormID id = dataHandler->LookupFormID(0x801, "InGameLightingToolkit.esp");
-
-			if (auto* boundObj = RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>())
+			if (auto ref = PlaceLight())
 			{
-				const auto ref = dataHandler
-				                     ->CreateReferenceAtLocation(
-										 boundObj,
-										 Lighting::GetCameraLookingAt(50.0f),
-										 RE::NiPoint3(),
-										 RE::PlayerCharacter::GetSingleton()->GetParentCell(),
-										 RE::PlayerCharacter::GetSingleton()->GetWorldspace(),
-										 nullptr,
-										 nullptr,
-										 RE::ObjectRefHandle(),
-										 true,
-										 true)
-				                     .get();
 				Lighting newProp(ref, &config, *lightSelector.GetSelection());
-
 				newProp.Init3D();
 				lights.push_back(std::move(newProp));
-			}
-			else
-			{
-				logger::error("Could not find light reference in InGameLightingToolkit.esp");
 			}
 		}
 	}

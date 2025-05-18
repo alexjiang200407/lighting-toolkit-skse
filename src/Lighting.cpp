@@ -48,13 +48,13 @@ bool Lighting::DrawTabItem(bool& active)
 {
 	bool isNotRemoved = true;
 	bool selected     = false;
-	if ((selected = ImGui::BeginTabItem(
-			 std::format("{} 0x{:X}", ref->GetFormEditorID(), ref->GetFormID()).c_str(),
-			 &isNotRemoved)))
+
+	if ((selected = ImGui::BeginTabItem(tabLabel.c_str(), &isNotRemoved)))
 	{
 		active = selected;
 		ImGui::EndTabItem();
 	}
+
 	return isNotRemoved;
 }
 
@@ -90,7 +90,10 @@ void Lighting::DrawControlPanel()
 void Lighting::UpdateLightColor()
 {
 	if (auto selection = colorPalette.GetSelection())
+	{
 		niLight->diffuse = *selection;
+		tabLabel         = std::format("{}###{}", selection->GetName(), ref->GetFormID());
+	}
 }
 
 void Lighting::UpdateLightTemplate()

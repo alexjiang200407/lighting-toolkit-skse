@@ -24,9 +24,10 @@ public:
 	const preset::Color* GetSelection() const;
 
 private:
+	bool                                      firstRender = true;
 	std::string                               nameInput;
 	preset::PresetDatabase*                   presetDB;
-	ColorSelectionMode                        mode = ColorSelectionMode::kPreset;
+	ColorSelectionMode                        mode;
 	preset::Color                             editorColor{ true };
 	ImGui::ImGuiPresetSelector<preset::Color> presetSelector;
 };

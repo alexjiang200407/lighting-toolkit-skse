@@ -61,6 +61,7 @@ private:
 	static RE::NiPoint3 GetCameraPosition();
 
 private:
+	std::string                              tabLabel;
 	bool                                     hideLight  = false;
 	bool                                     hideMarker = false;
 	float                                    fade       = 2.0f;
