@@ -1,20 +1,18 @@
 #pragma once
-#include "ImGui/ImGuiValueEditor.h"
 
 namespace ImGui
 {
 	template <typename T>
-	class ImGuiSelector : public ImGuiValueEditorMode<T>
+	class ImGuiSelector
 	{
 	public:
-		ImGuiSelector(const char* selectionID) : ImGuiValueEditorMode<T>(selectionID){};
-		ImGuiSelector(const char* selectionID, T current) :
-			ImGuiValueEditorMode<T>(selectionID), selection(current)
+		ImGuiSelector(const char* selectionID) : label(selectionID){};
+		ImGuiSelector(const char* selectionID, T current) : label(selectionID), selection(current)
 		{}
 
 	public:
-		bool DrawValueEditor() override { return true; }
-		T*   GetSelection() override
+		virtual bool DrawValueEditor() = 0;
+		const T*     GetSelection() const
 		{
 			if (selection.has_value())
 			{
@@ -24,6 +22,7 @@ namespace ImGui
 		}
 
 	protected:
+		std::string      label;
 		std::optional<T> selection;
 	};
 }

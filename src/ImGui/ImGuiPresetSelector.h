@@ -21,16 +21,16 @@ namespace ImGui
 	public:
 		bool DrawValueEditor() override
 		{
+			const char* label = ImGuiSelector<T>::label.c_str();
 			ImGui::PushItemWidth(
-				ImGui::GetContentRegionAvail().x -
-				ImGui::CalcTextSize(ImGuiNavBarItem::GetLabel()).x -
+				ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(label).x -
 				ImGui::GetStyle().ItemSpacing.x);
 
 			auto [st, end] = presetDB->GetAllPresetsOfType(T::TID);
 
 			if (st == end)
 			{
-				if (ImGui::BeginCombo(ImGuiNavBarItem::GetLabel(), "No Presets Found"))
+				if (ImGui::BeginCombo(label, "No Presets Found"))
 				{
 					ImGui::EndCombo();
 				}
@@ -51,7 +51,7 @@ namespace ImGui
 			}
 
 			preset::Preset* selected = selectedIt->get();
-			if (ImGui::BeginCombo(ImGuiNavBarItem::GetLabel(), (*selectedIt)->GetSelectionName()))
+			if (ImGui::BeginCombo(label, (*selectedIt)->GetSelectionName()))
 			{
 				while (st != end)
 				{

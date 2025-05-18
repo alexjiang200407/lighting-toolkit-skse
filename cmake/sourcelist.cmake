@@ -1,12 +1,9 @@
 set(SOURCES ${SOURCES}
 	src/Color.cpp
-	src/ColorDesigner.cpp
 	src/ColorPalette.cpp
 	src/ImGui/ImGuiInputAdapter.cpp
-	src/ImGui/ImGuiNavBar.cpp
 	src/ImGui/ImGuiRenderer.cpp
 	src/ImGui/ImGuiRenderTarget.cpp
-	src/ImGui/ImGuiTabBarAbstract.cpp
 	src/ImGui/ImGuiWidgets.cpp
 	src/Input/DeviceKeyMapping.cpp
 	src/Input/InputContext.cpp
@@ -19,11 +16,10 @@ set(SOURCES ${SOURCES}
 	src/Input/InputModifier/FreeCameraControl.cpp
 	src/Input/InputModifier/FreeCameraZTranslate.cpp
 	src/Input/InputModifier/InputModifier.cpp
-	src/LightDesigner.cpp
-	src/LightEditor.cpp
 	src/Lighting.cpp
 	src/LightingPreset.cpp
 	src/LightingToolkit.cpp
+	src/LightSelector.cpp
 	src/main.cpp
 	src/MCM/Settings.cpp
 	src/MenuInputContext.cpp

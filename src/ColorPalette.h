@@ -1,25 +1,32 @@
 #pragma once
 #include "Color.h"
-#include "ColorDesigner.h"
 #include "ImGui/ImGuiPresetSelector.h"
-#include "ImGui/ImGuiValueEditor.h"
 #include "Preset/PresetDatabase.h"
 #include "SKSE/CoSaveIO.h"
 
-typedef ImGui::ImGuiSelector<preset::Color>                           ImGuiColorSelector;
-typedef ImGui::ImGuiPresetSelector<preset::Color>                     ImGuiColorPresetSelector;
-typedef ImGui::ImGuiValueEditor<ImGuiColorSelector, preset::Color, 2> ImGuiColorEditor;
-
-class ColorPalette : public ImGuiColorEditor
+class ColorPalette
 {
 public:
 	ColorPalette(preset::PresetDatabase* presetDB);
 	ColorPalette(preset::PresetDatabase* presetDB, preset::Color color);
 
 private:
-	ColorPalette(ImGuiColorPresetSelector* presetSelector, ColorDesigner* color);
+	enum class ColorSelectionMode
+	{
+		kPreset = 0,
+		kCustom = 1,
+	};
 
 public:
 	void                 Serialize(SKSE::CoSaveIO io) const;
 	static preset::Color Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB);
+	bool                 DrawEditor();
+	const preset::Color* GetSelection() const;
+
+private:
+	std::string                               nameInput;
+	preset::PresetDatabase*                   presetDB;
+	ColorSelectionMode                        mode = ColorSelectionMode::kPreset;
+	preset::Color                             editorColor{ true };
+	ImGui::ImGuiPresetSelector<preset::Color> presetSelector;
 };

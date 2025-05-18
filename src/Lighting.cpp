@@ -60,6 +60,7 @@ bool Lighting::DrawTabItem(bool& active)
 
 void Lighting::DrawControlPanel()
 {
+	ImGui::PushID(std::bit_cast<int>(ref->GetFormID()));
 	ImGui::BeginDisabled(!ref->Is3DLoaded() || !niLight || hideLight);
 	{
 		if (colorPalette.DrawEditor())
@@ -83,6 +84,7 @@ void Lighting::DrawControlPanel()
 	{
 		model->GetObjectByName("Marker")->SetAppCulled(hideMarker);
 	}
+	ImGui::PopID();
 }
 
 void Lighting::UpdateLightColor()
@@ -154,7 +156,7 @@ void Lighting::OnEnterCell()
 	MoveToCurrentPosition();
 }
 
-RE::FormID Lighting::GetCellID()
+RE::FormID Lighting::GetCellID() const
 {
 	assert(ref->GetParentCell());
 	return ref->GetParentCell()->formID;
@@ -260,7 +262,7 @@ void Lighting::Init3D()
 	UpdateLightTemplate();
 }
 
-LightingPtr Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB)
+std::optional<Lighting> Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB)
 {
 	RE::FormID                               formID;
 	float                                    fade, radius;
@@ -278,13 +280,13 @@ LightingPtr Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* pre
 	auto* tesForm = RE::TESObjectREFR::LookupByID(formID);
 
 	if (!tesForm)
-		return LightingPtr();
+		return std::nullopt;
 
 	auto* tesObjectREFR = tesForm->As<RE::TESObjectREFR>();
 	if (!tesObjectREFR)
-		return LightingPtr();
+		return std::nullopt;
 
-	return std::make_unique<Lighting>(Lighting(
+	return Lighting(
 		tesObjectREFR->CreateRefHandle().get(),
 		color,
 		presetDB,
@@ -292,7 +294,7 @@ LightingPtr Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* pre
 		fade,
 		radius,
 		hideLight,
-		hideMarker));
+		hideMarker);
 }
 
 void Lighting::DrawCameraOffsetSlider()

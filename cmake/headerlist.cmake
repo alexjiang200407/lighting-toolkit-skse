@@ -1,18 +1,13 @@
 set(HEADERS ${HEADERS}
 	src/Color.h
-	src/ColorDesigner.h
 	src/ColorPalette.h
 	src/common/util.h
 	src/common/uuid.h
 	src/ImGui/ImGuiInputAdapter.h
-	src/ImGui/ImGuiNavBar.h
 	src/ImGui/ImGuiPresetSelector.h
 	src/ImGui/ImGuiRenderer.h
 	src/ImGui/ImGuiRenderTarget.h
 	src/ImGui/ImGuiSelector.h
-	src/ImGui/ImGuiTabBar.h
-	src/ImGui/ImGuiTabBarAbstract.h
-	src/ImGui/ImGuiValueEditor.h
 	src/ImGui/ImGuiWidgets.h
 	src/Input/DeviceKeyMapping.h
 	src/Input/InputContext.h
@@ -26,11 +21,10 @@ set(HEADERS ${HEADERS}
 	src/Input/InputModifier/FreeCameraControl.h
 	src/Input/InputModifier/FreeCameraZTranslate.h
 	src/Input/InputModifier/InputModifier.h
-	src/LightDesigner.h
-	src/LightEditor.h
 	src/Lighting.h
 	src/LightingPreset.h
 	src/LightingToolkit.h
+	src/LightSelector.h
 	src/MCM/Settings.h
 	src/MenuInputContext.h
 	src/MenuState/MenuHidden.h

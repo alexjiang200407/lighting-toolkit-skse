@@ -1,6 +1,5 @@
 #pragma once
 #include "ColorPalette.h"
-#include "ImGui/ImGuiTabBar.h"
 #include "LightingPreset.h"
 #include "Preset/PresetDatabase.h"
 #include "SKSE/CoSaveIO.h"
@@ -8,7 +7,7 @@
 class Lighting;
 typedef std::unique_ptr<Lighting> LightingPtr;
 
-class Lighting : public ImGui::ImGuiTabBarItemRemovable
+class Lighting
 {
 public:
 	Lighting(
@@ -39,24 +38,24 @@ public:
 		bool                                     hideMarker = false);
 
 public:
-	virtual bool            DrawTabItem(bool& active) override;
-	void                    UpdateLightColor();
-	void                    UpdateLightTemplate();
-	virtual void            DrawControlPanel();
-	virtual void            Remove() override;
-	virtual void            MoveToCameraLookingAt(bool resetOffset = false);
-	virtual void            MoveTo(RE::NiPoint3 newPos);
-	void                    MoveToCurrentPosition();
-	virtual void            OnEnterCell();
-	RE::FormID              GetCellID();
-	void                    Rotate(float delta);
-	virtual void            Rotate(RE::NiMatrix3 rotation);
-	static RE::NiPoint3     GetCameraLookingAt(float distanceFromCamera);
-	virtual RE::BSFadeNode* Attach3D();
-	virtual void            Init3D();
-	static LightingPtr      Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB);
-	void                    DrawCameraOffsetSlider();
-	void                    Serialize(SKSE::CoSaveIO io) const;
+	bool                           DrawTabItem(bool& active);
+	void                           UpdateLightColor();
+	void                           UpdateLightTemplate();
+	virtual void                   DrawControlPanel();
+	void                           Remove();
+	virtual void                   MoveToCameraLookingAt(bool resetOffset = false);
+	virtual void                   MoveTo(RE::NiPoint3 newPos);
+	void                           MoveToCurrentPosition();
+	virtual void                   OnEnterCell();
+	RE::FormID                     GetCellID() const;
+	void                           Rotate(float delta);
+	virtual void                   Rotate(RE::NiMatrix3 rotation);
+	static RE::NiPoint3            GetCameraLookingAt(float distanceFromCamera);
+	virtual RE::BSFadeNode*        Attach3D();
+	virtual void                   Init3D();
+	static std::optional<Lighting> Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB);
+	void                           DrawCameraOffsetSlider();
+	void                           Serialize(SKSE::CoSaveIO io) const;
 
 private:
 	static RE::NiPoint3 GetCameraPosition();
@@ -65,9 +64,9 @@ private:
 	bool                                     hideLight  = false;
 	bool                                     hideMarker = false;
 	float                                    fade       = 2.0f;
+	RE::NiPointer<RE::BSLight>               bsLight    = nullptr;
+	RE::NiPointer<RE::NiPointLight>          niLight    = nullptr;
 	RE::NiPoint3                             radius{ 500, 500, 500 };
-	RE::NiPointer<RE::BSLight>               bsLight = nullptr;
-	RE::NiPointer<RE::NiPointLight>          niLight = nullptr;
 	ColorPalette                             colorPalette;
 	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightCreateParams;
 	RE::TESObjectREFRPtr                     ref;

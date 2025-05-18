@@ -1,7 +1,6 @@
 #include "LightingToolkit.h"
 #include "ImGui/ImGuiInputAdapter.h"
 #include "ImGui/ImGuiRenderer.h"
-#include "ImGui/ImGuiTabBar.h"
 #include "Lighting.h"
 #include "LightingPreset.h"
 #include "MenuState/MenuOpen.h"
@@ -25,9 +24,9 @@ void LightingToolkit::OnDataLoaded() { RE::PlayerCharacter::GetSingleton()->AddE
 
 void LightingToolkit::OnSavePostLoaded()
 {
-	for (const auto& light : items)
+	for (auto& light : lights)
 	{
-		light->Init3D();
+		light.Init3D();
 	}
 }
 
@@ -56,12 +55,12 @@ void LightingToolkit::DoFrame()
 	menuState->DoFrame(this);
 
 	// Reset currentTab and wait for next draw cycle
-	currentTab = nullptr;
+	currentTab = std::nullopt;
 }
 
 LightingToolkit* LightingToolkit::GetSingleton() { return &singleton; }
 
-LightingToolkit::LightingToolkit() : ImGuiTabBar<Lighting>("##propstabbar") {}
+LightingToolkit::LightingToolkit() {}
 
 void LightingToolkit::ToggleMenu()
 {
@@ -161,21 +160,21 @@ float* LightingToolkit::GetCameraMoveSpeed()
 void LightingToolkit::DrawPropControlWindow()
 {
 	ImGui::PushID("###PropControlWindow");
-	if (currentTab)
+	if (auto* currentLight = GetCurrentLight())
 	{
 		if (ImGui::ImGuiInputAdapter::IsKeyDown("iRotateLeftKey"))
-			currentTab->Rotate(-0.1f);
+			currentLight->Rotate(-0.1f);
 		if (ImGui::ImGuiInputAdapter::IsKeyDown("iRotateRightKey"))
-			currentTab->Rotate(0.1f);
+			currentLight->Rotate(0.1f);
 
-		ImGui::BeginChild(
-			"##PropControlPanel",
-			ImVec2(0, 0),
-			ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
+		if (ImGui::BeginChild(
+				"##PropControlPanel",
+				ImVec2(0, 0),
+				ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding))
 		{
-			currentTab->DrawControlPanel();
+			currentLight->DrawControlPanel();
+			ImGui::EndChild();
 		}
-		ImGui::EndChild();
 	}
 	ImGui::PopID();
 }
@@ -228,11 +227,10 @@ void LightingToolkit::DrawSceneControlWindow()
 										 true,
 										 true)
 				                     .get();
-				std::unique_ptr<Lighting> newProp =
-					std::make_unique<Lighting>(ref, &config, *lightSelector.GetSelection());
+				Lighting newProp(ref, &config, *lightSelector.GetSelection());
 
-				newProp->Init3D();
-				AddItem(std::move(newProp));
+				newProp.Init3D();
+				lights.push_back(std::move(newProp));
 			}
 			else
 			{
@@ -258,23 +256,37 @@ RE::BSEventNotifyControl LightingToolkit::ProcessEvent(
 		return RE::BSEventNotifyControl::kContinue;
 	}
 
-	for (const auto& prop : items)
+	for (auto& light : lights)
 	{
-		if (prop->GetCellID() == a_event->cellID)
+		if (light.GetCellID() == a_event->cellID)
 		{
-			prop->OnEnterCell();
+			light.OnEnterCell();
 		}
 	}
 	return RE::BSEventNotifyControl::kContinue;
 }
 
+Lighting* LightingToolkit::GetCurrentLight()
+{
+	if (!currentTab)
+		return nullptr;
+
+	if (*currentTab >= lights.size())
+	{
+		logger::error("CurrentTab index out of bounds");
+		return nullptr;
+	}
+
+	return &lights[*currentTab];
+}
+
 void LightingToolkit::SerializeItems(SKSE::CoSaveIO io) const
 {
 	logger::info("Serializing Lights...");
-	io.Write(items.size());
-	for (const auto& light : items)
+	io.Write(lights.size());
+	for (const auto& light : lights)
 	{
-		light->Serialize(io);
+		light.Serialize(io);
 	}
 }
 
@@ -285,23 +297,52 @@ void LightingToolkit::DeserializeItems(SKSE::CoSaveIO io)
 
 	for (size_t i = 0; i < itemsCount; i++)
 	{
-		auto light = Lighting::Deserialize(io, &config);
-		AddItem(std::move(light));
+		if (auto light = Lighting::Deserialize(io, &config))
+		{
+			lights.push_back(std::move(*light));
+		}
 	}
 }
 
 void LightingToolkit::Revert(SKSE::CoSaveIO)
 {
 	logger::info("Reverting Save");
-	items.clear();
+	lights.clear();
 }
 
 constexpr uint32_t LightingToolkit::GetKey() { return serializationKey; }
 
 void LightingToolkit::PositionLight()
 {
-	if (currentTab)
-		currentTab->MoveToCameraLookingAt(true);
+	if (auto* light = GetCurrentLight())
+		light->MoveToCameraLookingAt(true);
+}
+
+void LightingToolkit::DrawTabBar()
+{
+	if (ImGui::BeginTabBar(
+			"###Lights",
+			(ImGuiTabBarFlags_AutoSelectNewTabs | ImGuiTabBarFlags_FittingPolicyScroll)))
+	{
+		for (auto it = lights.begin(); it != lights.end();)
+		{
+			bool active = false;
+			bool open   = it->DrawTabItem(active);
+
+			if (open)
+			{
+				if (active)
+					currentTab = std::distance(lights.begin(), it);
+				it++;
+			}
+			else if (!open)
+			{
+				it->Remove();
+				it = lights.erase(it);
+			}
+		}
+		ImGui::EndTabBar();
+	}
 }
 
 ImGuiStyle LightingToolkit::Style()

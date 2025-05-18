@@ -34,11 +34,11 @@ MenuStatePtr MenuOpen::Transition(Input::MenuInputContext* inputCtx)
 
 void MenuOpen::DoFrame(LightingToolkit* menu)
 {
-	ImGui::Begin("##SCMain", nullptr, windowFlags);
+	if (ImGui::Begin("##SCMain", nullptr, windowFlags))
 	{
 		DrawMenu(menu);
+		ImGui::End();
 	}
-	ImGui::End();
 }
 
 void MenuOpen::DrawMenu(LightingToolkit* menu)
