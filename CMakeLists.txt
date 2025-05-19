@@ -68,7 +68,6 @@ else ()
 	)
 endif ()
 
-set(Boost_USE_STATIC_RUNTIME OFF CACHE BOOL "")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 
 project(InGameLightingToolkit VERSION 0.9.0 LANGUAGES CXX)
