@@ -12,8 +12,8 @@
         "nearDistance": 5
       },
       {
-        "flags": 63,
-        "name": "01 Key Light (Shadow)",
+        "flags": 58,
+        "name": "01 Key Light",
         "sid": "01881155-8c54-4714-8431-823bc414d288",
         "falloff": 1,
         "fov": 360,
@@ -23,8 +23,8 @@
         "nearDistance": 5
       },
       {
-        "flags": 63,
-        "name": "02 Back Lighting (Shadow)",
+        "flags": 58,
+        "name": "02 Back Lighting",
         "sid": "cd787520-e83a-43ce-b8bf-31f3c1d84f4c",
         "falloff": 1,
         "fov": 360,
