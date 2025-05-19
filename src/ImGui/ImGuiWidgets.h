@@ -39,4 +39,8 @@ namespace ImGui
 		ImGuiInputTextFlags    flags     = 0,
 		ImGuiInputTextCallback callback  = NULL,
 		void*                  user_data = NULL);
+
+
+	bool BeginPanel(const char* str_id);
+	void EndPanel();
 }

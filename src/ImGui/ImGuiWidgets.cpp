@@ -24,3 +24,13 @@ bool ImGui::ConditionalCheckbox(const char* label, bool cond, bool* v)
 	EndDisabled();
 	return retVal;
 }
+
+bool ImGui::BeginPanel(const char* str_id)
+{
+	return ImGui::BeginChild(
+		str_id,
+		ImVec2(0, 0),
+		ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
+}
+
+void ImGui::EndPanel() { ImGui::EndChild(); }

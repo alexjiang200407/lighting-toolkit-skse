@@ -25,7 +25,6 @@ public:
 
 private:
 	bool                                      firstRender = true;
-	std::string                               nameInput;
 	preset::PresetDatabase*                   presetDB;
 	ColorSelectionMode                        mode;
 	preset::Color                             editorColor{ true };

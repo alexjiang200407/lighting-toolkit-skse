@@ -167,30 +167,19 @@ void LightingToolkit::DrawPropControlWindow()
 		if (ImGui::ImGuiInputAdapter::IsKeyDown("iRotateRightKey"))
 			currentLight->Rotate(0.1f);
 
-		if (ImGui::BeginChild(
-				"##PropControlPanel",
-				ImVec2(0, 0),
-				ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding))
-		{
-			currentLight->DrawControlPanel();
-			ImGui::EndChild();
-		}
+		currentLight->DrawControlPanel();
 	}
 	ImGui::PopID();
 }
 
 void LightingToolkit::DrawCameraControlWindow()
 {
-	ImGui::BeginChild(
-		"###CameraControlWindow",
-		ImVec2(0, 0),
-		ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
+	if (ImGui::BeginPanel("Camera Settings###CameraControlWindow"))
 	{
-		ImGui::Text("Camera Settings:");
 		ImGui::Checkbox("Freeze Time", &RE::Main::GetSingleton()->freezeTime);
 		ImGui::SliderAutoFill("Camera Speed", GetCameraMoveSpeed(), 0.1f, 50.0f);
+		ImGui::EndPanel();
 	}
-	ImGui::EndChild();
 }
 
 static RE::TESObjectREFRPtr PlaceLight()
@@ -235,17 +224,8 @@ static RE::TESObjectREFRPtr PlaceLight()
 
 void LightingToolkit::DrawSceneControlWindow()
 {
-	ImGui::BeginChild(
-		"###SceneControlWindow",
-		ImVec2(0, 0),
-		ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding);
+	if (ImGui::BeginPanel("Scene Settings###SceneControlWindow"))
 	{
-		ImGui::Text("Scene Settings:");
-		if (ImGui::Button("Save Presets"))
-		{
-			presetSerializationControl.Serialize(config);
-		}
-
 		lightSelector.DrawValueEditor();
 		if (ImGui::Button("Add Light"))
 		{
@@ -256,8 +236,8 @@ void LightingToolkit::DrawSceneControlWindow()
 				lights.push_back(std::move(newProp));
 			}
 		}
+		ImGui::EndPanel();
 	}
-	ImGui::EndChild();
 }
 
 RE::BSEventNotifyControl LightingToolkit::ProcessEvent(

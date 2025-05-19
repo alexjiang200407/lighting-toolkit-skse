@@ -58,31 +58,50 @@ bool Lighting::DrawTabItem(bool& active)
 	return isNotRemoved;
 }
 
+
+
 void Lighting::DrawControlPanel()
 {
 	ImGui::PushID(std::bit_cast<int>(ref->GetFormID()));
-	ImGui::BeginDisabled(!ref->Is3DLoaded() || !niLight || hideLight);
 	{
-		if (colorPalette.DrawEditor())
+		bool disabled = !ref->Is3DLoaded() || !niLight || hideLight;
+		ImGui::BeginDisabled(disabled);
 		{
-			UpdateLightColor();
+			if (ImGui::BeginPanel("##ColorSelector"))
+			{
+				if (colorPalette.DrawEditor())
+				{
+					UpdateLightColor();
+				}
+				ImGui::EndPanel();
+			}
 		}
-		ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
-		ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
+		ImGui::EndDisabled();
 
-		radius = niLight->radius;
-		fade   = niLight->fade;
-		DrawCameraOffsetSlider();
-	}
-	ImGui::EndDisabled();
-	if (ImGui::ConditionalCheckbox("Hide Light", niLight.get(), &hideLight))
-	{
-		niLight->SetAppCulled(hideLight);
-	}
-	ImGui::SameLine();
-	if (auto* model = ref->Get3D(); ImGui::ConditionalCheckbox("Hide Marker", model, &hideMarker))
-	{
-		model->GetObjectByName("Marker")->SetAppCulled(hideMarker);
+		if (ImGui::BeginPanel("##LightProperties"))
+		{
+			ImGui::BeginDisabled(disabled);
+			{
+				ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
+				ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
+
+				radius = niLight->radius;
+				fade   = niLight->fade;
+				DrawCameraOffsetSlider();
+			}
+			ImGui::EndDisabled();
+			if (ImGui::ConditionalCheckbox("Hide Light", niLight.get(), &hideLight))
+			{
+				niLight->SetAppCulled(hideLight);
+			}
+			ImGui::SameLine();
+			if (auto* model = ref->Get3D();
+			    ImGui::ConditionalCheckbox("Hide Marker", model, &hideMarker))
+			{
+				model->GetObjectByName("Marker")->SetAppCulled(hideMarker);
+			}
+			ImGui::EndPanel();
+		}
 	}
 	ImGui::PopID();
 }

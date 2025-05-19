@@ -44,10 +44,7 @@ preset::Color ColorPalette::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabas
 	return preset::Color(buf.get(), color, true);
 }
 
-bool DrawColorEditor(
-	std::string&            nameInput,
-	preset::Color&          color,
-	preset::PresetDatabase* presetDB);
+bool DrawColorEditor(preset::Color& color, preset::PresetDatabase* presetDB);
 
 bool ColorPalette::DrawEditor()
 {
@@ -91,18 +88,17 @@ bool ColorPalette::DrawEditor()
 	case ColorSelectionMode::kPreset:
 		return presetSelector.DrawValueEditor() || changedMode;
 	case ColorSelectionMode::kCustom:
-		return DrawColorEditor(nameInput, editorColor, presetDB) || changedMode;
+		return DrawColorEditor(editorColor, presetDB) || changedMode;
 	default:
 		logger::error("Invalid Color Selection Mode");
 		return false;
 	}
 }
 
-bool DrawColorEditor(std::string& nameInput, preset::Color& color, preset::PresetDatabase* presetDB)
+bool DrawColorEditor(preset::Color& color, preset::PresetDatabase* presetDB)
 {
 	float rgb[3]  = { color.red, color.green, color.blue };
 	bool  changed = false;
-	ImGui::InputText("Color Name", &nameInput);
 
 	if (ImGui::ColorEdit3("Color Picker", rgb))
 	{
@@ -110,11 +106,6 @@ bool DrawColorEditor(std::string& nameInput, preset::Color& color, preset::Prese
 		color.green = rgb[1];
 		color.blue  = rgb[2];
 		changed     = true;
-	}
-
-	if (ImGui::Button("Save Color"))
-	{
-		presetDB->Insert(std::make_unique<preset::Color>(color.Clone(nameInput, false)));
 	}
 
 	return changed;
