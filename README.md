@@ -1,1 +1,45 @@
-# CineStudioSKSE - Cinematography Utility for Skyrim
+![Lighting Toolkit](https://cdn.imgchest.com/files/yxkczrpgov7.png "Title")
+
+
+Lighting Toolkit is an SKSE plugin that lets players place dynamic, shadow-casting lights in the game world, primarily for screenshots and videos. It's designed to be used alongside poser frameworks and OStim. Currently supporting Skyrim AE 1.6.640, Skyrim AE 1.6.1170 and Skyrim SE 1.5.97.
+
+![Showcase](https://staticdelivery.nexusmods.com/mods/1704/images/150279/150279-1747455611-413762325.jpeg "Showcase")
+
+
+## Features
+
+* Easy to use UI powered by Dear ImGui (default END key to open). 
+* Place shadow casting and dynamic lights in game world.
+* Navigate scene in Free Camera mode.
+* Change light color, intensity, range.
+* Script free! (Except for SkyUI Mod Configuration).
+* Install and uninstall anytime.
+
+## Planned Features
+
+* Change weather while in menu.
+* Change ambient lighting while in menu.
+* Modify existing lights
+* Additional languages
+
+## Runtime Requirements
+
+* SKSE
+* Address Library for SKSE Plugins﻿
+* SkyUI﻿ to access plugin settings in Mod Configuration Menu
+* MCM Helper﻿ for the Mod Configuration Menu to work
+
+
+## Build Requirements
+
+* Visual Studio 2022.
+* CMake.
+* vcpkg (set environment variable VCPKG_ROOT to installation directory).
+* PO3 CommonLibSSE Fork, clone and set environment variable CommonLibSSEPath to point to cloned location.
+
+## Credits
+* powerofthree ﻿for Light Placer and his CommonLibSSE fork.﻿
+* Ryan for CommonLibSSE.
+* All Skyrim reverse engineers who shared their work.
+* Ersh. Copied his nexus mod description layout.
+* Bethesda Game Studios.
