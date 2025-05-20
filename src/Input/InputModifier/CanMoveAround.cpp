@@ -1,6 +1,4 @@
-#include "Input/InputModifier/CanMoveAround.h"
+#include "../InputModifier/CanMoveAround.h"
 
-Input::CanMoveAround::CanMoveAround(bool blockMove) :
-	BSKeyboardGamepadModifier(inputIDs, blockMove)
-{
-}
+Input::CanMoveAround::CanMoveAround(bool blockMove) : BSKeyboardGamepadModifier(inputIDs, blockMove)
+{}

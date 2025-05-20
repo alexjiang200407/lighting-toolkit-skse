@@ -1,7 +1,7 @@
-#include "Preset/PresetSerializationControl.h"
+#include "../Preset/PresetSerializationControl.h"
+#include "../Color.h"
+#include "../LightingPreset.h"
 #include <fstream>
-#include "Color.h"
-#include "LightingPreset.h"
 
 using namespace preset;
 
@@ -19,7 +19,10 @@ void PresetSerializationControl::Serialize(const PresetDatabase& a_presetDB)
 
 		while (it != a_presetDB.cend() && currentTID == (*it)->GetTID())
 		{
-			logger::info("Serialising preset with tid: {} and id: {}", static_cast<int>(currentTID), (*it)->GetSIDAsString());
+			logger::info(
+				"Serialising preset with tid: {} and id: {}",
+				static_cast<int>(currentTID),
+				(*it)->GetSIDAsString());
 			jsonBuf[tidAsStr].push_back((*it)->Serialize());
 			it++;
 		}
@@ -65,14 +68,18 @@ void PresetSerializationControl::Deserialize(PresetDatabase& a_presetDB)
 	}
 }
 
-void PresetSerializationControl::RegisterPresets(PresetDatabase& a_presetDB, PresetTID tid, json json) const
+void PresetSerializationControl::RegisterPresets(
+	PresetDatabase& a_presetDB,
+	PresetTID       tid,
+	json            json) const
 {
 	for (const auto& preset : json)
 	{
 		if (!preset.contains("sid") || !preset.contains("name"))
 			throw std::runtime_error("Must include SID and Name fields");
 
-		const auto presetID = PresetID::SIDToID(tid, std::string(preset["sid"]), std::string(preset["name"]));
+		const auto presetID =
+			PresetID::SIDToID(tid, std::string(preset["sid"]), std::string(preset["name"]));
 
 		if (presetID.IsNull())
 			throw std::runtime_error("invalid sid");

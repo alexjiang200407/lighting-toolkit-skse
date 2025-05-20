@@ -1,6 +1,3 @@
-#include "SKSE/CoSaveIO.h"
+#include "CoSaveIO.h"
 
-SKSE::CoSaveIO::CoSaveIO(SerializationInterface* a_intfc) :
-	serial(a_intfc)
-{
-}
+SKSE::CoSaveIO::CoSaveIO(SerializationInterface* a_intfc) : serial(a_intfc) {}

@@ -1,6 +1,3 @@
-#include "Input/InputModifier/CanRun.h"
+#include "../InputModifier/CanRun.h"
 
-Input::CanRun::CanRun(bool blockRun) :
-	BSKeyboardGamepadModifier(inputIDs, blockRun)
-{
-}
+Input::CanRun::CanRun(bool blockRun) : BSKeyboardGamepadModifier(inputIDs, blockRun) {}

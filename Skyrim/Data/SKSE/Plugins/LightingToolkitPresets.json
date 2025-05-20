@@ -1,0 +1,159 @@
+{
+    "1": [
+      {
+        "flags": 58,
+        "name": "00 Soft Light",
+        "sid": "0449b255-1d84-408b-b483-551d3fe5c524",
+        "falloff": 1,
+        "fov": 360,
+        "radius": 256,
+        "intensity": 0.7,
+        "depthBias": 2,
+        "nearDistance": 5
+      },
+      {
+        "flags": 63,
+        "name": "01 Key Light (Shadow)",
+        "sid": "01881155-8c54-4714-8431-823bc414d288",
+        "falloff": 1,
+        "fov": 360,
+        "radius": 512,
+        "intensity": 1.2,
+        "depthBias": 2,
+        "nearDistance": 5
+      },
+      {
+        "flags": 63,
+        "name": "02 Back Lighting (Shadow)",
+        "sid": "cd787520-e83a-43ce-b8bf-31f3c1d84f4c",
+        "falloff": 1,
+        "fov": 360,
+        "radius": 256,
+        "intensity": 2,
+        "depthBias": 2,
+        "nearDistance": 5
+      }
+    ],
+    "2": [
+      {
+        "colorcode": 15592160,
+        "name": "Alabaster",
+        "sid": "1c6f2f97-e233-4bbb-af75-704af32b9e2d"
+      },
+      {
+        "colorcode": 9124317,
+        "name": "Amethyst",
+        "sid": "014be41c-3225-4698-9abf-254933dc7e67"
+      },
+      {
+        "colorcode": 65535,
+        "name": "Aqua",
+        "sid": "b697c814-ec0f-4478-990c-1035160fb3b1"
+      },
+      {
+        "colorcode": 65471,
+        "name": "Aquamarine",
+        "sid": "42fa0d89-c4eb-4eaf-b960-dc0bf84d299a"
+      },
+      {
+        "colorcode": 432883,
+        "name": "Azure",
+        "sid": "7983837f-55fc-45c1-9302-3e09d8cd5d68"
+      },
+      {
+        "colorcode": 9031664,
+        "name": "Baby Blues",
+        "sid": "af289a5e-2835-4fd9-a3f5-1d31d86bc982"
+      },
+      {
+        "colorcode": 16119260,
+        "name": "Beige",
+        "sid": "aa64b889-f7ad-4d83-90a2-6a86d185c9c9"
+      },
+      {
+        "colorcode": 8388640,
+        "name": "Burgundy",
+        "sid": "ef3579d6-d631-4a5f-8500-e3240b1cd5c6"
+      },
+      {
+        "colorcode": 16777113,
+        "name": "Canary",
+        "sid": "efb8a19f-6fdb-448b-b5e2-47b2fe6297ec"
+      },
+      {
+        "colorcode": 16766362,
+        "name": "Caramel",
+        "sid": "ff563fc7-9bc0-4e59-b0c0-2ba0d90d7450"
+      },
+      {
+        "colorcode": 15569185,
+        "name": "Carrot Orange",
+        "sid": "a7829db6-fd1a-44d0-8012-94e6bd7e83ef"
+      },
+      {
+        "colorcode": 16758725,
+        "name": "Cherry Blossom",
+        "sid": "ce4a4f8e-d1b7-4e9a-8a2c-91435e81e20d"
+      },
+      {
+        "colorcode": 16738751,
+        "name": "Hot Pink",
+        "sid": "e8d1c953-82ee-4b24-bd50-83719a8da064"
+      },
+      {
+        "colorcode": 7350627,
+        "name": "Lavender",
+        "sid": "c39c4d19-f076-4559-a7fb-d2286b18dffb"
+      },
+      {
+        "colorcode": 15264287,
+        "name": "Lemon",
+        "sid": "897fee26-94fb-469a-93d9-3ff89d539fdc"
+      },
+      {
+        "colorcode": 13140680,
+        "name": "Lilac",
+        "sid": "547cd392-99a2-407e-9969-8c6f995c4661"
+      },
+      {
+        "colorcode": 3242099,
+        "name": "Myrtle Green",
+        "sid": "3d134e4a-a848-42a8-ac1c-d22dd35d4c8e"
+      },
+      {
+        "colorcode": 13984512,
+        "name": "Orange",
+        "sid": "4b992439-6ac0-4b64-81e8-8d011722f5b7"
+      },
+      {
+        "colorcode": 16741656,
+        "name": "Pumpkin",
+        "sid": "7ea6cafc-7d37-405c-bc87-14ecb258562b"
+      },
+      {
+        "colorcode": 10771026,
+        "name": "Redwood",
+        "sid": "4b54649b-e687-46a6-adb5-08c8b374ac37"
+      },
+      {
+        "colorcode": 6787687,
+        "name": "Russian Green",
+        "sid": "acc47e0b-c98d-4d33-ad47-af97c153d6c8"
+      },
+      {
+        "colorcode": 16416882,
+        "name": "Salmon",
+        "sid": "c611518c-1932-43f4-97d2-e8ffe2ff6b34"
+      },
+      {
+        "colorcode": 13693120,
+        "name": "Tea Green",
+        "sid": "32632288-7ec1-4f82-8808-199745d2ce82"
+      },
+      {
+        "colorcode": 16777215,
+        "name": "White",
+        "sid": "0dc595ed-b9c9-4a20-9a53-04523897f880"
+      }
+    ]
+  }

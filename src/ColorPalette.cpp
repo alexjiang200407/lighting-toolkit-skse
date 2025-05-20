@@ -1,24 +1,13 @@
 #include "ColorPalette.h"
-#include "ColorDesigner.h"
 
 ColorPalette::ColorPalette(preset::PresetDatabase* presetDB) :
-	ColorPalette(new ImGuiColorPresetSelector("Color Presets##ColorPresetSelector", presetDB), new ColorDesigner(presetDB))
-{
-}
+	presetSelector("Color Preset", presetDB), presetDB(presetDB), mode(ColorSelectionMode::kPreset)
+{}
 
 ColorPalette::ColorPalette(preset::PresetDatabase* presetDB, preset::Color color) :
-	ColorPalette(
-		color.IsCustom() ?
-			ColorPalette(new ImGuiColorPresetSelector("Color Presets##ColorPresetSelector", presetDB), new ColorDesigner(presetDB, color)) :
-			ColorPalette(new ImGuiColorPresetSelector("Color Presets##ColorPresetSelector", presetDB, color), new ColorDesigner(presetDB)))
+	presetSelector("Color Preset", presetDB, color), presetDB(presetDB)
 {
-	if (color.IsCustom())
-		SetSelected(1);
-}
-
-ColorPalette::ColorPalette(ImGuiColorPresetSelector* presetSelector, ColorDesigner* color) :
-	ImGuiColorEditor("Color", { presetSelector, color })
-{
+	mode = color.IsCustom() ? ColorSelectionMode::kCustom : ColorSelectionMode::kPreset;
 }
 
 void ColorPalette::Serialize(SKSE::CoSaveIO io) const
@@ -46,10 +35,92 @@ preset::Color ColorPalette::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabas
 	auto buf = std::unique_ptr<char[]>(new char[nameSz]);
 	io.Read(buf.get(), nameSz);
 
-	if (const auto existing = presetDB->Find({ preset::Color::TID, sid, std::string(buf.get()) }); !presetDB->IsEnd(existing))
+	if (const auto existing = presetDB->Find({ preset::Color::TID, sid, std::string(buf.get()) });
+	    !presetDB->IsEnd(existing))
 	{
 		return *dynamic_cast<preset::Color*>(existing->get());
 	}
 
 	return preset::Color(buf.get(), color, true);
+}
+
+bool DrawColorEditor(preset::Color& color, preset::PresetDatabase* presetDB);
+
+bool ColorPalette::DrawEditor()
+{
+	bool changedMode = false;
+	if (ImGui::BeginTabBar("Choose Color"))
+	{
+		auto presetTabFlags = (firstRender && mode == ColorSelectionMode::kPreset) ?
+		                          ImGuiTabItemFlags_SetSelected :
+		                          ImGuiTabItemFlags_None;
+		auto customTabFlags = (firstRender && mode == ColorSelectionMode::kCustom) ?
+		                          ImGuiTabItemFlags_SetSelected :
+		                          ImGuiTabItemFlags_None;
+
+		if (ImGui::BeginTabItem("Presets", nullptr, presetTabFlags))
+		{
+			if (customTabFlags != ImGuiTabItemFlags_SetSelected)
+			{
+				mode        = ColorSelectionMode::kPreset;
+				changedMode = true;
+			}
+
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Custom", nullptr, customTabFlags))
+		{
+			if (presetTabFlags != ImGuiTabItemFlags_SetSelected)
+			{
+				mode        = ColorSelectionMode::kCustom;
+				changedMode = true;
+			}
+			ImGui::EndTabItem();
+		}
+		ImGui::EndTabBar();
+	}
+
+	firstRender = false;
+
+	switch (mode)
+	{
+	case ColorSelectionMode::kPreset:
+		return presetSelector.DrawValueEditor() || changedMode;
+	case ColorSelectionMode::kCustom:
+		return DrawColorEditor(editorColor, presetDB) || changedMode;
+	default:
+		logger::error("Invalid Color Selection Mode");
+		return false;
+	}
+}
+
+bool DrawColorEditor(preset::Color& color, preset::PresetDatabase* presetDB)
+{
+	float rgb[3]  = { color.red, color.green, color.blue };
+	bool  changed = false;
+
+	if (ImGui::ColorEdit3("Color Picker", rgb))
+	{
+		color.red   = rgb[0];
+		color.green = rgb[1];
+		color.blue  = rgb[2];
+		changed     = true;
+	}
+
+	return changed;
+}
+
+const preset::Color* ColorPalette::GetSelection() const
+{
+	switch (mode)
+	{
+	case ColorSelectionMode::kPreset:
+		return presetSelector.GetSelection();
+	case ColorSelectionMode::kCustom:
+		return &editorColor;
+	default:
+		logger::error("Invalid Color Selection");
+		return nullptr;
+	}
 }

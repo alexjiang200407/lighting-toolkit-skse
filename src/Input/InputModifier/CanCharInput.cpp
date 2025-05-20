@@ -1,11 +1,5 @@
-#include "Input/InputModifier/CanCharInput.h"
+#include "../InputModifier/CanCharInput.h"
 
-Input::CanCharInput::CanCharInput(bool blockCharModifer) :
-	blockCharModifer(blockCharModifer)
-{
-}
+Input::CanCharInput::CanCharInput(bool blockCharModifer) : blockCharModifer(blockCharModifer) {}
 
-bool Input::CanCharInput::ApplyBlockCharModifier(bool) const
-{
-	return blockCharModifer;
-}
+bool Input::CanCharInput::ApplyBlockCharModifier(bool) const { return blockCharModifer; }

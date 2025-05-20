@@ -1,4 +1,4 @@
-#include "Input/InputFilter.h"
+#include "InputFilter.h"
 
 bool Input::InputFilter::IsSuppressing(RE::IDEvent* evt) const
 {
@@ -26,29 +26,20 @@ void Input::InputFilter::AllowInput(const std::vector<DeviceKeyMapping>& list)
 	}
 }
 
-bool Input::InputFilter::IsBlockingChar() const
-{
-	return blockCharEvents;
-}
+bool Input::InputFilter::IsBlockingChar() const { return blockCharEvents; }
 
-void Input::InputFilter::SetBlockingChar(bool blockingChar)
-{
-	blockCharEvents = blockingChar;
-}
+void Input::InputFilter::SetBlockingChar(bool blockingChar) { blockCharEvents = blockingChar; }
 
 void Input::InputFilter::SetBlockingMouseMove(bool blockingMouseMove)
 {
 	blockMouseMoveEvents = blockingMouseMove;
 }
 
-bool Input::InputFilter::IsBlockingMouseMove() const
-{
-	return blockMouseMoveEvents;
-}
+bool Input::InputFilter::IsBlockingMouseMove() const { return blockMouseMoveEvents; }
 
 void Input::InputFilter::Clear()
 {
-	blockCharEvents = false;
+	blockCharEvents      = false;
 	blockMouseMoveEvents = false;
 	allowedInputIDs.clear();
 }

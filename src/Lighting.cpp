@@ -1,69 +1,116 @@
 #include "Lighting.h"
 
-Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
+Lighting::Lighting(
+	RE::TESObjectREFRPtr    ref,
+	preset::PresetDatabase* presetDB,
+	preset::LightingPreset  lightPreset) :
 	Lighting(ref, presetDB, lightPreset, lightPreset.intensity, lightPreset.radius)
-{
-}
+{}
 
-Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, preset::LightingPreset lightPreset) :
+Lighting::Lighting(
+	RE::TESObjectREFRPtr    ref,
+	preset::Color           color,
+	preset::PresetDatabase* presetDB,
+	preset::LightingPreset  lightPreset) :
 	Lighting(ref, color, presetDB, lightPreset, lightPreset.intensity, lightPreset.radius)
-{
-}
+{}
 
-Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::PresetDatabase* presetDB, RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset, float fade, float radius, bool hideLight, bool hideMarker) :
-	ref(ref), colorPalette(presetDB), lightCreateParams(lightPreset), fade(fade), radius(radius, radius, radius), worldTranslate(ref->GetPosition()), hideLight(hideLight), hideMarker(hideMarker)
-{
-}
+Lighting::Lighting(
+	RE::TESObjectREFRPtr                     ref,
+	preset::PresetDatabase*                  presetDB,
+	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset,
+	float                                    fade,
+	float                                    radius,
+	bool                                     hideLight,
+	bool                                     hideMarker) :
+	ref(ref),
+	colorPalette(presetDB), lightCreateParams(lightPreset), fade(fade),
+	radius(radius, radius, radius), worldTranslate(ref->GetPosition()), hideLight(hideLight),
+	hideMarker(hideMarker)
+{}
 
-Lighting::Lighting(RE::TESObjectREFRPtr ref, preset::Color color, preset::PresetDatabase* presetDB, RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset, float fade, float radius, bool hideLight, bool hideMarker) :
-	ref(ref), colorPalette(presetDB, color), lightCreateParams(lightPreset),
-	fade(fade), radius(radius, radius, radius), worldTranslate(ref->GetPosition()), hideLight(hideLight), hideMarker(hideMarker)
-{
-}
+Lighting::Lighting(
+	RE::TESObjectREFRPtr                     ref,
+	preset::Color                            color,
+	preset::PresetDatabase*                  presetDB,
+	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset,
+	float                                    fade,
+	float                                    radius,
+	bool                                     hideLight,
+	bool                                     hideMarker) :
+	ref(ref),
+	colorPalette(presetDB, color), lightCreateParams(lightPreset), fade(fade),
+	radius(radius, radius, radius), worldTranslate(ref->GetPosition()), hideLight(hideLight),
+	hideMarker(hideMarker)
+{}
 
 bool Lighting::DrawTabItem(bool& active)
 {
 	bool isNotRemoved = true;
 	bool selected     = false;
-	if ((selected = ImGui::BeginTabItem(std::format("{} 0x{:X}", ref->GetFormEditorID(), ref->GetFormID()).c_str(), &isNotRemoved)))
+
+	if ((selected = ImGui::BeginTabItem(tabLabel.c_str(), &isNotRemoved)))
 	{
 		active = selected;
 		ImGui::EndTabItem();
 	}
+
 	return isNotRemoved;
 }
 
 void Lighting::DrawControlPanel()
 {
-	ImGui::BeginDisabled(!ref->Is3DLoaded() || !niLight || hideLight);
+	ImGui::PushID(std::bit_cast<int>(ref->GetFormID()));
 	{
-		if (colorPalette.DrawEditor())
+		bool disabled = !ref->Is3DLoaded() || !niLight || hideLight;
+		ImGui::BeginDisabled(disabled);
 		{
-			UpdateLightColor();
+			if (ImGui::BeginPanel("##ColorSelector"))
+			{
+				if (colorPalette.DrawEditor())
+				{
+					UpdateLightColor();
+				}
+				ImGui::EndPanel();
+			}
 		}
-		ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
-		ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
+		ImGui::EndDisabled();
 
-		radius = niLight->radius;
-		fade   = niLight->fade;
-		DrawCameraOffsetSlider();
+		if (ImGui::BeginPanel("##LightProperties"))
+		{
+			ImGui::BeginDisabled(disabled);
+			{
+				ImGui::SliderAutoFill("Light Radius", &niLight->radius.x, 32.0f, 1024.0f);
+				ImGui::SliderAutoFill("Light Intensity", &niLight->fade, 0.0f, 10.0f);
+
+				radius = niLight->radius;
+				fade   = niLight->fade;
+				DrawCameraOffsetSlider();
+			}
+			ImGui::EndDisabled();
+			if (ImGui::ConditionalCheckbox("Hide Light", niLight.get(), &hideLight))
+			{
+				niLight->SetAppCulled(hideLight);
+			}
+			ImGui::SameLine();
+			if (auto* model = ref->Get3D();
+			    ImGui::ConditionalCheckbox("Hide Marker", model, &hideMarker))
+			{
+				model->GetObjectByName("Marker")->SetAppCulled(hideMarker);
+			}
+			ImGui::EndPanel();
+		}
 	}
-	ImGui::EndDisabled();
-	if (ImGui::ConditionalCheckbox("Hide Light", niLight.get(), &hideLight))
-	{
-		niLight->SetAppCulled(hideLight);
-	}
-	ImGui::SameLine();
-	if (auto* model = ref->Get3D(); ImGui::ConditionalCheckbox("Hide Marker", model, &hideMarker))
-	{
-		model->GetObjectByName("Marker")->SetAppCulled(hideMarker);
-	}
+	ImGui::PopID();
 }
 
 void Lighting::UpdateLightColor()
 {
 	if (auto selection = colorPalette.GetSelection())
+	{
 		niLight->diffuse = *selection;
+		tabLabel         = std::format("{}###{}", selection->GetName(), ref->GetFormID());
+	}
 }
 
 void Lighting::UpdateLightTemplate()
@@ -79,7 +126,8 @@ void Lighting::UpdateLightTemplate()
 void Lighting::MoveToCameraLookingAt(bool resetOffset)
 {
 	auto cameraNode = RE::PlayerCamera::GetSingleton()->cameraRoot.get()->AsNode();
-	auto cameraNI   = reinterpret_cast<RE::NiCamera*>((cameraNode->children.size() == 0) ? nullptr : cameraNode->children[0].get());
+	auto cameraNI   = reinterpret_cast<RE::NiCamera*>(
+        (cameraNode->children.size() == 0) ? nullptr : cameraNode->children[0].get());
 
 	if (cameraNI)
 	{
@@ -116,10 +164,7 @@ void Lighting::MoveTo(RE::NiPoint3 point)
 	niLight->world.translate = point;
 }
 
-void Lighting::MoveToCurrentPosition()
-{
-	MoveTo(worldTranslate);
-}
+void Lighting::MoveToCurrentPosition() { MoveTo(worldTranslate); }
 
 void Lighting::OnEnterCell()
 {
@@ -131,7 +176,7 @@ void Lighting::OnEnterCell()
 	MoveToCurrentPosition();
 }
 
-RE::FormID Lighting::GetCellID()
+RE::FormID Lighting::GetCellID() const
 {
 	assert(ref->GetParentCell());
 	return ref->GetParentCell()->formID;
@@ -139,18 +184,16 @@ RE::FormID Lighting::GetCellID()
 
 void Lighting::Rotate(float delta)
 {
-	RE::NiMatrix3 rotation = {
-		{ 1, 0, 0 },
-		{ 0, cos(delta), -sin(delta) },
-		{ 0, sin(delta), cos(delta) }
-	};
+	RE::NiMatrix3 rotation = { { 1, 0, 0 },
+		                       { 0, cos(delta), -sin(delta) },
+		                       { 0, sin(delta), cos(delta) } };
 
 	Rotate(rotation);
 }
 
 void Lighting::Remove()
 {
-	auto* shadowSceneNode                   = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
+	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 	shadowSceneNode->allowLightRemoveQueues = false;
 
 	if (niLight.get())
@@ -176,12 +219,38 @@ void Lighting::Rotate(RE::NiMatrix3 rotation)
 
 RE::NiPoint3 Lighting::GetCameraLookingAt(float distanceFromCamera)
 {
-	auto cameraNode = RE::PlayerCamera::GetSingleton()->cameraRoot.get()->AsNode();
-	auto cameraNI   = reinterpret_cast<RE::NiCamera*>((cameraNode->children.size() == 0) ? nullptr : cameraNode->children[0].get());
+	auto* playerCamera = RE::PlayerCamera::GetSingleton();
+
+	if (!playerCamera)
+	{
+		logger::error("Could not get player camera");
+		return RE::NiPoint3();
+	}
+
+	auto* cameraRoot = playerCamera->cameraRoot.get();
+
+	if (!cameraRoot)
+	{
+		logger::error("Could not get camera root");
+		return RE::NiPoint3();
+	}
+
+	auto* cameraNode = cameraRoot->AsNode();
+
+	if (!cameraNode)
+	{
+		logger::error("Could not get camera node");
+		return RE::NiPoint3();
+	}
+
+	auto cameraNI = reinterpret_cast<RE::NiCamera*>(
+		(cameraNode->children.size() == 0) ? nullptr : cameraNode->children[0].get());
 
 	if (cameraNI)
-		return GetCameraPosition() + (cameraNI->world.rotate * RE::NiPoint3{ distanceFromCamera, 0.0f, 0.0f });
+		return GetCameraPosition() +
+		       (cameraNI->world.rotate * RE::NiPoint3{ distanceFromCamera, 0.0f, 0.0f });
 
+	logger::error("Could not get NiCamera");
 	return RE::NiPoint3();
 }
 
@@ -190,15 +259,21 @@ RE::BSFadeNode* Lighting::Attach3D()
 	if (!ref->Is3DLoaded())
 		ref->Load3D(false);
 
-	auto* niRoot = ref->Get3D()->AsFadeNode();
+	auto* ref3D = ref->Get3D();
+
+	if (!ref3D)
+	{
+		logger::error("Cannot attach 3D. 3D is not loaded");
+		return nullptr;
+	}
+
+	auto* niRoot = ref3D->AsFadeNode();
 
 	if (!niRoot)
 	{
 		logger::error("Base Root Node not found!");
-	}
-
-	if (!niRoot)
 		return nullptr;
+	}
 
 	if (auto* newLight = niRoot->GetObjectByName("ChiaroscuroLight"))
 	{
@@ -221,7 +296,7 @@ RE::BSFadeNode* Lighting::Attach3D()
 
 	if (hideLight)
 		niLight->SetAppCulled(true);
-	
+
 	if (hideMarker)
 		niRoot->GetObjectByName("Marker")->SetAppCulled(true);
 
@@ -237,7 +312,7 @@ void Lighting::Init3D()
 	UpdateLightTemplate();
 }
 
-LightingPtr Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB)
+std::optional<Lighting> Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB)
 {
 	RE::FormID                               formID;
 	float                                    fade, radius;
@@ -255,21 +330,29 @@ LightingPtr Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* pre
 	auto* tesForm = RE::TESObjectREFR::LookupByID(formID);
 
 	if (!tesForm)
-		return LightingPtr();
+		return std::nullopt;
 
 	auto* tesObjectREFR = tesForm->As<RE::TESObjectREFR>();
 	if (!tesObjectREFR)
-		return LightingPtr();	
+		return std::nullopt;
 
-	return std::make_unique<Lighting>(Lighting(tesObjectREFR->CreateRefHandle().get(), color, presetDB, lightCreateParams, fade, radius, hideLight, hideMarker));
+	return Lighting(
+		tesObjectREFR->CreateRefHandle().get(),
+		color,
+		presetDB,
+		lightCreateParams,
+		fade,
+		radius,
+		hideLight,
+		hideMarker);
 }
 
 void Lighting::DrawCameraOffsetSlider()
 {
 	bool changed = false;
 	changed      = ImGui::SliderAutoFill("Offset Forward/Backward", &cameraOffset.x, 0.1f, 500.0f);
-	changed      = ImGui::SliderAutoFill("Offset Up/Down", &cameraOffset.y, -50.0f, 50.0f) || changed;
-	changed      = ImGui::SliderAutoFill("Offset Left/Right", &cameraOffset.z, -50.0f, 50.0f) || changed;
+	changed = ImGui::SliderAutoFill("Offset Up/Down", &cameraOffset.y, -50.0f, 50.0f) || changed;
+	changed = ImGui::SliderAutoFill("Offset Left/Right", &cameraOffset.z, -50.0f, 50.0f) || changed;
 
 	if (changed)
 	{
@@ -291,8 +374,16 @@ void Lighting::Serialize(SKSE::CoSaveIO io) const
 RE::NiPoint3 Lighting::GetCameraPosition()
 {
 	RE::NiPoint3 origin;
-	if (RE::PlayerCamera::GetSingleton()->IsInFreeCameraMode())
-		reinterpret_cast<RE::FreeCameraState*>(RE::PlayerCamera::GetSingleton()->currentState.get())->GetTranslation(origin);
+	auto*        camera = RE::PlayerCamera::GetSingleton();
+
+	if (!camera)
+	{
+		logger::error("Could not get player camera");
+		return RE::NiPoint3();
+	}
+
+	if (camera->IsInFreeCameraMode())
+		reinterpret_cast<RE::FreeCameraState*>(camera->currentState.get())->GetTranslation(origin);
 	else
 		origin = RE::PlayerCamera::GetSingleton()->pos;
 

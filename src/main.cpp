@@ -1,6 +1,6 @@
-#include "Chiaroscuro.h"
-#include "SKSE/SerializationControl.h"
+#include "LightingToolkit.h"
 #include "MCM/Settings.h"
+#include "SKSE/SerializationControl.h"
 
 void InitializeLog()
 {
@@ -31,7 +31,7 @@ void InitializeLog()
 extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
 	SKSE::PluginVersionData v;
 	v.PluginVersion(Version::MAJOR);
-	v.PluginName("Chiaroscuro");
+	v.PluginName(Version::PROJECT);
 	v.AuthorName("shdowraithe101");
 	v.UsesAddressLibrary();
 	v.UsesUpdatedStructs();
@@ -40,10 +40,11 @@ extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
 	return v;
 }();
 #else
-extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
+extern "C" DLLEXPORT bool SKSEAPI
+	SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 {
 	a_info->infoVersion = SKSE::PluginInfo::kVersion;
-	a_info->name        = "Chiaroscuro";
+	a_info->name        = "InGameLightingToolkit";
 	a_info->version     = Version::MAJOR;
 
 	if (a_skse->IsEditor())
@@ -75,18 +76,18 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	InitializeLog();
 
 	logger::info("Game version : {}", a_skse->RuntimeVersion().string());
-	Chiaroscuro::GetSingleton()->Init();
 	MCM::Settings::GetSingleton()->Init();
+	LightingToolkit::GetSingleton()->Init();
 
 	SKSE::GetMessagingInterface()->RegisterListener([](SKSE::MessagingInterface::Message* message) {
 		if (message->type == SKSE::MessagingInterface::kDataLoaded)
 		{
-			RE::ConsoleLog::GetSingleton()->Print("Chiaroscuro has been loaded");
+			RE::ConsoleLog::GetSingleton()->Print("LightingToolkit has been loaded");
 			SKSE::SerializationControl::GetSingleton()->Init();
-			Chiaroscuro::GetSingleton()->OnDataLoaded();
+			LightingToolkit::GetSingleton()->OnDataLoaded();
 		}
 		else if (message->type == SKSE::MessagingInterface::kPostLoadGame)
-			Chiaroscuro::GetSingleton()->OnSavePostLoaded();
+			LightingToolkit::GetSingleton()->OnSavePostLoaded();
 	});
 
 	return true;

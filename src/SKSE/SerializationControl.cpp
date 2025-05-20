@@ -1,4 +1,4 @@
-#include "SKSE/SerializationControl.h"
+#include "SerializationControl.h"
 
 SKSE::SerializationControl SKSE::SerializationControl::singleton;
 
@@ -21,10 +21,7 @@ void SKSE::SerializationControl::UnregisterSerializer(SerializableCollection* se
 	serializables.erase(serializer->GetKey());
 }
 
-SKSE::SerializationControl* SKSE::SerializationControl::GetSingleton()
-{
-	return &singleton;
-}
+SKSE::SerializationControl* SKSE::SerializationControl::GetSingleton() { return &singleton; }
 
 void SKSE::SerializationControl::Save(SerializationInterface* a_intfc)
 {
@@ -46,7 +43,8 @@ void SKSE::SerializationControl::Load(SerializationInterface* a_intfc)
 	{
 		if (!size)
 			continue;
-		if (const auto& it = singleton.serializables.find(type); it != singleton.serializables.end())
+		if (const auto& it = singleton.serializables.find(type);
+		    it != singleton.serializables.end())
 		{
 			try
 			{

@@ -1,9 +1,9 @@
-#include "MenuState/MenuOpen.h"
-#include "MenuState/MenuHidden.h"
-#include "MenuState/MenuLookingAround.h"
-#include "MenuState/MenuPositioning.h"
-#include "MenuState/MenuItemActive.h"
-#include "ImGui/ImGuiInputAdapter.h"
+#include "MenuOpen.h"
+#include "../ImGui/ImGuiInputAdapter.h"
+#include "MenuHidden.h"
+#include "MenuItemActive.h"
+#include "MenuLookingAround.h"
+#include "MenuPositioning.h"
 
 MenuOpen::MenuOpen(Input::MenuInputContext* inputCtx)
 {
@@ -32,16 +32,16 @@ MenuStatePtr MenuOpen::Transition(Input::MenuInputContext* inputCtx)
 	return nullptr;
 }
 
-void MenuOpen::DoFrame(Chiaroscuro* menu)
+void MenuOpen::DoFrame(LightingToolkit* menu)
 {
-	ImGui::Begin("##SCMain", nullptr, windowFlags);
+	if (ImGui::Begin("##SCMain", nullptr, windowFlags))
 	{
 		DrawMenu(menu);
+		ImGui::End();
 	}
-	ImGui::End();
 }
 
-void MenuOpen::DrawMenu(Chiaroscuro* menu)
+void MenuOpen::DrawMenu(LightingToolkit* menu)
 {
 	menu->DrawTabBar();
 	menu->DrawPropControlWindow();

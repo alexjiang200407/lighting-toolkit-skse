@@ -1,17 +1,13 @@
-#include "MenuState/MenuPositioning.h"
-#include "ImGui/ImGuiInputAdapter.h"
+#include "MenuPositioning.h"
+#include "../ImGui/ImGuiInputAdapter.h"
 
-MenuPositioning::MenuPositioning(Input::MenuInputContext* inputCtx) :
-	MenuLookingAround(inputCtx)
+MenuPositioning::MenuPositioning(Input::MenuInputContext* inputCtx) : MenuLookingAround(inputCtx)
 {
 	prevFreezeTime                       = RE::Main::GetSingleton()->freezeTime;
 	RE::Main::GetSingleton()->freezeTime = true;
 }
 
-MenuPositioning::~MenuPositioning()
-{
-	RE::Main::GetSingleton()->freezeTime = prevFreezeTime;
-}
+MenuPositioning::~MenuPositioning() { RE::Main::GetSingleton()->freezeTime = prevFreezeTime; }
 
 MenuStatePtr MenuPositioning::Transition(Input::MenuInputContext* inputCtx)
 {
@@ -22,7 +18,7 @@ MenuStatePtr MenuPositioning::Transition(Input::MenuInputContext* inputCtx)
 	return MenuStatePtr(nullptr);
 }
 
-void MenuPositioning::DrawMenu(Chiaroscuro* menu)
+void MenuPositioning::DrawMenu(LightingToolkit* menu)
 {
 	MenuLookingAround::DrawMenu(menu);
 	menu->PositionLight();

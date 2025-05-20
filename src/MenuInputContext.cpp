@@ -1,15 +1,12 @@
 #include "MenuInputContext.h"
-#include "Input/InputModifier/CanMoveAround.h"
-#include "Input/InputModifier/CanMouseMove.h"
-#include "Input/InputModifier/CanCharInput.h"
-#include "Input/InputModifier/FreeCameraControl.h"
 #include "ImGui/ImGuiInputAdapter.h"
+#include "Input/InputModifier/CanCharInput.h"
 #include "Input/InputModifier/CanMouseMove.h"
+#include "Input/InputModifier/CanMoveAround.h"
 #include "Input/InputModifier/CanRun.h"
+#include "Input/InputModifier/FreeCameraControl.h"
 
-Input::MenuInputContext::MenuInputContext()
-{
-}
+Input::MenuInputContext::MenuInputContext() {}
 
 void Input::MenuInputContext::StartLookingAround()
 {
@@ -26,10 +23,7 @@ void Input::MenuInputContext::StartTextInput()
 	AddModifier(kTextInput, new FreeCameraControl(true));
 }
 
-void Input::MenuInputContext::StopTextInput()
-{
-	RemoveModifier(kTextInput);
-}
+void Input::MenuInputContext::StopTextInput() { RemoveModifier(kTextInput); }
 
 void Input::MenuInputContext::MenuOpen()
 {

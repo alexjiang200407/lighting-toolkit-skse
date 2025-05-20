@@ -1,10 +1,12 @@
-#include "ImGui/ImGuiInputAdapter.h"
-#include "MCM/Settings.h"
+#include "ImGuiInputAdapter.h"
+#include "../MCM/Settings.h"
 #include <d3d11.h>
 
 ImGui::ImGuiInputAdapter ImGui::ImGuiInputAdapter::singleton;
 
-void ImGui::ImGuiInputAdapter::SendInputEvent::thunk(RE::BSTEventSource<RE::InputEvent*>* dispatcher, RE::InputEvent** ppEvents)
+void ImGui::ImGuiInputAdapter::SendInputEvent::thunk(
+	RE::BSTEventSource<RE::InputEvent*>* dispatcher,
+	RE::InputEvent**                     ppEvents)
 {
 	if (!ppEvents || !*ppEvents)
 	{
@@ -18,7 +20,10 @@ void ImGui::ImGuiInputAdapter::SendInputEvent::thunk(RE::BSTEventSource<RE::Inpu
 
 void ImGui::ImGuiInputAdapter::Init()
 {
-	REL::Relocation<std::uintptr_t> target1{ RELOCATION_ID(67315, 68617), OFFSET(0x7B, 0x7B) };  // BSTEventSource<InputEvent*>::SendEvent
+	REL::Relocation<std::uintptr_t> target1{
+		RELOCATION_ID(67315, 68617),
+		OFFSET(0x7B, 0x7B)
+	};  // BSTEventSource<InputEvent*>::SendEvent
 	stl::write_thunk_call<SendInputEvent>(target1.address());
 }
 
@@ -240,18 +245,28 @@ ImGuiKey ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32KeyboardDevice::Key key
 	}
 }
 
-bool ImGui::ImGuiInputAdapter::AddButtonEvent(InputList& list, InputList& removed, RE::ButtonEvent* const event)
+bool ImGui::ImGuiInputAdapter::AddButtonEvent(
+	InputList&             list,
+	InputList&             removed,
+	RE::ButtonEvent* const event)
 {
 	bool suppressing = filter.IsSuppressing(event);
 	return AddInputEvent(!suppressing || (suppressing && event->IsUp()), list, removed, event);
 }
 
-bool ImGui::ImGuiInputAdapter::AddIDEvent(InputList& list, InputList& removed, RE::IDEvent* const event)
+bool ImGui::ImGuiInputAdapter::AddIDEvent(
+	InputList&         list,
+	InputList&         removed,
+	RE::IDEvent* const event)
 {
 	return AddInputEvent(!filter.IsSuppressing(event), list, removed, event);
 }
 
-bool ImGui::ImGuiInputAdapter::AddInputEvent(bool cond, InputList& list, InputList& removed, RE::InputEvent* const event)
+bool ImGui::ImGuiInputAdapter::AddInputEvent(
+	bool                  cond,
+	InputList&            list,
+	InputList&            removed,
+	RE::InputEvent* const event)
 {
 	if (!isSuppressing || cond)
 	{
@@ -264,7 +279,6 @@ bool ImGui::ImGuiInputAdapter::AddInputEvent(bool cond, InputList& list, InputLi
 		return false;
 	}
 }
-
 
 ImGuiKey ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32GamepadDevice::Key key)
 {
@@ -304,7 +318,10 @@ ImGuiKey ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32GamepadDevice::Key key)
 	}
 }
 
-void ImGui::ImGuiInputAdapter::HandleButtonEvent(RE::ButtonEvent* const buttonEvt, InputList& list, InputList& removed)
+void ImGui::ImGuiInputAdapter::HandleButtonEvent(
+	RE::ButtonEvent* const buttonEvt,
+	InputList&             list,
+	InputList&             removed)
 {
 	switch (buttonEvt->GetDevice())
 	{
@@ -317,7 +334,10 @@ void ImGui::ImGuiInputAdapter::HandleButtonEvent(RE::ButtonEvent* const buttonEv
 		break;
 	case RE::INPUT_DEVICE::kMouse:
 		{
-			HandleMouseButtonEvent(buttonEvt->GetIDCode(), buttonEvt->Value(), buttonEvt->IsPressed());
+			HandleMouseButtonEvent(
+				buttonEvt->GetIDCode(),
+				buttonEvt->Value(),
+				buttonEvt->IsPressed());
 			AddButtonEvent(list, removed, buttonEvt);
 		}
 		break;
@@ -359,9 +379,7 @@ void ImGui::ImGuiInputAdapter::HandleMouseButtonEvent(uint32_t key, float value,
 	if (key > MouseKey::kButton5)
 		key = ImGuiMouseButton_::ImGuiMouseButton_COUNT;
 
-	inputEvtCallbacks.push_back([=](auto io) {
-		io.AddMouseButtonEvent(key, isPressed);
-	});
+	inputEvtCallbacks.push_back([=](auto io) { io.AddMouseButtonEvent(key, isPressed); });
 }
 
 void ImGui::ImGuiInputAdapter::HandleGamepadButtonEvent(uint32_t key, bool isPressed)
@@ -390,10 +408,7 @@ void ImGui::ImGuiInputAdapter::DisableSupression()
 	isSuppressing = false;
 }
 
-ImGui::ImGuiInputAdapter* ImGui::ImGuiInputAdapter::GetSingleton()
-{
-	return &singleton;
-}
+ImGui::ImGuiInputAdapter* ImGui::ImGuiInputAdapter::GetSingleton() { return &singleton; }
 
 void ImGui::ImGuiInputAdapter::DispatchImGuiInputEvents()
 {
@@ -407,7 +422,9 @@ void ImGui::ImGuiInputAdapter::DispatchImGuiInputEvents()
 	}
 }
 
-void ImGui::ImGuiInputAdapter::Adapt(RE::BSTEventSource<RE::InputEvent*>*, RE::InputEvent** ppEvents)
+void ImGui::ImGuiInputAdapter::Adapt(
+	RE::BSTEventSource<RE::InputEvent*>*,
+	RE::InputEvent** ppEvents)
 {
 	InputList list{ nullptr, nullptr };
 	InputList removed{ nullptr, nullptr };
@@ -446,10 +463,11 @@ void ImGui::ImGuiInputAdapter::Adapt(RE::BSTEventSource<RE::InputEvent*>*, RE::I
 
 bool ImGui::ImGuiInputAdapter::IsKeyPressed(const char* keyID, bool repeat)
 {
-	uint32_t dInputkey;
-	if (MCM::Settings::GetSingleton()->Get("Controls", keyID, dInputkey))
+	int32_t dInputkey;
+	if (MCM::Settings::Get_s("Controls", keyID, dInputkey))
 	{
-		ImGuiKey key = ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32KeyboardDevice::Key(dInputkey));
+		ImGuiKey key =
+			ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32KeyboardDevice::Key(dInputkey));
 		return ImGui::IsKeyPressedA(key, repeat);
 	}
 
@@ -458,10 +476,11 @@ bool ImGui::ImGuiInputAdapter::IsKeyPressed(const char* keyID, bool repeat)
 
 bool ImGui::ImGuiInputAdapter::IsKeyDown(const char* keyID)
 {
-	uint32_t dInputkey;
-	if (MCM::Settings::GetSingleton()->Get("Controls", keyID, dInputkey))
+	int32_t dInputkey;
+	if (MCM::Settings::Get_s("Controls", keyID, dInputkey))
 	{
-		ImGuiKey key = ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32KeyboardDevice::Key(dInputkey));
+		ImGuiKey key =
+			ImGui::ImGuiInputAdapter::ToImGuiKey(RE::BSWin32KeyboardDevice::Key(dInputkey));
 		return ImGui::IsKeyDownA(key);
 	}
 

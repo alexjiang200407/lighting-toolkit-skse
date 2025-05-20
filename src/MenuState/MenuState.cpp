@@ -1,10 +1,5 @@
-#include "MenuState/MenuState.h"
+#include "MenuState.h"
 
-void MenuState::DoFrame(Chiaroscuro*)
-{
-}
+void MenuState::DoFrame(LightingToolkit*) {}
 
-bool MenuState::ShouldDrawCursor() const
-{
-	return true;
-}
+bool MenuState::ShouldDrawCursor() const { return true; }

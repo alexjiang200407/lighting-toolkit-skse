@@ -1,5 +1,5 @@
 {
-  "name": "chiaroscuro",
+  "name": "ingame-lighting-toolkit-sse",
   "description": "Cinematography mod for Skyrim SE",
   "dependencies": [
     {
@@ -9,7 +9,6 @@
     "spdlog",
     "rsm-binary-io",
     "nlohmann-json",
-    "xbyak",
     "simpleini"
   ],
   "builtin-baseline": "4d22d579c2299aaf1e0bd6b7aa64832658330c88"

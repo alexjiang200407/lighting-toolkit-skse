@@ -1,6 +1,6 @@
-#include "MenuState/MenuLookingAround.h"
-#include "MenuState/MenuOpen.h"
-#include "ImGui/ImGuiInputAdapter.h"
+#include "MenuLookingAround.h"
+#include "../ImGui/ImGuiInputAdapter.h"
+#include "MenuOpen.h"
 
 MenuLookingAround::MenuLookingAround(Input::MenuInputContext* inputCtx)
 {
@@ -16,7 +16,7 @@ MenuStatePtr MenuLookingAround::Transition(Input::MenuInputContext* inputCtx)
 	return MenuStatePtr(nullptr);
 }
 
-void MenuLookingAround::DrawMenu(Chiaroscuro* menu)
+void MenuLookingAround::DrawMenu(LightingToolkit* menu)
 {
 	ImGui::BeginDisabled();
 	{
@@ -25,7 +25,4 @@ void MenuLookingAround::DrawMenu(Chiaroscuro* menu)
 	ImGui::EndDisabled();
 }
 
-bool MenuLookingAround::ShouldDrawCursor() const
-{
-	return false;
-}
+bool MenuLookingAround::ShouldDrawCursor() const { return false; }
