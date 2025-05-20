@@ -69,6 +69,12 @@
       }
     },
     {
+      "name": "release",
+      "cacheVariables": {
+        "STRIPPED_PDB": true
+      }
+    },
+    {
       "name": "vs2022-windows-vcpkg-se",
       "inherits": [
         "cmake-dev",
@@ -97,6 +103,27 @@
         "vs2022",
         "vr"
       ]
+    },
+    {
+      "name": "vs2022-windows-vcpkg-se-release",
+      "inherits": [
+        "vs2022-windows-vcpkg-se",
+        "release"
+      ]
+    },
+    {
+      "name": "vs2022-windows-vcpkg-ae-release",
+      "inherits": [
+        "vs2022-windows-vcpkg-ae",
+        "release"
+      ]
+    },
+    {
+      "name": "vs2022-windows-vcpkg-vr-release",
+      "inherits": [
+        "vs2022-windows-vcpkg-vr",
+        "release"
+      ]
     }
   ],
   "buildPresets": [
@@ -107,7 +134,7 @@
     },
     {
       "name": "vs2022-windows-vcpkg-ae-release",
-      "configurePreset": "vs2022-windows-vcpkg-ae",
+      "configurePreset": "vs2022-windows-vcpkg-ae-release",
       "configuration": "Release"
     },
     {
@@ -117,8 +144,8 @@
     },
     {
       "name": "vs2022-windows-vcpkg-se-release",
-      "configurePreset": "vs2022-windows-vcpkg-se",
-      "configuration": "Debug"
+      "configurePreset": "vs2022-windows-vcpkg-se-release",
+      "configuration": "Release"
     },
     {
       "name": "vs2022-windows-vcpkg-vr",
@@ -127,8 +154,8 @@
     },
     {
       "name": "vs2022-windows-vcpkg-vr-release",
-      "configurePreset": "vs2022-windows-vcpkg-vr",
-      "configuration": "Debug"
+      "configurePreset": "vs2022-windows-vcpkg-vr-release",
+      "configuration": "Release"
     }
   ]
 }

@@ -3,6 +3,7 @@ set(AE_VERSION 1)
 
 option(BUILD_SKYRIMVR "Build for Skyrim VR" OFF)
 option(BUILD_SKYRIMAE "Build for Skyrim AE" OFF)
+option(STRIPPED_PDB "Strip private for PDB" OFF)
 
 
 macro(set_from_environment VARIABLE)
@@ -157,6 +158,27 @@ target_link_libraries(
 )
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE src/PCH.h)
+
+if(STRIPPED_PDB)
+	find_program(PDBCOPY_EXECUTABLE pdbcopy REQUIRED)
+	if(PDBCOPY_EXECUTABLE)
+		set(STRIPPED_PDB_LOCATION "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}.stripped.pdb")
+		message(STATUS "pdbcopy found")
+		add_custom_command(
+			TARGET "${PROJECT_NAME}" POST_BUILD
+			COMMAND "${PDBCOPY_EXECUTABLE}"
+				"$<TARGET_PDB_FILE:${PROJECT_NAME}>"
+				"${STRIPPED_PDB_LOCATION}"
+				-p
+			COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${STRIPPED_PDB_LOCATION}" "$<TARGET_PDB_FILE:${PROJECT_NAME}>"
+			COMMAND "${CMAKE_COMMAND}" -E remove -f "${STRIPPED_PDB_LOCATION}"
+			COMMENT "Stripping private symbols from actual PDB (Release)"
+			VERBATIM
+		)
+	else()
+		message(WARNING "pdbcopy not found, cannot strip private symbols from PDB.")
+	endif()
+endif()
 
 
 if(DEFINED SkyrimModsPath)
