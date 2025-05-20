@@ -58,8 +58,6 @@ bool Lighting::DrawTabItem(bool& active)
 	return isNotRemoved;
 }
 
-
-
 void Lighting::DrawControlPanel()
 {
 	ImGui::PushID(std::bit_cast<int>(ref->GetFormID()));
@@ -221,14 +219,38 @@ void Lighting::Rotate(RE::NiMatrix3 rotation)
 
 RE::NiPoint3 Lighting::GetCameraLookingAt(float distanceFromCamera)
 {
-	auto cameraNode = RE::PlayerCamera::GetSingleton()->cameraRoot.get()->AsNode();
-	auto cameraNI   = reinterpret_cast<RE::NiCamera*>(
-        (cameraNode->children.size() == 0) ? nullptr : cameraNode->children[0].get());
+	auto* playerCamera = RE::PlayerCamera::GetSingleton();
+
+	if (!playerCamera)
+	{
+		logger::error("Could not get player camera");
+		return RE::NiPoint3();
+	}
+
+	auto* cameraRoot = playerCamera->cameraRoot.get();
+
+	if (!cameraRoot)
+	{
+		logger::error("Could not get camera root");
+		return RE::NiPoint3();
+	}
+
+	auto* cameraNode = cameraRoot->AsNode();
+
+	if (!cameraNode)
+	{
+		logger::error("Could not get camera node");
+		return RE::NiPoint3();
+	}
+
+	auto cameraNI = reinterpret_cast<RE::NiCamera*>(
+		(cameraNode->children.size() == 0) ? nullptr : cameraNode->children[0].get());
 
 	if (cameraNI)
 		return GetCameraPosition() +
 		       (cameraNI->world.rotate * RE::NiPoint3{ distanceFromCamera, 0.0f, 0.0f });
 
+	logger::error("Could not get NiCamera");
 	return RE::NiPoint3();
 }
 
@@ -237,15 +259,21 @@ RE::BSFadeNode* Lighting::Attach3D()
 	if (!ref->Is3DLoaded())
 		ref->Load3D(false);
 
-	auto* niRoot = ref->Get3D()->AsFadeNode();
+	auto* ref3D = ref->Get3D();
+
+	if (!ref3D)
+	{
+		logger::error("Cannot attach 3D. 3D is not loaded");
+		return nullptr;
+	}
+
+	auto* niRoot = ref3D->AsFadeNode();
 
 	if (!niRoot)
 	{
 		logger::error("Base Root Node not found!");
-	}
-
-	if (!niRoot)
 		return nullptr;
+	}
 
 	if (auto* newLight = niRoot->GetObjectByName("ChiaroscuroLight"))
 	{
@@ -346,9 +374,16 @@ void Lighting::Serialize(SKSE::CoSaveIO io) const
 RE::NiPoint3 Lighting::GetCameraPosition()
 {
 	RE::NiPoint3 origin;
-	if (RE::PlayerCamera::GetSingleton()->IsInFreeCameraMode())
-		reinterpret_cast<RE::FreeCameraState*>(RE::PlayerCamera::GetSingleton()->currentState.get())
-			->GetTranslation(origin);
+	auto*        camera = RE::PlayerCamera::GetSingleton();
+
+	if (!camera)
+	{
+		logger::error("Could not get player camera");
+		return RE::NiPoint3();
+	}
+
+	if (camera->IsInFreeCameraMode())
+		reinterpret_cast<RE::FreeCameraState*>(camera->currentState.get())->GetTranslation(origin);
 	else
 		origin = RE::PlayerCamera::GetSingleton()->pos;
 

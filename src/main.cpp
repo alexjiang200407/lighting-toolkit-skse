@@ -44,7 +44,7 @@ extern "C" DLLEXPORT bool SKSEAPI
 	SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 {
 	a_info->infoVersion = SKSE::PluginInfo::kVersion;
-	a_info->name        = Version::PROJECT;
+	a_info->name        = "InGameLightingToolkit";
 	a_info->version     = Version::MAJOR;
 
 	if (a_skse->IsEditor())
