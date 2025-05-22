@@ -49,37 +49,15 @@ bool DrawColorEditor(preset::Color& color, preset::PresetDatabase* presetDB);
 bool ColorPalette::DrawEditor()
 {
 	bool changedMode = false;
-	if (ImGui::BeginTabBar("Choose Color"))
-	{
-		auto presetTabFlags = (firstRender && mode == ColorSelectionMode::kPreset) ?
-		                          ImGuiTabItemFlags_SetSelected :
-		                          ImGuiTabItemFlags_None;
-		auto customTabFlags = (firstRender && mode == ColorSelectionMode::kCustom) ?
-		                          ImGuiTabItemFlags_SetSelected :
-		                          ImGuiTabItemFlags_None;
-
-		if (ImGui::BeginTabItem("Presets", nullptr, presetTabFlags))
-		{
-			if (customTabFlags != ImGuiTabItemFlags_SetSelected)
-			{
-				mode        = ColorSelectionMode::kPreset;
-				changedMode = true;
-			}
-
-			ImGui::EndTabItem();
-		}
-
-		if (ImGui::BeginTabItem("Custom", nullptr, customTabFlags))
-		{
-			if (presetTabFlags != ImGuiTabItemFlags_SetSelected)
-			{
-				mode        = ColorSelectionMode::kCustom;
-				changedMode = true;
-			}
-			ImGui::EndTabItem();
-		}
-		ImGui::EndTabBar();
-	}
+	static const char* tabs[]    = { "Presets", "Custom" };
+	static bool        enabled[] = { true, true };
+	ImGui::NavBar(
+		"Choose Color",
+		tabs,
+		enabled,
+		reinterpret_cast<size_t*>(&mode),
+		&changedMode,
+		firstRender ? reinterpret_cast<size_t*>(&mode) : nullptr);
 
 	firstRender = false;
 
