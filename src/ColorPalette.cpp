@@ -5,7 +5,11 @@ ColorPalette::ColorPalette(preset::PresetDatabase* presetDB) :
 {}
 
 ColorPalette::ColorPalette(preset::PresetDatabase* presetDB, preset::Color color) :
-	presetSelector("Color Preset", presetDB, color.IsCustom() ? std::nullopt : std::optional(color)), presetDB(presetDB), editorColor(color)
+	presetSelector(
+		"Color Preset",
+		presetDB,
+		color.IsCustom() ? std::nullopt : std::optional(color)),
+	presetDB(presetDB), editorColor(color)
 {
 	mode = color.IsCustom() ? ColorSelectionMode::kCustom : ColorSelectionMode::kPreset;
 }
@@ -48,9 +52,9 @@ bool DrawColorEditor(preset::Color& color, preset::PresetDatabase* presetDB);
 
 bool ColorPalette::DrawEditor()
 {
-	bool changedMode = false;
-	static const char* tabs[]    = { "Presets", "Custom" };
-	static bool        enabled[] = { true, true };
+	bool               changedMode = false;
+	static const char* tabs[]      = { "Presets", "Custom" };
+	static bool        enabled[]   = { true, true };
 	ImGui::NavBar(
 		"Choose Color",
 		tabs,

@@ -25,13 +25,13 @@ public:
 		RE::BSTEventSource<RE::BGSActorCellEvent>* a_eventSource) override;
 
 private:
-	void      DrawTabBar();
-	void      DrawPropControlWindow();
-	void      DrawSceneControlWindow(preset::PresetDatabase* config);
+	void        DrawTabBar();
+	void        DrawPropControlWindow();
+	void        DrawSceneControlWindow(preset::PresetDatabase* config);
 	SceneLight* GetCurrentLight();
 
 private:
-	std::vector<SceneLight>     lights;
+	std::vector<SceneLight>   lights;
 	LightSelector             lightSelector;
 	std::optional<size_t>     currentTab;
 	std::optional<RE::FormID> currentFormID;

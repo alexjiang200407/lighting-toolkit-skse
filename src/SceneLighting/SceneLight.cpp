@@ -312,7 +312,8 @@ void SceneLight::Init3D()
 	UpdateLightTemplate();
 }
 
-std::optional<SceneLight> SceneLight::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB)
+std::optional<SceneLight>
+	SceneLight::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB)
 {
 	RE::FormID                               formID;
 	float                                    fade, radius;

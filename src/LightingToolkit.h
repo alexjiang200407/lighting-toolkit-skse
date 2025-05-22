@@ -11,9 +11,7 @@
 class MenuState;
 class MenuOpen;
 
-class LightingToolkit :
-	ImGui::ImGuiRenderTarget,
-	public SKSE::SerializableCollection
+class LightingToolkit : ImGui::ImGuiRenderTarget, public SKSE::SerializableCollection
 {
 private:
 	enum class Tool : size_t
