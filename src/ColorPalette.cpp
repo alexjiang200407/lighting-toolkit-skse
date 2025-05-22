@@ -5,7 +5,7 @@ ColorPalette::ColorPalette(preset::PresetDatabase* presetDB) :
 {}
 
 ColorPalette::ColorPalette(preset::PresetDatabase* presetDB, preset::Color color) :
-	presetSelector("Color Preset", presetDB, color), presetDB(presetDB)
+	presetSelector("Color Preset", presetDB, color.IsCustom() ? std::nullopt : std::optional(color)), presetDB(presetDB), editorColor(color)
 {
 	mode = color.IsCustom() ? ColorSelectionMode::kCustom : ColorSelectionMode::kPreset;
 }

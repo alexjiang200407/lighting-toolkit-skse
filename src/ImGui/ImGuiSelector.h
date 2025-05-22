@@ -6,8 +6,7 @@ namespace ImGui
 	class ImGuiSelector
 	{
 	public:
-		ImGuiSelector(const char* selectionID) : label(selectionID){};
-		ImGuiSelector(const char* selectionID, T current) : label(selectionID), selection(current)
+		ImGuiSelector(const char* selectionID, std::optional<T> current = std::nullopt) : label(selectionID), selection(current)
 		{}
 
 	public:
