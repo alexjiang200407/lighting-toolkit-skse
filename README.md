@@ -12,15 +12,20 @@ Lighting Toolkit is an SKSE plugin that lets players place dynamic, shadow-casti
 * Place shadow casting and dynamic lights in game world.
 * Navigate scene in Free Camera mode.
 * Change light color, intensity, range.
+* Change weather while in menu.
+* Change ambient lighting while in menu.
+* Change imagespace while in menu.
+* Attach Lights to objects
+* Saved attached lights as presets, to reuse on other objects.
 * Script free! (Except for SkyUI Mod Configuration).
 * Install and uninstall anytime.
 
 ## Planned Features
 
-* Change weather while in menu.
-* Change ambient lighting while in menu.
+* ENB integration
 * Modify existing lights
 * Additional languages
+* MFG?
 
 ## Runtime Requirements
 

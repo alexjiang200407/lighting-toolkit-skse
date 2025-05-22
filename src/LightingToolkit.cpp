@@ -60,6 +60,41 @@ void LightingToolkit::DoFrame()
 
 LightingToolkit* LightingToolkit::GetSingleton() { return &singleton; }
 
+void LightingToolkit::DrawMenu()
+{
+	auto* menu = GetSingleton();
+
+	static const char* labels[] = {
+		"Scene Light",
+		"Character Light",
+		"Camera",
+		"Environment",
+	};
+	static bool enabled[] = { true, true, true, true };
+
+	static size_t selected = 0;
+	bool          changedSelected;
+
+	ImGui::Toolbar(
+		"##ControlTabs",
+		labels,
+		enabled,
+		sizeof(enabled) / sizeof(bool),
+		&selected,
+		&changedSelected);
+
+	if (selected == 0)
+	{
+		menu->DrawTabBar();
+		menu->DrawPropControlWindow();
+		menu->DrawSceneControlWindow();
+	}
+	else
+	{
+		menu->DrawCameraControlWindow();
+	}
+}
+
 LightingToolkit::LightingToolkit() {}
 
 void LightingToolkit::ToggleMenu()

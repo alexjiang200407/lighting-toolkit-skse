@@ -1,5 +1,121 @@
 #include "ImGuiWidgets.h"
 
+void ImGui::NavBar(
+	const char* str_id,
+	const char* nav_item_id[],
+	bool        enabled_tabs[],
+	size_t      len,
+	size_t*     selected,
+	bool*       changedSelected,
+	size_t*     set_selected)
+{
+	if (changedSelected)
+		*changedSelected = false;
+
+	if (ImGui::BeginTabBar(str_id))
+	{
+		for (size_t i = 0; i < len; i++)
+		{
+			ImGuiTabBarFlags flags = ImGuiTabItemFlags_None;
+
+			if (set_selected && i == *set_selected)
+			{
+				flags = ImGuiTabItemFlags_SetSelected;
+			}
+
+			ImGui::BeginDisabled(!enabled_tabs[i]);
+			{
+				if (ImGui::BeginTabItem(nav_item_id[i], nullptr, flags))
+				{
+					if ((!set_selected || *set_selected == i) && selected)
+					{
+						*selected = i;
+
+						if (changedSelected)
+							*changedSelected = true;
+					}
+					ImGui::EndTabItem();
+				}
+			}
+			ImGui::EndDisabled();
+		}
+		ImGui::EndTabBar();
+	}
+}
+
+void ImGui::Toolbar(
+	const char* str_id,
+	const char* toolbar_item_id[],
+	bool        enabled_items[],
+	size_t      len,
+	size_t*     selected,
+	bool*       changedSelected,
+	size_t*     set_selected)
+{
+	assert(selected);
+	assert(len < 256);
+
+	if (changedSelected)
+		*changedSelected = false;
+
+	ImGuiStyle& style    = ImGui::GetStyle();
+	float       spacing  = style.ItemSpacing.x;
+	float       paddingX = 10.0f;
+	float       paddingY = 8.0f;
+
+	float widths[256] = {};
+	float buttonWidth = 0.0f;
+	for (size_t i = 0; i < len; i++)
+	{
+		ImVec2 textSize = ImGui::CalcTextSize(toolbar_item_id[i]);
+		widths[i]       = textSize.x + paddingX * 2;
+		buttonWidth     = std::max(buttonWidth, widths[i]);
+	}
+
+	float totalWidth = (buttonWidth * len) + spacing * (len - 1);
+	float cursorX    = (ImGui::GetContentRegionAvail().x - totalWidth) * 0.5f;
+	ImGui::SetCursorPosX(std::max(cursorX, 0.0f));
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(paddingX, paddingY));
+
+	for (size_t i = 0; i < len; i++)
+	{
+		ImGui::BeginDisabled(!enabled_items[i]);
+		{
+			bool didColor = false;
+
+			if (*selected == i)
+			{
+				auto color = ImColor(33, 118, 255, 255).Value;
+
+				ImGui::PushStyleColor(ImGuiCol_Button, color);
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, color);
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, color);
+				didColor = true;
+			}
+
+			if (ImGui::Button(toolbar_item_id[i], ImVec2(buttonWidth, 0.0f)))
+			{
+				if (!set_selected || *set_selected == i)
+				{
+					*selected = i;
+					if (changedSelected)
+						*changedSelected = true;
+				}
+			}
+
+			if (didColor)
+				ImGui::PopStyleColor(3);
+		}
+		ImGui::EndDisabled();
+
+		if (i != len - 1)
+			ImGui::SameLine();
+	}
+
+	ImGui::PopStyleVar();
+}
+
 bool ImGui::IsKeyDownA(ImGuiKey key)
 {
 	if (ImGui::IsAnyItemActive())

@@ -41,10 +41,4 @@ void MenuOpen::DoFrame(LightingToolkit* menu)
 	}
 }
 
-void MenuOpen::DrawMenu(LightingToolkit* menu)
-{
-	menu->DrawTabBar();
-	menu->DrawPropControlWindow();
-	menu->DrawCameraControlWindow();
-	menu->DrawSceneControlWindow();
-}
+void MenuOpen::DrawMenu(LightingToolkit* menu) { menu->DrawMenu(); }

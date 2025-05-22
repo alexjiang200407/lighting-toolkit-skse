@@ -55,6 +55,7 @@ bool ColorPalette::DrawEditor()
 		"Choose Color",
 		tabs,
 		enabled,
+		sizeof(tabs) / sizeof(const char*),
 		reinterpret_cast<size_t*>(&mode),
 		&changedMode,
 		firstRender ? reinterpret_cast<size_t*>(&mode) : nullptr);

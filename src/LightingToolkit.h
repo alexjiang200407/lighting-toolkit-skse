@@ -24,9 +24,7 @@ public:
 	void                    DoFrame();
 	ImGuiStyle              Style();
 	static LightingToolkit* GetSingleton();
-	void                    DrawPropControlWindow();
-	void                    DrawCameraControlWindow();
-	void                    DrawSceneControlWindow();
+	void                    DrawMenu();
 	void                    PositionLight();
 	void                    DrawTabBar();
 
@@ -42,6 +40,9 @@ private:
 	void               DeserializeItems(SKSE::CoSaveIO io) override;
 	void               Revert(SKSE::CoSaveIO io) override;
 	constexpr uint32_t GetKey() override;
+	void               DrawPropControlWindow();
+	void               DrawCameraControlWindow();
+	void               DrawSceneControlWindow();
 
 	RE::BSEventNotifyControl ProcessEvent(
 		const RE::BGSActorCellEvent*               a_event,
