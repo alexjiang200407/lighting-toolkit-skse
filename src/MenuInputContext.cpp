@@ -25,6 +25,9 @@ void Input::MenuInputContext::StartTextInput()
 
 void Input::MenuInputContext::StopTextInput() { RemoveModifier(kTextInput); }
 
+void Input::MenuInputContext::StopAllInput() { ClearAllModifiers(); }
+
+
 void Input::MenuInputContext::MenuOpen()
 {
 	AddModifier(kCanRun, new CanRun(false));

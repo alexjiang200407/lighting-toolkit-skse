@@ -2,7 +2,7 @@
 #include "ImGui/ImGuiInputAdapter.h"
 #include "MenuOpen.h"
 
-MenuHidden::MenuHidden(Input::MenuInputContext* inputCtx) { inputCtx->StartLookingAround(); }
+MenuHidden::MenuHidden(Input::MenuInputContext* inputCtx) { inputCtx->StopAllInput(); }
 
 MenuStatePtr MenuHidden::Transition(Input::MenuInputContext* inputCtx)
 {

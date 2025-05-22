@@ -21,6 +21,7 @@ namespace Input
 		void StopLookingAround();
 		void StartTextInput();
 		void StopTextInput();
+		void StopAllInput();
 		void MenuOpen();
 		void MenuClose();
 	};

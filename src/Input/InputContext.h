@@ -14,6 +14,6 @@ namespace Input
 		void TransformInputFilter(InputFilter& data) const;
 
 	private:
-		std::map<int, InputModifierPtr> modifiers;
+		std::unordered_map<int, InputModifierPtr> modifiers;
 	};
 }
