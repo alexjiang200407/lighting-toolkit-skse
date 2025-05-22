@@ -1,5 +1,5 @@
 #include "MenuPositioning.h"
-#include "../ImGui/ImGuiInputAdapter.h"
+#include "ImGui/ImGuiInputAdapter.h"
 
 MenuPositioning::MenuPositioning(Input::MenuInputContext* inputCtx) : MenuLookingAround(inputCtx)
 {

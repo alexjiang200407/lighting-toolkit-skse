@@ -1,4 +1,4 @@
-#include "InputFilter.h"
+#include "Input/InputFilter.h"
 
 bool Input::InputFilter::IsSuppressing(RE::IDEvent* evt) const
 {

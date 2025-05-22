@@ -1,8 +1,8 @@
 #pragma once
-#include "../ColorPalette.h"
-#include "../LightingPreset.h"
-#include "../Preset/PresetDatabase.h"
-#include "../SKSE/CoSaveIO.h"
+#include "ColorPalette.h"
+#include "LightingPreset.h"
+#include "Preset/PresetDatabase.h"
+#include "SKSE/CoSaveIO.h"
 
 class SceneLight;
 typedef std::unique_ptr<SceneLight> LightingPtr;

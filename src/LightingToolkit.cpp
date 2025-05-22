@@ -57,8 +57,6 @@ LightingToolkit* LightingToolkit::GetSingleton() { return &singleton; }
 
 void LightingToolkit::DrawMenu()
 {
-	auto* menu = GetSingleton();
-
 	static const char* labels[] = {
 		"Scene Light",
 		"Character Light",
@@ -99,7 +97,7 @@ void LightingToolkit::Position()
 	}
 }
 
-LightingToolkit::LightingToolkit() : sceneLighting(&config) {}
+LightingToolkit::LightingToolkit() : sceneLighting(&config), currentTool(Tool::kSceneLight) {}
 
 void LightingToolkit::ToggleMenu()
 {
@@ -204,46 +202,6 @@ void LightingToolkit::DrawCameraControlWindow()
 		ImGui::SliderAutoFill("Camera Speed", GetCameraMoveSpeed(), 0.1f, 50.0f);
 		ImGui::EndPanel();
 	}
-}
-
-static RE::TESObjectREFRPtr PlaceLight()
-{
-	const auto dataHandler = RE::TESDataHandler::GetSingleton();
-
-	if (!dataHandler)
-	{
-		logger::error("Data Handler singleton not found");
-		return nullptr;
-	}
-
-	const RE::FormID id = dataHandler->LookupFormID(0x801, "InGameLightingToolkit.esp");
-
-	if (!id)
-	{
-		logger::error("Data Handler could not find ID");
-		return nullptr;
-	}
-
-	if (auto* boundObj = RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>())
-	{
-		const auto ref = dataHandler
-		                     ->CreateReferenceAtLocation(
-								 boundObj,
-								 SceneLight::GetCameraLookingAt(50.0f),
-								 RE::NiPoint3(),
-								 RE::PlayerCharacter::GetSingleton()->GetParentCell(),
-								 RE::PlayerCharacter::GetSingleton()->GetWorldspace(),
-								 nullptr,
-								 nullptr,
-								 RE::ObjectRefHandle(),
-								 true,
-								 true)
-		                     .get();
-		return ref;
-	}
-
-	logger::error("Could not find light reference in InGameLightingToolkit.esp");
-	return nullptr;
 }
 
 void LightingToolkit::SerializeItems(SKSE::CoSaveIO io) const { sceneLighting.SerializeItems(io); }

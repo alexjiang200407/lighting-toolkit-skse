@@ -1,5 +1,5 @@
 #include "MenuHidden.h"
-#include "../ImGui/ImGuiInputAdapter.h"
+#include "ImGui/ImGuiInputAdapter.h"
 #include "MenuOpen.h"
 
 MenuHidden::MenuHidden(Input::MenuInputContext* inputCtx) { inputCtx->StartLookingAround(); }

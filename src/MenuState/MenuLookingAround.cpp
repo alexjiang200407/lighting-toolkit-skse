@@ -1,5 +1,5 @@
 #include "MenuLookingAround.h"
-#include "../ImGui/ImGuiInputAdapter.h"
+#include "ImGui/ImGuiInputAdapter.h"
 #include "MenuOpen.h"
 
 MenuLookingAround::MenuLookingAround(Input::MenuInputContext* inputCtx)

@@ -1,9 +1,9 @@
 #pragma once
-#include "../LightSelector.h"
-#include "../MCM/Settings.h"
-#include "../Preset/PresetDatabase.h"
-#include "../Preset/PresetSerializationControl.h"
-#include "../SKSE/SerializableCollection.h"
+#include "LightSelector.h"
+#include "MCM/Settings.h"
+#include "Preset/PresetDatabase.h"
+#include "Preset/PresetSerializationControl.h"
+#include "SKSE/SerializableCollection.h"
 #include "SceneLight.h"
 
 class SceneLighting : public RE::BSTEventSink<RE::BGSActorCellEvent>

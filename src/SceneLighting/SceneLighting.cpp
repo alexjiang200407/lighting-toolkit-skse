@@ -1,5 +1,5 @@
 #include "SceneLighting.h"
-#include "../ImGui/ImGuiInputAdapter.h"
+#include "ImGui/ImGuiInputAdapter.h"
 
 void SceneLighting::DrawTabBar()
 {

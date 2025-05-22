@@ -1,5 +1,5 @@
 #include "MenuOpen.h"
-#include "../ImGui/ImGuiInputAdapter.h"
+#include "ImGui/ImGuiInputAdapter.h"
 #include "MenuHidden.h"
 #include "MenuItemActive.h"
 #include "MenuLookingAround.h"

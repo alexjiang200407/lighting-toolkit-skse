@@ -1,6 +1,6 @@
 #pragma once
-#include "InputFilter.h"
-#include "InputModifier/InputModifier.h"
+#include "Input/InputFilter.h"
+#include "Input/InputModifier/InputModifier.h"
 
 namespace Input
 {

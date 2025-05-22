@@ -1,5 +1,5 @@
 #include "ImGuiInputAdapter.h"
-#include "../MCM/Settings.h"
+#include "MCM/Settings.h"
 #include <d3d11.h>
 
 ImGui::ImGuiInputAdapter ImGui::ImGuiInputAdapter::singleton;

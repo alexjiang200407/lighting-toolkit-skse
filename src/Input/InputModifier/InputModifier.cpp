@@ -1,4 +1,4 @@
-#include "../InputModifier/InputModifier.h"
+#include "Input/InputModifier/InputModifier.h"
 
 bool Input::InputModifier::ApplyBlockCharModifier(bool prevBlockChars) const
 {

@@ -1,5 +1,5 @@
 #pragma once
-#include "../LightingToolkit.h"
+#include "LightingToolkit.h"
 #include "MenuState.h"
 
 class MenuOpen : public MenuState
