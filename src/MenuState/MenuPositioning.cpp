@@ -21,5 +21,5 @@ MenuStatePtr MenuPositioning::Transition(Input::MenuInputContext* inputCtx)
 void MenuPositioning::DrawMenu(LightingToolkit* menu)
 {
 	MenuLookingAround::DrawMenu(menu);
-	menu->PositionLight();
+	menu->Position();
 }

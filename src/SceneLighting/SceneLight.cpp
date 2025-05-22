@@ -1,21 +1,21 @@
-#include "Lighting.h"
+#include "SceneLight.h"
 
-Lighting::Lighting(
+SceneLight::SceneLight(
 	RE::TESObjectREFRPtr    ref,
 	preset::PresetDatabase* presetDB,
 	preset::LightingPreset  lightPreset) :
-	Lighting(ref, presetDB, lightPreset, lightPreset.intensity, lightPreset.radius)
+	SceneLight(ref, presetDB, lightPreset, lightPreset.intensity, lightPreset.radius)
 {}
 
-Lighting::Lighting(
+SceneLight::SceneLight(
 	RE::TESObjectREFRPtr    ref,
 	preset::Color           color,
 	preset::PresetDatabase* presetDB,
 	preset::LightingPreset  lightPreset) :
-	Lighting(ref, color, presetDB, lightPreset, lightPreset.intensity, lightPreset.radius)
+	SceneLight(ref, color, presetDB, lightPreset, lightPreset.intensity, lightPreset.radius)
 {}
 
-Lighting::Lighting(
+SceneLight::SceneLight(
 	RE::TESObjectREFRPtr                     ref,
 	preset::PresetDatabase*                  presetDB,
 	RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset,
@@ -29,7 +29,7 @@ Lighting::Lighting(
 	hideMarker(hideMarker)
 {}
 
-Lighting::Lighting(
+SceneLight::SceneLight(
 	RE::TESObjectREFRPtr                     ref,
 	preset::Color                            color,
 	preset::PresetDatabase*                  presetDB,
@@ -44,7 +44,7 @@ Lighting::Lighting(
 	hideMarker(hideMarker)
 {}
 
-bool Lighting::DrawTabItem(bool& active)
+bool SceneLight::DrawTabItem(bool& active)
 {
 	bool isNotRemoved = true;
 	bool selected     = false;
@@ -58,7 +58,7 @@ bool Lighting::DrawTabItem(bool& active)
 	return isNotRemoved;
 }
 
-void Lighting::DrawControlPanel()
+void SceneLight::DrawControlPanel()
 {
 	ImGui::PushID(std::bit_cast<int>(ref->GetFormID()));
 	{
@@ -104,7 +104,7 @@ void Lighting::DrawControlPanel()
 	ImGui::PopID();
 }
 
-void Lighting::UpdateLightColor()
+void SceneLight::UpdateLightColor()
 {
 	if (auto selection = colorPalette.GetSelection())
 	{
@@ -113,7 +113,7 @@ void Lighting::UpdateLightColor()
 	}
 }
 
-void Lighting::UpdateLightTemplate()
+void SceneLight::UpdateLightTemplate()
 {
 	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 
@@ -123,7 +123,7 @@ void Lighting::UpdateLightTemplate()
 	bsLight.reset(shadowSceneNode->AddLight(niLight.get(), lightCreateParams));
 }
 
-void Lighting::MoveToCameraLookingAt(bool resetOffset)
+void SceneLight::MoveToCameraLookingAt(bool resetOffset)
 {
 	auto cameraNode = RE::PlayerCamera::GetSingleton()->cameraRoot.get()->AsNode();
 	auto cameraNI   = reinterpret_cast<RE::NiCamera*>(
@@ -156,7 +156,7 @@ void Lighting::MoveToCameraLookingAt(bool resetOffset)
 	}
 }
 
-void Lighting::MoveTo(RE::NiPoint3 point)
+void SceneLight::MoveTo(RE::NiPoint3 point)
 {
 	hideMarker     = false;
 	worldTranslate = point;
@@ -164,9 +164,9 @@ void Lighting::MoveTo(RE::NiPoint3 point)
 	niLight->world.translate = point;
 }
 
-void Lighting::MoveToCurrentPosition() { MoveTo(worldTranslate); }
+void SceneLight::MoveToCurrentPosition() { MoveTo(worldTranslate); }
 
-void Lighting::OnEnterCell()
+void SceneLight::OnEnterCell()
 {
 	// Skyrim creates a new niLight when we enter a cell
 	// so we have to update our state
@@ -176,13 +176,13 @@ void Lighting::OnEnterCell()
 	MoveToCurrentPosition();
 }
 
-RE::FormID Lighting::GetCellID() const
+RE::FormID SceneLight::GetCellID() const
 {
 	assert(ref->GetParentCell());
 	return ref->GetParentCell()->formID;
 }
 
-void Lighting::Rotate(float delta)
+void SceneLight::Rotate(float delta)
 {
 	RE::NiMatrix3 rotation = { { 1, 0, 0 },
 		                       { 0, cos(delta), -sin(delta) },
@@ -191,7 +191,7 @@ void Lighting::Rotate(float delta)
 	Rotate(rotation);
 }
 
-void Lighting::Remove()
+void SceneLight::Remove()
 {
 	auto* shadowSceneNode = RE::BSShaderManager::State::GetSingleton().shadowSceneNode[0];
 	shadowSceneNode->allowLightRemoveQueues = false;
@@ -209,7 +209,7 @@ void Lighting::Remove()
 	ref->SetDelete(true);
 }
 
-void Lighting::Rotate(RE::NiMatrix3 rotation)
+void SceneLight::Rotate(RE::NiMatrix3 rotation)
 {
 	if (niLight)
 	{
@@ -217,7 +217,7 @@ void Lighting::Rotate(RE::NiMatrix3 rotation)
 	}
 }
 
-RE::NiPoint3 Lighting::GetCameraLookingAt(float distanceFromCamera)
+RE::NiPoint3 SceneLight::GetCameraLookingAt(float distanceFromCamera)
 {
 	auto* playerCamera = RE::PlayerCamera::GetSingleton();
 
@@ -254,7 +254,7 @@ RE::NiPoint3 Lighting::GetCameraLookingAt(float distanceFromCamera)
 	return RE::NiPoint3();
 }
 
-RE::BSFadeNode* Lighting::Attach3D()
+RE::BSFadeNode* SceneLight::Attach3D()
 {
 	if (!ref->Is3DLoaded())
 		ref->Load3D(false);
@@ -303,7 +303,7 @@ RE::BSFadeNode* Lighting::Attach3D()
 	return niRoot;
 }
 
-void Lighting::Init3D()
+void SceneLight::Init3D()
 {
 	Attach3D();
 	//MoveTo(worldTranslate); // Moving causes the EXCEPTION_ACCESS_VIOLATION bug
@@ -312,7 +312,7 @@ void Lighting::Init3D()
 	UpdateLightTemplate();
 }
 
-std::optional<Lighting> Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB)
+std::optional<SceneLight> SceneLight::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB)
 {
 	RE::FormID                               formID;
 	float                                    fade, radius;
@@ -336,7 +336,7 @@ std::optional<Lighting> Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetD
 	if (!tesObjectREFR)
 		return std::nullopt;
 
-	return Lighting(
+	return SceneLight(
 		tesObjectREFR->CreateRefHandle().get(),
 		color,
 		presetDB,
@@ -347,7 +347,7 @@ std::optional<Lighting> Lighting::Deserialize(SKSE::CoSaveIO io, preset::PresetD
 		hideMarker);
 }
 
-void Lighting::DrawCameraOffsetSlider()
+void SceneLight::DrawCameraOffsetSlider()
 {
 	bool changed = false;
 	changed      = ImGui::SliderAutoFill("Offset Forward/Backward", &cameraOffset.x, 0.1f, 500.0f);
@@ -360,7 +360,7 @@ void Lighting::DrawCameraOffsetSlider()
 	}
 }
 
-void Lighting::Serialize(SKSE::CoSaveIO io) const
+void SceneLight::Serialize(SKSE::CoSaveIO io) const
 {
 	io.Write(hideLight);
 	io.Write(hideMarker);
@@ -371,7 +371,7 @@ void Lighting::Serialize(SKSE::CoSaveIO io) const
 	io.Write(ref->GetFormID());
 }
 
-RE::NiPoint3 Lighting::GetCameraPosition()
+RE::NiPoint3 SceneLight::GetCameraPosition()
 {
 	RE::NiPoint3 origin;
 	auto*        camera = RE::PlayerCamera::GetSingleton();

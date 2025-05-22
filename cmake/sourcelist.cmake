@@ -16,7 +16,6 @@ set(SOURCES ${SOURCES}
 	src/Input/InputModifier/FreeCameraControl.cpp
 	src/Input/InputModifier/FreeCameraZTranslate.cpp
 	src/Input/InputModifier/InputModifier.cpp
-	src/Lighting.cpp
 	src/LightingPreset.cpp
 	src/LightingToolkit.cpp
 	src/LightSelector.cpp
@@ -33,6 +32,8 @@ set(SOURCES ${SOURCES}
 	src/Preset/PresetDatabase.cpp
 	src/Preset/PresetSerializationControl.cpp
 	src/RE.cpp
+	src/SceneLighting/SceneLight.cpp
+	src/SceneLighting/SceneLighting.cpp
 	src/SKSE/CoSaveIO.cpp
 	src/SKSE/SerializationControl.cpp
 )

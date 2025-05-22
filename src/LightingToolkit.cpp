@@ -1,7 +1,6 @@
 #include "LightingToolkit.h"
 #include "ImGui/ImGuiInputAdapter.h"
 #include "ImGui/ImGuiRenderer.h"
-#include "Lighting.h"
 #include "LightingPreset.h"
 #include "MenuState/MenuOpen.h"
 #include "SKSE/SerializationControl.h"
@@ -20,15 +19,12 @@ void LightingToolkit::Init()
 	SKSE::SerializationControl::GetSingleton()->RegisterSerializer(this);
 }
 
-void LightingToolkit::OnDataLoaded() { RE::PlayerCharacter::GetSingleton()->AddEventSink(this); }
-
-void LightingToolkit::OnSavePostLoaded()
+void LightingToolkit::OnDataLoaded()
 {
-	for (auto& light : lights)
-	{
-		light.Init3D();
-	}
+	RE::PlayerCharacter::GetSingleton()->AddEventSink(&sceneLighting);
 }
+
+void LightingToolkit::OnSavePostLoaded() { sceneLighting.OnSavePostLoaded(); }
 
 void LightingToolkit::DoFrame()
 {
@@ -54,8 +50,7 @@ void LightingToolkit::DoFrame()
 	firstRender = false;
 	menuState->DoFrame(this);
 
-	// Reset currentTab and wait for next draw cycle
-	currentTab = std::nullopt;
+	sceneLighting.EndFrame();
 }
 
 LightingToolkit* LightingToolkit::GetSingleton() { return &singleton; }
@@ -71,31 +66,40 @@ void LightingToolkit::DrawMenu()
 		"Environment",
 	};
 	static bool enabled[] = { true, true, true, true };
-
-	static size_t selected = 0;
-	bool          changedSelected;
+	bool        changedSelected;
 
 	ImGui::Toolbar(
 		"##ControlTabs",
 		labels,
 		enabled,
 		sizeof(enabled) / sizeof(bool),
-		&selected,
+		reinterpret_cast<size_t*>(&currentTool),
 		&changedSelected);
 
-	if (selected == 0)
+	switch (currentTool)
 	{
-		menu->DrawTabBar();
-		menu->DrawPropControlWindow();
-		menu->DrawSceneControlWindow();
-	}
-	else
-	{
-		menu->DrawCameraControlWindow();
+	case Tool::kSceneLight:
+		sceneLighting.DrawWindow(&config);
+		break;
+	case Tool::kCharacterLight:
+		break;
+	case Tool::kCamera:
+		DrawCameraControlWindow();
+		break;
+	case Tool::kEnvironment:
+		break;
 	}
 }
 
-LightingToolkit::LightingToolkit() {}
+void LightingToolkit::Position()
+{
+	if (currentTool == Tool::kSceneLight)
+	{
+		sceneLighting.PositionLight();
+	}
+}
+
+LightingToolkit::LightingToolkit() : sceneLighting(&config) {}
 
 void LightingToolkit::ToggleMenu()
 {
@@ -192,21 +196,6 @@ float* LightingToolkit::GetCameraMoveSpeed()
 	return REL::Relocation<float*>{ RELOCATION_ID(509808, 382522) }.get();
 }
 
-void LightingToolkit::DrawPropControlWindow()
-{
-	ImGui::PushID("###PropControlWindow");
-	if (auto* currentLight = GetCurrentLight())
-	{
-		if (ImGui::ImGuiInputAdapter::IsKeyDown("iRotateLeftKey"))
-			currentLight->Rotate(-0.1f);
-		if (ImGui::ImGuiInputAdapter::IsKeyDown("iRotateRightKey"))
-			currentLight->Rotate(0.1f);
-
-		currentLight->DrawControlPanel();
-	}
-	ImGui::PopID();
-}
-
 void LightingToolkit::DrawCameraControlWindow()
 {
 	if (ImGui::BeginPanel("Camera Settings###CameraControlWindow"))
@@ -240,7 +229,7 @@ static RE::TESObjectREFRPtr PlaceLight()
 		const auto ref = dataHandler
 		                     ->CreateReferenceAtLocation(
 								 boundObj,
-								 Lighting::GetCameraLookingAt(50.0f),
+								 SceneLight::GetCameraLookingAt(50.0f),
 								 RE::NiPoint3(),
 								 RE::PlayerCharacter::GetSingleton()->GetParentCell(),
 								 RE::PlayerCharacter::GetSingleton()->GetWorldspace(),
@@ -257,127 +246,16 @@ static RE::TESObjectREFRPtr PlaceLight()
 	return nullptr;
 }
 
-void LightingToolkit::DrawSceneControlWindow()
-{
-	if (ImGui::BeginPanel("Scene Settings###SceneControlWindow"))
-	{
-		lightSelector.DrawValueEditor();
-		if (ImGui::Button("Add Light"))
-		{
-			if (auto ref = PlaceLight())
-			{
-				Lighting newProp(ref, &config, *lightSelector.GetSelection());
-				newProp.Init3D();
-				lights.push_back(std::move(newProp));
-			}
-		}
-		ImGui::EndPanel();
-	}
-}
-
-RE::BSEventNotifyControl LightingToolkit::ProcessEvent(
-	const RE::BGSActorCellEvent* a_event,
-	RE::BSTEventSource<RE::BGSActorCellEvent>*)
-{
-	if (!a_event || a_event->flags == RE::BGSActorCellEvent::CellFlag::kLeave)
-	{
-		return RE::BSEventNotifyControl::kContinue;
-	}
-
-	auto cell = RE::TESForm::LookupByID<RE::TESObjectCELL>(a_event->cellID);
-	if (!cell)
-	{
-		return RE::BSEventNotifyControl::kContinue;
-	}
-
-	for (auto& light : lights)
-	{
-		if (light.GetCellID() == a_event->cellID)
-		{
-			light.OnEnterCell();
-		}
-	}
-	return RE::BSEventNotifyControl::kContinue;
-}
-
-Lighting* LightingToolkit::GetCurrentLight()
-{
-	if (!currentTab)
-		return nullptr;
-
-	if (*currentTab >= lights.size())
-	{
-		logger::error("CurrentTab index out of bounds");
-		return nullptr;
-	}
-
-	return &lights[*currentTab];
-}
-
-void LightingToolkit::SerializeItems(SKSE::CoSaveIO io) const
-{
-	logger::info("Serializing Lights...");
-	io.Write(lights.size());
-	for (const auto& light : lights)
-	{
-		light.Serialize(io);
-	}
-}
+void LightingToolkit::SerializeItems(SKSE::CoSaveIO io) const { sceneLighting.SerializeItems(io); }
 
 void LightingToolkit::DeserializeItems(SKSE::CoSaveIO io)
 {
-	size_t itemsCount;
-	io.Read(itemsCount);
-
-	for (size_t i = 0; i < itemsCount; i++)
-	{
-		if (auto light = Lighting::Deserialize(io, &config))
-		{
-			lights.push_back(std::move(*light));
-		}
-	}
+	sceneLighting.DeserializeItems(io, &config);
 }
 
-void LightingToolkit::Revert(SKSE::CoSaveIO)
-{
-	logger::info("Reverting Save");
-	lights.clear();
-}
+void LightingToolkit::Revert(SKSE::CoSaveIO io) { sceneLighting.Revert(io); }
 
 constexpr uint32_t LightingToolkit::GetKey() { return serializationKey; }
-
-void LightingToolkit::PositionLight()
-{
-	if (auto* light = GetCurrentLight())
-		light->MoveToCameraLookingAt(true);
-}
-
-void LightingToolkit::DrawTabBar()
-{
-	if (ImGui::BeginTabBar(
-			"###Lights",
-			(ImGuiTabBarFlags_AutoSelectNewTabs | ImGuiTabBarFlags_FittingPolicyScroll)))
-	{
-		for (auto it = lights.begin(); it != lights.end();)
-		{
-			bool active = false;
-			bool open   = it->DrawTabItem(active);
-
-			if (open)
-			{
-				if (active)
-					currentTab = std::distance(lights.begin(), it);
-				it++;
-			}
-			else if (!open)
-			{
-				it->Remove();
-				it = lights.erase(it);
-			}
-		}
-		ImGui::EndTabBar();
-	}
-}
 
 ImGuiStyle LightingToolkit::Style()
 {

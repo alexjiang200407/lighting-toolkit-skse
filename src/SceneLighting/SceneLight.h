@@ -1,25 +1,25 @@
 #pragma once
-#include "ColorPalette.h"
-#include "LightingPreset.h"
-#include "Preset/PresetDatabase.h"
-#include "SKSE/CoSaveIO.h"
+#include "../ColorPalette.h"
+#include "../LightingPreset.h"
+#include "../Preset/PresetDatabase.h"
+#include "../SKSE/CoSaveIO.h"
 
-class Lighting;
-typedef std::unique_ptr<Lighting> LightingPtr;
+class SceneLight;
+typedef std::unique_ptr<SceneLight> LightingPtr;
 
-class Lighting
+class SceneLight
 {
 public:
-	Lighting(
+	SceneLight(
 		RE::TESObjectREFRPtr    ref,
 		preset::PresetDatabase* presetDB,
 		preset::LightingPreset  lightPreset);
-	Lighting(
+	SceneLight(
 		RE::TESObjectREFRPtr    ref,
 		preset::Color           color,
 		preset::PresetDatabase* presetDB,
 		preset::LightingPreset  lightPreset);
-	Lighting(
+	SceneLight(
 		RE::TESObjectREFRPtr                     ref,
 		preset::PresetDatabase*                  presetDB,
 		RE::ShadowSceneNode::LIGHT_CREATE_PARAMS lightPreset,
@@ -27,7 +27,7 @@ public:
 		float                                    radius,
 		bool                                     hideLight  = false,
 		bool                                     hideMarker = false);
-	Lighting(
+	SceneLight(
 		RE::TESObjectREFRPtr                     ref,
 		preset::Color                            color,
 		preset::PresetDatabase*                  presetDB,
@@ -53,7 +53,7 @@ public:
 	static RE::NiPoint3            GetCameraLookingAt(float distanceFromCamera);
 	virtual RE::BSFadeNode*        Attach3D();
 	virtual void                   Init3D();
-	static std::optional<Lighting> Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB);
+	static std::optional<SceneLight> Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB);
 	void                           DrawCameraOffsetSlider();
 	void                           Serialize(SKSE::CoSaveIO io) const;
 

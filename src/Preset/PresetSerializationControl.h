@@ -1,3 +1,4 @@
+#pragma once
 #include "Preset.h"
 #include "PresetDatabase.h"
 #include <fstream>
