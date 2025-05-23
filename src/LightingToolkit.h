@@ -1,4 +1,5 @@
 #pragma once
+#include "Environment/Environment.h"
 #include "ImGui/ImGuiRenderTarget.h"
 #include "MCM/Settings.h"
 #include "MenuInputContext.h"
@@ -49,6 +50,7 @@ private:
 private:
 	bool                               firstRender = true;
 	SceneLighting                      sceneLighting;
+	Environment                        environment;
 	std::unique_ptr<MenuState>         menuState{ nullptr };
 	Input::MenuInputContext            inputCtx;
 	preset::PresetSerializationControl presetSerializationControl;

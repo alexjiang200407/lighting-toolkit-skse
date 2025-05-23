@@ -33,6 +33,7 @@ Lighting Toolkit is an SKSE plugin that lets players place dynamic, shadow-casti
 * Address Library for SKSE Plugins﻿
 * SkyUI﻿ to access plugin settings in Mod Configuration Menu
 * MCM Helper﻿ for the Mod Configuration Menu to work
+* PO3 Tweaks. Ensure you have Load EditorIDs enabled in the ini file. 
 
 
 ## Build Requirements

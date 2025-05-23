@@ -107,3 +107,11 @@ const preset::Color* ColorPalette::GetSelection() const
 		return nullptr;
 	}
 }
+
+void ColorPalette::SetCustomColor(RE::NiColor color)
+{
+	editorColor.red   = color.red;
+	editorColor.green = color.green;
+	editorColor.blue  = color.blue;
+	mode              = ColorSelectionMode::kCustom;
+}

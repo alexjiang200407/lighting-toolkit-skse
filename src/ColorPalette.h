@@ -22,6 +22,7 @@ public:
 	static preset::Color Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB);
 	bool                 DrawEditor();
 	const preset::Color* GetSelection() const;
+	void                 SetCustomColor(RE::NiColor color);
 
 private:
 	bool                                      firstRender = true;

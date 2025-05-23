@@ -3,6 +3,7 @@ set(HEADERS ${HEADERS}
 	src/ColorPalette.h
 	src/common/util.h
 	src/common/uuid.h
+	src/Environment/Environment.h
 	src/ImGui/ImGuiInputAdapter.h
 	src/ImGui/ImGuiPresetSelector.h
 	src/ImGui/ImGuiRenderer.h

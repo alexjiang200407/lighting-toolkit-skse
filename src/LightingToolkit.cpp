@@ -22,6 +22,7 @@ void LightingToolkit::Init()
 void LightingToolkit::OnDataLoaded()
 {
 	RE::PlayerCharacter::GetSingleton()->AddEventSink(&sceneLighting);
+	environment.OnDataLoaded();
 }
 
 void LightingToolkit::OnSavePostLoaded() { sceneLighting.OnSavePostLoaded(); }
@@ -85,6 +86,7 @@ void LightingToolkit::DrawMenu()
 		DrawCameraControlWindow();
 		break;
 	case Tool::kEnvironment:
+		environment.DrawWindow();
 		break;
 	}
 }
@@ -127,6 +129,7 @@ void LightingToolkit::ToggleMenu()
 
 		RE::UI::GetSingleton()->ShowMenus(false);
 		previouslyFreezeTime = RE::Main::GetSingleton()->freezeTime;
+		environment.OnMenuOpened();
 	}
 	else
 	{
@@ -142,6 +145,7 @@ void LightingToolkit::ToggleMenu()
 			RE::ControlMap::GetSingleton()->PopInputContext(
 				RE::ControlMap::InputContextID::kTFCMode);
 		}
+		environment.OnMenuClosed();
 	}
 }
 

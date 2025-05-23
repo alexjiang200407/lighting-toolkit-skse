@@ -8,7 +8,7 @@ namespace ImGui
 		T*               v,
 		T                v_min,
 		T                v_max,
-		const char*      format = "%.3f",
+		const char*      format = nullptr,
 		ImGuiSliderFlags flags  = 0)
 	{
 		float availableWidth = ImGui::GetContentRegionAvail().x;
@@ -19,11 +19,21 @@ namespace ImGui
 		bool retVal = false;
 		if constexpr (std::is_same<T, float>::value)
 		{
-			retVal = ImGui::SliderFloat(label, v, v_min, v_max, format, flags);
+			retVal = ImGui::SliderFloat(label, v, v_min, v_max, format ? "%.3f" : format, flags);
 		}
 		else if constexpr (std::is_same<T, int>::value)
 		{
-			retVal = ImGui::SliderInt(label, v, v_min, v_max, flags);
+			retVal = ImGui::SliderInt(label, v, v_min, v_max, format ? "%d" : format, flags);
+		}
+		else if constexpr (std::is_same<T, uint8_t>::value || std::is_same_v<T, int8_t>)
+		{
+			int tmp = static_cast<int>(*v);
+			retVal  = ImGui::SliderInt(label, &tmp, v_min, v_max, format ? "%d" : format, flags);
+			*v      = static_cast<T>(tmp);
+		}
+		else
+		{
+			static_assert(false, "Unsupported type passed to generic SliderAutoFill");
 		}
 		ImGui::PopItemWidth();
 		return retVal;
@@ -60,4 +70,15 @@ namespace ImGui
 
 	bool BeginPanel(const char* str_id);
 	void EndPanel();
+
+	bool NiColorEditor(const char* label, RE::NiColor& niColor, ImGuiColorEditFlags flags = 0);
+
+	bool NiPointEditor(
+		const char*   xLabel,
+		const char*   yLabel,
+		const char*   zLabel,
+		RE::NiPoint3& niPoint,
+		RE::NiPoint3  rangeMin,
+		RE::NiPoint3  rangeMax);
+
 }

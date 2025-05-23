@@ -150,3 +150,33 @@ bool ImGui::BeginPanel(const char* str_id)
 }
 
 void ImGui::EndPanel() { ImGui::EndChild(); }
+
+bool ImGui::NiColorEditor(const char* label, RE::NiColor& niColor, ImGuiColorEditFlags flags)
+{
+	float colors[3] = { niColor.red, niColor.green, niColor.blue };
+	bool  retVal    = ImGui::ColorEdit3(label, colors);
+	niColor.red     = colors[0];
+	niColor.green   = colors[1];
+	niColor.blue    = colors[2];
+
+	return retVal;
+}
+
+bool ImGui::NiPointEditor(
+	const char*        xLabel,
+	const char*        yLabel,
+	const char*        zLabel,
+	RE::NiPoint3&      niPoint,
+	const RE::NiPoint3 rangeMin,
+	const RE::NiPoint3 rangeMax)
+{
+	assert(rangeMin.x <= rangeMax.x);
+	assert(rangeMin.y <= rangeMax.y);
+	assert(rangeMin.z <= rangeMax.z);
+
+	bool changed = false;
+	changed      = ImGui::SliderAutoFill(xLabel, &niPoint.x, rangeMin.x, rangeMax.x);
+	changed      = ImGui::SliderAutoFill(yLabel, &niPoint.y, rangeMin.y, rangeMax.y) || changed;
+	changed      = ImGui::SliderAutoFill(zLabel, &niPoint.z, rangeMin.z, rangeMax.z) || changed;
+	return changed;
+}
