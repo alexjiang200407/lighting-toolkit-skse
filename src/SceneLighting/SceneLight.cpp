@@ -71,8 +71,8 @@ void SceneLight::DrawControlPanel()
 				{
 					UpdateLightColor();
 				}
-				ImGui::EndPanel();
 			}
+			ImGui::EndPanel();
 		}
 		ImGui::EndDisabled();
 
@@ -98,8 +98,8 @@ void SceneLight::DrawControlPanel()
 			{
 				model->GetObjectByName("Marker")->SetAppCulled(hideMarker);
 			}
-			ImGui::EndPanel();
 		}
+		ImGui::EndPanel();
 	}
 	ImGui::PopID();
 }

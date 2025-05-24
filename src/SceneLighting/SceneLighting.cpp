@@ -143,8 +143,8 @@ void SceneLighting::DrawSceneControlWindow(preset::PresetDatabase* config)
 				lights.push_back(std::move(newProp));
 			}
 		}
-		ImGui::EndPanel();
 	}
+	ImGui::EndPanel();
 }
 
 void SceneLighting::DrawWindow(preset::PresetDatabase* config)

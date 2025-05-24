@@ -204,8 +204,8 @@ void LightingToolkit::DrawCameraControlWindow()
 	{
 		ImGui::Checkbox("Freeze Time", &RE::Main::GetSingleton()->freezeTime);
 		ImGui::SliderAutoFill("Camera Speed", GetCameraMoveSpeed(), 0.1f, 50.0f);
-		ImGui::EndPanel();
 	}
+	ImGui::EndPanel();
 }
 
 void LightingToolkit::SerializeItems(SKSE::CoSaveIO io) const { sceneLighting.SerializeItems(io); }
