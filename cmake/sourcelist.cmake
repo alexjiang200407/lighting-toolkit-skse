@@ -1,6 +1,7 @@
 set(SOURCES ${SOURCES}
 	src/Color.cpp
 	src/ColorPalette.cpp
+	src/common/util.cpp
 	src/Environment/Environment.cpp
 	src/ImGui/ImGuiInputAdapter.cpp
 	src/ImGui/ImGuiRenderer.cpp

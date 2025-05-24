@@ -11,33 +11,71 @@ public:
 	void OnMenuClosed();
 
 private:
-	struct WeatherItem
+	template <typename T>
+	struct BaseFormItem
+	{
+		ASSERT_BASE(T, RE::TESForm);
+
+		T*          base;
+		std::string weatherDisplayName;
+
+		BaseFormItem(T* item) :
+			base(item),
+			weatherDisplayName(fmt::format("{}##{}", GetEditorID(item), item->formID)){};
+
+		template <typename U, typename F>
+		static void GetAllFormsOfType(std::vector<U>& allForms, F create)
+		{
+			auto& formArray = RE::TESDataHandler::GetSingleton()->GetFormArray<T>();
+
+			allForms.clear();
+			std::transform(
+				formArray.begin(),
+				formArray.end(),
+				std::back_inserter(allForms),
+				create);
+		}
+		const char* GetName() const { return weatherDisplayName.c_str(); };
+
+		bool operator==(const T* rhs) const { return base == rhs; }
+		bool operator==(const BaseFormItem<T> rhs) const { return *this == rhs.base; }
+		bool operator!=(const BaseFormItem<T> rhs) const { return !(*this == rhs); }
+	};
+
+	struct ImageSpaceItem : public BaseFormItem<RE::TESImageSpace>
+	{
+		ImageSpaceItem(RE::TESImageSpace* imageSpace);
+
+		using BaseFormItem<RE::TESImageSpace>::operator==;
+	};
+
+	struct WeatherItem : public BaseFormItem<RE::TESWeather>
 	{
 		using ColorTypes = RE::TESWeather::ColorTypes;
 		using ColorTime  = RE::TESWeather::ColorTime;
 
-		std::string          weatherDisplayName;
-		RE::TESWeather*      tesWeather;
+		using BaseFormItem<RE::TESWeather>::operator==;
+
 		RE::TESWeather::Data originalData;
 		RE::Color            oldColorData[ColorTypes::kTotal][ColorTime::kTotal];
 
 		WeatherItem(RE::TESWeather* weather);
 
-		bool                  operator==(const RE::TESWeather* weather) const;
-		bool                  operator==(const WeatherItem weather) const;
-		const char*           GetName() const;
 		void                  RestoreOriginalData();
 		RE::TESWeather::Data& GetData();
-		RE::TESWeather::Data& GetColorData();
 	};
 
 private:
 	void DrawWeatherControl();
 	void DrawColorDataEditor(const char* label, size_t colorType);
+	void Restore();
 
 private:
-	float                      initialSunIntensity;
-	std::vector<WeatherItem>   weathers;
-	std::optional<WeatherItem> currentWeather;
-	std::optional<WeatherItem> oldWeather;
+	float                         initialSunExtreme[2] = { 0.0f, 0.0f };
+	float                         initialSunIntensity;
+	std::vector<WeatherItem>      weathers;
+	std::vector<ImageSpaceItem>   imageSpaces;
+	std::optional<WeatherItem>    currentWeather;
+	std::optional<ImageSpaceItem> currentImageSpace;
+	std::optional<WeatherItem>    oldWeather;
 };
