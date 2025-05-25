@@ -46,6 +46,7 @@ private:
 	void               Revert(SKSE::CoSaveIO io) override;
 	constexpr uint32_t GetKey() override;
 	void               DrawCameraControlWindow();
+	void               HandleToolMenuOpen();
 
 private:
 	bool                               firstRender = true;

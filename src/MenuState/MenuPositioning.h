@@ -11,7 +11,4 @@ public:
 public:
 	MenuStatePtr Transition(Input::MenuInputContext* inputCtx);
 	void         DrawMenu(LightingToolkit* menu) override;
-
-private:
-	bool prevFreezeTime;
 };

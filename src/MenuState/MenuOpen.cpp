@@ -21,7 +21,7 @@ MenuStatePtr MenuOpen::Transition(Input::MenuInputContext* inputCtx)
 	{
 		return std::make_unique<MenuLookingAround>(inputCtx);
 	}
-	if (ImGui::ImGuiInputAdapter::IsKeyDown("iPositionLightKey"))
+	if (inputCtx->AllowsPositioning() && ImGui::ImGuiInputAdapter::IsKeyDown("iPositionLightKey"))
 	{
 		return std::make_unique<MenuPositioning>(inputCtx);
 	}

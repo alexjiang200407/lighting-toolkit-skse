@@ -5,7 +5,6 @@
 class MenuOpen : public MenuState
 {
 public:
-	MenuOpen() = default;
 	MenuOpen(Input::MenuInputContext* inputCtx);
 
 public:
@@ -16,6 +15,4 @@ public:
 private:
 	static constexpr ImGuiWindowFlags windowFlags =
 		ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
-	bool previouslyInFreeCameraMode;
-	bool previouslyFreezeTime;
 };

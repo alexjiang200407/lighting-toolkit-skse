@@ -1,7 +1,10 @@
 #include "MenuItemActive.h"
 #include "MenuOpen.h"
 
-MenuItemActive::MenuItemActive(Input::MenuInputContext* inputCtx) { inputCtx->StartTextInput(); }
+MenuItemActive::MenuItemActive(Input::MenuInputContext* inputCtx) : MenuOpen(inputCtx)
+{
+	inputCtx->StartTextInput();
+}
 
 MenuStatePtr MenuItemActive::Transition(Input::MenuInputContext* inputCtx)
 {

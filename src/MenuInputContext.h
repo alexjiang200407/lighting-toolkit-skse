@@ -23,6 +23,13 @@ namespace Input
 		void StopTextInput();
 		void StopAllInput();
 		void MenuOpen();
+		void MenuHidden();
 		void MenuClose();
+		void EnablePositioning();
+		void DisablePositioning();
+		bool AllowsPositioning() const;
+
+	private:
+		bool allowPositioning = false;
 	};
 }

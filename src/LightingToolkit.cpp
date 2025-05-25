@@ -40,7 +40,7 @@ void LightingToolkit::DoFrame()
 	if (auto newState = menuState->Transition(&inputCtx))
 	{
 		inputCtx.Update();
-		menuState = std::move(newState);
+		menuState.swap(newState);
 	}
 
 	if (firstRender && !ImGui::ImGuiRenderer::GetSingleton()->HasPreexistingIni())
@@ -65,7 +65,7 @@ void LightingToolkit::DrawMenu()
 		"Environment",
 	};
 	static bool enabled[] = { true, true, true, true };
-	bool        changedSelected;
+	bool        changedTool;
 
 	ImGui::Toolbar(
 		"##ControlTabs",
@@ -73,7 +73,12 @@ void LightingToolkit::DrawMenu()
 		enabled,
 		sizeof(enabled) / sizeof(bool),
 		reinterpret_cast<size_t*>(&currentTool),
-		&changedSelected);
+		&changedTool);
+
+	if (changedTool)
+	{
+		HandleToolMenuOpen();
+	}
 
 	switch (currentTool)
 	{
@@ -116,19 +121,20 @@ void LightingToolkit::ToggleMenu()
 
 		RE::PlaySound("UIMenuOK");
 		logger::info("Opening Menu...");
-		inputCtx.MenuOpen();
-		inputCtx.Update();
-		menuState                  = std::make_unique<MenuOpen>(&inputCtx);
+
+		HandleToolMenuOpen();
+
 		previouslyInFreeCameraMode = RE::PlayerCamera::GetSingleton()->IsInFreeCameraMode();
 		if (!previouslyInFreeCameraMode)
 		{
-			RE::PlayerCamera::GetSingleton()->ToggleFreeCameraMode(true);
+			RE::PlayerCamera::GetSingleton()->ToggleFreeCameraMode(false);
 			RE::ControlMap::GetSingleton()->PushInputContext(
 				RE::ControlMap::InputContextID::kTFCMode);
 		}
-
+		RE::Main::GetSingleton()->freezeTime = false;
 		RE::UI::GetSingleton()->ShowMenus(false);
 		previouslyFreezeTime = RE::Main::GetSingleton()->freezeTime;
+
 		environment.OnMenuOpened();
 	}
 	else
@@ -202,10 +208,25 @@ void LightingToolkit::DrawCameraControlWindow()
 {
 	if (ImGui::BeginPanel("Camera Settings###CameraControlWindow"))
 	{
-		ImGui::Checkbox("Freeze Time", &RE::Main::GetSingleton()->freezeTime);
 		ImGui::SliderAutoFill("Camera Speed", GetCameraMoveSpeed(), 0.1f, 50.0f);
 	}
 	ImGui::EndPanel();
+}
+
+void LightingToolkit::HandleToolMenuOpen()
+{
+	switch (currentTool)
+	{
+	case Tool::kSceneLight:
+		inputCtx.EnablePositioning();
+		menuState = std::make_unique<MenuOpen>(&inputCtx);
+		break;
+	default:
+		inputCtx.DisablePositioning();
+		menuState = std::make_unique<MenuOpen>(&inputCtx);
+		break;
+	}
+	inputCtx.Update();
 }
 
 void LightingToolkit::SerializeItems(SKSE::CoSaveIO io) const { sceneLighting.SerializeItems(io); }

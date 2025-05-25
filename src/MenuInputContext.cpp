@@ -34,8 +34,21 @@ void Input::MenuInputContext::MenuOpen()
 	AddModifier(kFreeCameraMoveMode, new CanMoveAround(false));
 }
 
+void Input::MenuInputContext::MenuHidden()
+{
+	AddModifier(kCanRun, new CanRun(false));
+	AddModifier(kFreeCameraLook, new CanMouseMove(false));
+	AddModifier(kFreeCameraMoveMode, new FreeCameraControl(false));
+}
+
 void Input::MenuInputContext::MenuClose()
 {
 	ClearAllModifiers();
 	ImGui::ImGuiInputAdapter::GetSingleton()->DisableSupression();
 }
+
+void Input::MenuInputContext::EnablePositioning() { allowPositioning = true; }
+
+void Input::MenuInputContext::DisablePositioning() { allowPositioning = false; }
+
+bool Input::MenuInputContext::AllowsPositioning() const { return allowPositioning; }
