@@ -16,8 +16,8 @@ private:
 	{
 		ASSERT_BASE(T, RE::TESForm);
 
-		T*          base;
-		std::string weatherDisplayName;
+		T*                base;
+		const std::string weatherDisplayName;
 
 		BaseFormItem(T* item) :
 			base(item),
@@ -67,15 +67,15 @@ private:
 
 private:
 	void DrawWeatherControl();
-	void DrawColorDataEditor(const char* label, size_t colorType);
-	void Restore();
+	void DrawImageSpaceControl();
+	void DrawColorDataEditor(const char* label, size_t colorType, WeatherItem currentWeather);
+	void Restore(std::optional<WeatherItem> currentWeather = std::nullopt);
 
 private:
-	float                         initialSunExtreme[2] = { 0.0f, 0.0f };
-	float                         initialSunIntensity;
-	std::vector<WeatherItem>      weathers;
-	std::vector<ImageSpaceItem>   imageSpaces;
-	std::optional<WeatherItem>    currentWeather;
-	std::optional<ImageSpaceItem> currentImageSpace;
-	std::optional<WeatherItem>    oldWeather;
+	float                       initialSunExtreme[2] = { 0.0f, 0.0f };
+	float                       initialSunIntensity;
+	std::vector<WeatherItem>    weathers;
+	std::vector<ImageSpaceItem> imageSpaces;
+	std::optional<WeatherItem>  oldWeather;
+	RE::ImageSpaceBaseData*     oldImageSpace;
 };

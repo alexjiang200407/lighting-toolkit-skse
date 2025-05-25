@@ -2,6 +2,8 @@
 
 namespace ImGui
 {
+	void PushFullItemWidth(const char* label = nullptr);
+
 	template <typename T>
 	bool SliderAutoFill(
 		const char*      label,
@@ -11,10 +13,7 @@ namespace ImGui
 		const char*      format = nullptr,
 		ImGuiSliderFlags flags  = 0)
 	{
-		float availableWidth = ImGui::GetContentRegionAvail().x;
-
-		ImGui::PushItemWidth(
-			availableWidth - CalcTextSize(label).x - ImGui::GetStyle().ItemInnerSpacing.x);
+		PushFullItemWidth(label);
 
 		bool retVal = false;
 		if constexpr (std::is_same<T, float>::value)
@@ -80,5 +79,4 @@ namespace ImGui
 		RE::NiPoint3& niPoint,
 		RE::NiPoint3  rangeMin,
 		RE::NiPoint3  rangeMax);
-
 }

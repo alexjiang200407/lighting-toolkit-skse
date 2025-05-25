@@ -180,3 +180,10 @@ bool ImGui::NiPointEditor(
 	changed      = ImGui::SliderAutoFill(zLabel, &niPoint.z, rangeMin.z, rangeMax.z) || changed;
 	return changed;
 }
+
+void ImGui::PushFullItemWidth(const char* label)
+{
+	float availableWidth = ImGui::GetContentRegionAvail().x;
+	float textSize = label ? CalcTextSize(label).x + ImGui::GetStyle().ItemInnerSpacing.x : 0.0f;
+	ImGui::PushItemWidth(availableWidth - textSize);
+}

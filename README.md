@@ -48,4 +48,5 @@ Lighting Toolkit is an SKSE plugin that lets players place dynamic, shadow-casti
 * Ryan for CommonLibSSE.
 * All Skyrim reverse engineers who shared their work.
 * Ersh. Copied his nexus mod description layout.
+* Jonahex. Skyrim In-Game editor source code
 * Bethesda Game Studios.
