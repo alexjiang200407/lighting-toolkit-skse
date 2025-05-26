@@ -1,18 +1,15 @@
 #include "Environment/Environment.h"
 #include "MCM/Settings.h"
 
-static void
-	GetCurrentImageSpace(RE::TESImageSpace*& imageSpace, RE::ExtraCellImageSpace*& extraImageSpace);
-
 void Environment::OnDataLoaded()
 {
 	BaseFormItem<RE::TESWeather>::GetAllFormsOfType<WeatherItem>(
 		weathers,
 		[](RE::TESWeather* weather) { return WeatherItem{ weather }; });
 
-	BaseFormItem<RE::TESImageSpace>::GetAllFormsOfType<ImageSpaceItem>(
-		imageSpaces,
-		[](RE::TESImageSpace* image) { return ImageSpaceItem{ image }; });
+	BaseFormItem<RE::BGSLightingTemplate>::GetAllFormsOfType<LightingTemplateItem>(
+		lightingTemplates,
+		[](auto* lightingTemplate) { return LightingTemplateItem(lightingTemplate); });
 }
 
 static float* GetSunXExtreme()
@@ -38,7 +35,7 @@ void Environment::DrawWindow()
 	ImGui::PushID("environment");
 	{
 		DrawWeatherControl();
-		DrawImageSpaceControl();
+		DrawLightingTemplateControl();
 		if (ImGui::Button("Reset Environment"))
 		{
 			Restore();
@@ -62,7 +59,7 @@ void Environment::OnMenuOpened()
 
 	if (auto* skyWeather = sky->currentWeather)
 	{
-		oldWeather.emplace(skyWeather);
+		originalWeather.emplace(skyWeather);
 	}
 
 	if (auto* sun = sky->sun; sun && sun->light)
@@ -74,48 +71,48 @@ void Environment::OnMenuOpened()
 		logger::error("Sun not found");
 	}
 
-	if (auto* imageSpaceManager = RE::ImageSpaceManager::GetSingleton())
+	if (auto* cell = RE::PlayerCharacter::GetSingleton()->GetParentCell();
+	    cell && cell->IsInteriorCell())
 	{
-		oldImageSpace = imageSpaceManager->currentBaseData;
+		originalLightingTemplate = cell->lightingTemplate;
 	}
 }
 
 void Environment::OnMenuClosed()
 {
 	Restore();
-	if (oldWeather)
-	{
-		if (auto* taskQueueInterface = RE::TaskQueueInterface::GetSingleton())
-			taskQueueInterface->QueueForceWeather(oldWeather->base, true);
-		else
-			logger::error("Could not get task queue interface to force weather");
-	}
-
-	if (oldImageSpace)
-	{
-		RE::ImageSpaceManager::GetSingleton()->currentBaseData = oldImageSpace;
-	}
-
-	oldWeather.reset();
-	oldImageSpace = nullptr;
+	originalWeather.reset();
+	originalLightingTemplate = nullptr;
 }
 
 template <typename T>
-static bool ColorEditor4(const char* label, T& color, ImGuiColorEditFlags flags = 0)
+static bool ColorEditor4(const char* label, T* color, ImGuiColorEditFlags flags = 0)
 {
-	float colors[4] = { color.red / 255.0f,
-		                color.green / 255.0f,
-		                color.blue / 255.0f,
-		                color.alpha / 255.0f };
+	float colors[4];
+
+	if (color)
+	{
+		colors[0] = color->red / 255.0f;
+		colors[1] = color->green / 255.0f;
+		colors[2] = color->blue / 255.0f;
+		colors[3] = color->alpha / 255.0f;
+	}
+	else
+	{
+		std::fill(colors, colors + sizeof(colors) / sizeof(float), 0.0f);
+	}
 
 	ImGui::PushFullItemWidth(label);
 	bool retVal = ImGui::ColorEdit4(label, colors, flags);
 	ImGui::PopItemWidth();
 
-	color.red   = static_cast<uint8_t>(std::clamp(colors[0] * 255.0f, 0.0f, 255.0f));
-	color.green = static_cast<uint8_t>(std::clamp(colors[1] * 255.0f, 0.0f, 255.0f));
-	color.blue  = static_cast<uint8_t>(std::clamp(colors[2] * 255.0f, 0.0f, 255.0f));
-	color.alpha = static_cast<uint8_t>(std::clamp(colors[3] * 255.0f, 0.0f, 255.0f));
+	if (color)
+	{
+		color->red   = static_cast<uint8_t>(std::clamp(colors[0] * 255.0f, 0.0f, 255.0f));
+		color->green = static_cast<uint8_t>(std::clamp(colors[1] * 255.0f, 0.0f, 255.0f));
+		color->blue  = static_cast<uint8_t>(std::clamp(colors[2] * 255.0f, 0.0f, 255.0f));
+		color->alpha = static_cast<uint8_t>(std::clamp(colors[3] * 255.0f, 0.0f, 255.0f));
+	}
 	return retVal;
 }
 
@@ -131,20 +128,20 @@ void Environment::DrawColorDataEditor(
 	ImGui::PushID(label);
 	if (ImGui::CollapsingHeader(label))
 	{
-		ColorEditor4("Day", currentWeather.base->colorData[colorType][ColorTimes::kDay]);
-		ColorEditor4("Night", currentWeather.base->colorData[colorType][ColorTimes::kNight]);
-		ColorEditor4("Sunrise", currentWeather.base->colorData[colorType][ColorTimes::kSunrise]);
-		ColorEditor4("Sunset", currentWeather.base->colorData[colorType][ColorTimes::kSunset]);
+		ColorEditor4("Day", &currentWeather.base->colorData[colorType][ColorTimes::kDay]);
+		ColorEditor4("Night", &currentWeather.base->colorData[colorType][ColorTimes::kNight]);
+		ColorEditor4("Sunrise", &currentWeather.base->colorData[colorType][ColorTimes::kSunrise]);
+		ColorEditor4("Sunset", &currentWeather.base->colorData[colorType][ColorTimes::kSunset]);
 	}
 	ImGui::PopID();
 }
 
-void Environment::Restore(std::optional<WeatherItem> currentWeather)
+void Environment::Restore()
 {
 	*GetSunXExtreme() = initialSunExtreme[0];
 	*GetSunYExtreme() = initialSunExtreme[1];
 
-	if (currentWeather)
+	if (auto currentWeather = GetCurrentWeather(); currentWeather != weathers.end())
 	{
 		currentWeather->RestoreOriginalData();
 	}
@@ -162,25 +159,54 @@ void Environment::Restore(std::optional<WeatherItem> currentWeather)
 	else
 		logger::error("Could not get Sun or Sun directional light");
 
-	if (auto* cell = RE::PlayerCharacter::GetSingleton()->parentCell; cell && oldImageSpace)
-	{
-		RE::TESImageSpace*       imageSpace;
-		RE::ExtraCellImageSpace* extraImageSpace;
-		GetCurrentImageSpace(imageSpace, extraImageSpace);
-		if (extraImageSpace)
-			cell->extraList.Remove(extraImageSpace);
+	auto* cell = RE::PlayerCharacter::GetSingleton()->parentCell;
 
-		if (oldImageSpace)
-			RE::ImageSpaceManager::GetSingleton()->currentBaseData = oldImageSpace;
+	if (originalWeather)
+	{
+		if (auto* taskQueueInterface = RE::TaskQueueInterface::GetSingleton())
+			taskQueueInterface->QueueForceWeather(originalWeather->base, true);
+		else
+			logger::error("Could not get task queue interface to force weather");
+	}
+
+	if (cell)
+	{
+		auto currentLightingTemplate = GetCurrentLightingTemplate(cell);
+		if (currentLightingTemplate != lightingTemplates.end())
+			currentLightingTemplate->RestoreOriginalData();
+	}
+
+	if (originalLightingTemplate && cell)
+	{
+		cell->lightingTemplate = originalLightingTemplate;
 	}
 }
 
-template <typename T, bool HAS_NONE = false>
+Environment::WeatherItem::iterator Environment::GetCurrentWeather()
+{
+	if (auto* sky = RE::Sky::GetSingleton(); sky && sky->currentWeather)
+	{
+		return FindCurrent(sky->currentWeather, weathers);
+	}
+
+	return weathers.end();
+}
+
+Environment::LightingTemplateItem::iterator
+	Environment::GetCurrentLightingTemplate(const RE::TESObjectCELL* cell)
+{
+	if (!cell || !cell->lightingTemplate)
+		return lightingTemplates.end();
+
+	return FindCurrent(cell->lightingTemplate, lightingTemplates);
+}
+
+template <typename T, bool HAS_NONE = false, typename It>
 void TESFormComboBox(
-	const char*                                                     label,
-	std::optional<T>&                                               current,
-	const std::vector<T>&                                           allForms,
-	std::function<bool(std::optional<T>&, const std::optional<T>&)> handleChanged)
+	const char*                     label,
+	It&                             current,
+	std::vector<T>&                 allForms,
+	std::function<bool(It, It, It)> handleChanged)
 {
 	ImGui::PushFullItemWidth(label);
 	std::vector<std::string> labels;
@@ -191,16 +217,17 @@ void TESFormComboBox(
 	if constexpr (HAS_NONE)
 	{
 		labels.push_back("None");
-		if (!current.has_value())
+		if (current != allForms.end())
 			currentItem = 0;
 	}
 
 	{
 		int i = 0;
-		for (const auto& form : allForms)
+
+		for (auto it = allForms.begin(); it != allForms.end(); it++)
 		{
-			labels.push_back(form.GetName());
-			if (form == current)
+			labels.push_back(it->GetName());
+			if (current == it)
 			{
 				currentItem = i;
 			}
@@ -210,92 +237,66 @@ void TESFormComboBox(
 
 	if (ImGui::ComboWithFilter(label, &currentItem, labels, -1))
 	{
-		std::optional<T> newValue;
+		It newValue;
 		if (currentItem >= 0 && currentItem < static_cast<int>(allForms.size()))
 		{
-			newValue.emplace(allForms[currentItem]);
+			newValue = allForms.begin() + currentItem;
+		}
+		else if constexpr (HAS_NONE)
+		{
+			newValue = allForms.begin();
 		}
 
-		if (handleChanged(current, newValue))
+		if (handleChanged(current, newValue, allForms.end()))
 		{
-			current.emplace(allForms[currentItem]);
+			current = newValue;
 		}
 	}
 
 	ImGui::PopItemWidth();
 }
 
-static void
-	GetCurrentImageSpace(RE::TESImageSpace*& imageSpace, RE::ExtraCellImageSpace*& extraImageSpace)
+template <typename T, typename U, typename K>
+bool EnumSetCheckbox(const char* label, REX::EnumSet<T, U>* enumSet, K keys)
 {
-	imageSpace      = nullptr;
-	extraImageSpace = nullptr;
-
-	const auto* player = RE::PlayerCharacter::GetSingleton();
-	if (auto* cell = player->GetParentCell())
+	bool enabled = enumSet ? enumSet->all(keys) : false;
+	if (ImGui::Checkbox(label, &enabled))
 	{
-		extraImageSpace = static_cast<RE::ExtraCellImageSpace*>(
-			cell->extraList.GetByType(RE::ExtraDataType::kCellImageSpace));
-		if (extraImageSpace != nullptr)
-		{
-			imageSpace = extraImageSpace->imageSpace;
-		}
+		if (enabled && enumSet)
+			enumSet->set(keys);
+		else if (enumSet)
+			enumSet->reset(keys);
+		return true;
 	}
+	return false;
 }
 
-void Environment::DrawImageSpaceControl()
+void Environment::DrawLightingTemplateControl()
 {
-	if (ImGui::BeginPanel("Image Space Editor"))
+	const auto* player = RE::PlayerCharacter::GetSingleton();
+	auto*       cell   = player->parentCell;
+
+	if (!cell)
+		return;
+
+	if (ImGui::BeginPanel("LightingTemplateEditor"))
 	{
-		RE::TESImageSpace*            imageSpace      = nullptr;
-		RE::ExtraCellImageSpace*      extraImageSpace = nullptr;
-		std::optional<ImageSpaceItem> currentImageSpace{};
-
-		GetCurrentImageSpace(imageSpace, extraImageSpace);
-		if (imageSpace)
-			currentImageSpace.emplace(imageSpace);
-
-		TESFormComboBox<ImageSpaceItem, true>(
-			"Image Space",
-			currentImageSpace,
-			imageSpaces,
-			[&extraImageSpace, this](auto&, const auto& newImageSpace) {
-				const auto* player = RE::PlayerCharacter::GetSingleton();
-
-				auto* cell = player->GetParentCell();
-
-				if (!cell)
-				{
-					logger::warn("Could not get player parent cell");
-					return false;
-				}
-
-				if (newImageSpace && newImageSpace->base)
-				{
-					if (extraImageSpace)
+		ImGui::BeginDisabled(!cell->IsInteriorCell());
+		{
+			auto current = GetCurrentLightingTemplate(cell);
+			TESFormComboBox<LightingTemplateItem, true, LightingTemplateItem::iterator>(
+				"Lighting Template",
+				current,
+				lightingTemplates,
+				[cell](auto, auto newLightingTemplate, auto end) {
+					if (newLightingTemplate != end)
 					{
-						extraImageSpace->imageSpace = newImageSpace->base;
+						cell->lightingTemplate = newLightingTemplate->base;
 					}
-					else
-					{
-						extraImageSpace =
-							RE::ExtraCellImageSpace::Create<RE::ExtraCellImageSpace>();
-						extraImageSpace->imageSpace = newImageSpace->base;
-						cell->extraList.Add(extraImageSpace);
-					}
-
-					RE::ImageSpaceManager::GetSingleton()->currentBaseData =
-						&newImageSpace->base->data;
-				}
-				else if (extraImageSpace)
-				{
-					cell->extraList.Remove(extraImageSpace);
-					if (oldImageSpace)
-						RE::ImageSpaceManager::GetSingleton()->currentBaseData = oldImageSpace;
-				}
-
-				return true;
-			});
+					return true;
+				});
+		}
+		ImGui::EndDisabled();
 	}
 	ImGui::EndPanel();
 }
@@ -305,32 +306,28 @@ void Environment::DrawWeatherControl()
 	using MCM        = MCM::Settings;
 	using ColorTypes = RE::TESWeather::ColorTypes;
 
-	std::optional<WeatherItem> currentWeather{};
-
-	if (auto* sky = RE::Sky::GetSingleton())
-	{
-		currentWeather.emplace(sky->currentWeather);
-	}
+	auto currentWeather = GetCurrentWeather();
 
 	if (ImGui::BeginPanel("##WeatherControl"))
 	{
-		TESFormComboBox<WeatherItem>(
+		TESFormComboBox<WeatherItem, false, WeatherItem::iterator>(
 			"Weather",
 			currentWeather,
 			weathers,
-			[](std::optional<WeatherItem>&       oldWeather,
-		       const std::optional<WeatherItem>& newWeather) {
+			[](WeatherItem::iterator oldWeather,
+		       WeatherItem::iterator newWeather,
+		       WeatherItem::iterator end) {
 				if (auto* taskQueueInterface = RE::TaskQueueInterface::GetSingleton();
-			        taskQueueInterface && newWeather)
+			        taskQueueInterface && newWeather != end)
 				{
 					taskQueueInterface->QueueForceWeather(newWeather->base, true);
-					if (oldWeather)
+					if (oldWeather != end)
 						oldWeather->RestoreOriginalData();
 					return true;
 				}
 				return false;
 			});
-		if (currentWeather.has_value())
+		if (currentWeather != weathers.end())
 		{
 			ImGui::SliderAutoFill(
 				"Wind Speed",
@@ -350,7 +347,7 @@ void Environment::DrawWeatherControl()
 			auto* player = RE::PlayerCharacter::GetSingleton();
 			ImGui::BeginDisabled(player->parentCell && player->parentCell->IsInteriorCell());
 			ImGui::SliderAutoFill("Sun Intensity", &sun->light->fade, 0.0f, sunMaxIntensity);
-			if (currentWeather)
+			if (currentWeather != weathers.end())
 			{
 				DrawColorDataEditor("Sun Color", ColorTypes::kSun, *currentWeather);
 				DrawColorDataEditor("Sun Light", ColorTypes::kSunlight, *currentWeather);
@@ -394,6 +391,22 @@ void Environment::WeatherItem::RestoreOriginalData()
 
 inline RE::TESWeather::Data& Environment::WeatherItem::GetData() { return base->data; }
 
-Environment::ImageSpaceItem::ImageSpaceItem(RE::TESImageSpace* imageSpace) :
-	BaseFormItem<RE::TESImageSpace>(imageSpace)
-{}
+Environment::LightingTemplateItem::LightingTemplateItem(RE::BGSLightingTemplate* lightingTemplate) :
+	BaseFormItem<RE::BGSLightingTemplate>(lightingTemplate)
+{
+	assert(lightingTemplate);
+	memcpy(&originalData, &lightingTemplate->data, sizeof(lightingTemplate->data));
+	memcpy(
+		&originalDirectionalAmbientLightingColors,
+		&lightingTemplate->directionalAmbientLightingColors,
+		sizeof(lightingTemplate->directionalAmbientLightingColors));
+}
+
+void Environment::LightingTemplateItem::RestoreOriginalData()
+{
+	memcpy(&base->data, &originalData, sizeof(originalData));
+	memcpy(
+		&base->directionalAmbientLightingColors,
+		&originalDirectionalAmbientLightingColors,
+		sizeof(originalDirectionalAmbientLightingColors));
+}

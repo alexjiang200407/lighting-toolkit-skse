@@ -16,8 +16,8 @@ private:
 	{
 		ASSERT_BASE(T, RE::TESForm);
 
-		T*                base;
-		const std::string weatherDisplayName;
+		T*          base;
+		std::string weatherDisplayName;
 
 		BaseFormItem(T* item) :
 			base(item),
@@ -34,19 +34,15 @@ private:
 				formArray.end(),
 				std::back_inserter(allForms),
 				create);
+
+			std::sort(allForms.begin(), allForms.end());
 		}
 		const char* GetName() const { return weatherDisplayName.c_str(); };
 
-		bool operator==(const T* rhs) const { return base == rhs; }
+		bool operator<(const BaseFormItem<T>& rhs) const { return base->formID < rhs.base->formID; }
+		bool operator==(const T* rhs) const { return base->formID == rhs->formID; }
 		bool operator==(const BaseFormItem<T> rhs) const { return *this == rhs.base; }
 		bool operator!=(const BaseFormItem<T> rhs) const { return !(*this == rhs); }
-	};
-
-	struct ImageSpaceItem : public BaseFormItem<RE::TESImageSpace>
-	{
-		ImageSpaceItem(RE::TESImageSpace* imageSpace);
-
-		using BaseFormItem<RE::TESImageSpace>::operator==;
 	};
 
 	struct WeatherItem : public BaseFormItem<RE::TESWeather>
@@ -63,19 +59,51 @@ private:
 
 		void                  RestoreOriginalData();
 		RE::TESWeather::Data& GetData();
+
+		typedef std::vector<WeatherItem>::iterator iterator;
+	};
+
+	struct LightingTemplateItem : public BaseFormItem<RE::BGSLightingTemplate>
+	{
+		LightingTemplateItem(RE::BGSLightingTemplate* lightingTemplate);
+		using BaseFormItem<RE::BGSLightingTemplate>::operator==;
+		void RestoreOriginalData();
+
+		RE::INTERIOR_DATA                       originalData;
+		RE::BGSDirectionalAmbientLightingColors originalDirectionalAmbientLightingColors;
+
+		typedef std::vector<LightingTemplateItem>::iterator iterator;
 	};
 
 private:
+	template <typename T, typename U>
+	std::vector<U>::iterator FindCurrent(T* current, std::vector<U>& all)
+	{
+		ASSERT_BASE(U, Environment::BaseFormItem<T>);
+
+		auto it = std::lower_bound(all.begin(), all.end(), current, [](const U& lhs, const T* rhs) {
+			return lhs.base->formID < rhs->formID;
+		});
+		if (it != all.end() && *it == current)
+		{
+			return it;
+		}
+
+		return all.end();
+	}
+
 	void DrawWeatherControl();
-	void DrawImageSpaceControl();
+	void DrawLightingTemplateControl();
 	void DrawColorDataEditor(const char* label, size_t colorType, WeatherItem currentWeather);
-	void Restore(std::optional<WeatherItem> currentWeather = std::nullopt);
+	void Restore();
+	WeatherItem::iterator          GetCurrentWeather();
+	LightingTemplateItem::iterator GetCurrentLightingTemplate(const RE::TESObjectCELL* cell);
 
 private:
-	float                       initialSunExtreme[2] = { 0.0f, 0.0f };
-	float                       initialSunIntensity;
-	std::vector<WeatherItem>    weathers;
-	std::vector<ImageSpaceItem> imageSpaces;
-	std::optional<WeatherItem>  oldWeather;
-	RE::ImageSpaceBaseData*     oldImageSpace;
+	float                             initialSunExtreme[2] = { 0.0f, 0.0f };
+	float                             initialSunIntensity;
+	std::vector<WeatherItem>          weathers;
+	std::vector<LightingTemplateItem> lightingTemplates;
+	std::optional<WeatherItem>        originalWeather;
+	RE::BGSLightingTemplate*          originalLightingTemplate = nullptr;
 };
