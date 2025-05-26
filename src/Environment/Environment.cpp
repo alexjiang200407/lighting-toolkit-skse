@@ -177,51 +177,51 @@ void Environment::Restore(std::optional<WeatherItem> currentWeather)
 
 template <typename T, bool HAS_NONE = false>
 void TESFormComboBox(
-	const char*           label,
-	std::optional<T>&     current,
-	const std::vector<T>& allForms,
-	std::function<
-		bool(std::optional<T>&, std::conditional_t<HAS_NONE, const std::optional<T>&, const T&>)>
-		handleChanged)
+	const char*                                                     label,
+	std::optional<T>&                                               current,
+	const std::vector<T>&                                           allForms,
+	std::function<bool(std::optional<T>&, const std::optional<T>&)> handleChanged)
 {
 	ImGui::PushFullItemWidth(label);
-	if (ImGui::BeginCombo(label, current ? current->GetName() : "None"))
+	std::vector<std::string> labels;
+	labels.reserve(allForms.size() + 1);
+
+	int currentItem = -1;
+
+	if constexpr (HAS_NONE)
 	{
-		if constexpr (HAS_NONE)
+		labels.push_back("None");
+		if (!current.has_value())
+			currentItem = 0;
+	}
+
+	{
+		int i = 0;
+		for (const auto& form : allForms)
 		{
-			bool isSelected = current == std::nullopt;
-			if (ImGui::Selectable("None", &isSelected))
+			labels.push_back(form.GetName());
+			if (form == current)
 			{
-				if (current != std::nullopt)
-				{
-					if (handleChanged(current, std::nullopt))
-					{
-						current.reset();
-					}
-				}
+				currentItem = i;
 			}
-			if (isSelected)
-				ImGui::SetItemDefaultFocus();
+			i++;
+		}
+	}
+
+	if (ImGui::ComboWithFilter(label, &currentItem, labels, -1))
+	{
+		std::optional<T> newValue;
+		if (currentItem >= 0 && currentItem < static_cast<int>(allForms.size()))
+		{
+			newValue.emplace(allForms[currentItem]);
 		}
 
-		for (auto& form : allForms)
+		if (handleChanged(current, newValue))
 		{
-			bool isSelected = current && form == *current;
-			if (ImGui::Selectable(form.GetName(), &isSelected))
-			{
-				if (current != form)
-				{
-					if (handleChanged(current, form))
-					{
-						current.emplace(form.base);
-					}
-				}
-			}
-			if (isSelected)
-				ImGui::SetItemDefaultFocus();
+			current.emplace(allForms[currentItem]);
 		}
-		ImGui::EndCombo();
 	}
+
 	ImGui::PopItemWidth();
 }
 
@@ -318,15 +318,16 @@ void Environment::DrawWeatherControl()
 			"Weather",
 			currentWeather,
 			weathers,
-			[](std::optional<WeatherItem>& oldWeather, const WeatherItem& newWeather) {
-				if (auto* taskQueueInterface = RE::TaskQueueInterface::GetSingleton())
+			[](std::optional<WeatherItem>&       oldWeather,
+		       const std::optional<WeatherItem>& newWeather) {
+				if (auto* taskQueueInterface = RE::TaskQueueInterface::GetSingleton();
+			        taskQueueInterface && newWeather)
 				{
-					taskQueueInterface->QueueForceWeather(newWeather.base, true);
+					taskQueueInterface->QueueForceWeather(newWeather->base, true);
 					if (oldWeather)
 						oldWeather->RestoreOriginalData();
 					return true;
 				}
-				logger::error("Could not get task queue interface to force weather");
 				return false;
 			});
 		if (currentWeather.has_value())

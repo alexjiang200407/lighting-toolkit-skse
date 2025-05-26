@@ -79,4 +79,10 @@ namespace ImGui
 		RE::NiPoint3& niPoint,
 		RE::NiPoint3  rangeMin,
 		RE::NiPoint3  rangeMax);
+
+	bool ComboWithFilter(
+		const char*                     label,
+		int*                            currentItem,
+		const std::vector<std::string>& items,
+		int                             popupMaxHeightInItems);
 }
