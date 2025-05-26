@@ -17,19 +17,19 @@ void Environment::OnDataLoaded()
 
 static float* GetSunXExtreme()
 {
-	static auto* sunX = REL::Relocation<float*>{ RELOCATION_ID(370250, 370250) }.get();
+	static auto* sunX = REL::Relocation<float*>{ RELOCATION_ID(502621, 370250) }.get();
 	return sunX;
 }
 
 static float* GetSunYExtreme()
 {
-	static auto* sunY = REL::Relocation<float*>{ RELOCATION_ID(370253, 370253) }.get();
+	static auto* sunY = REL::Relocation<float*>{ RELOCATION_ID(502623, 370253) }.get();
 	return sunY;
 }
 
-static float* GetSunZExtreme()
+[[maybe_unused]] static float* GetSunZExtreme()
 {
-	static auto* sunZ = REL::Relocation<float*>{ RELOCATION_ID(370256, 370256) }.get();
+	static auto* sunZ = REL::Relocation<float*>{ RELOCATION_ID(502625, 370256) }.get();
 	return sunZ;
 }
 
