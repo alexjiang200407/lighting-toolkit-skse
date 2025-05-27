@@ -85,7 +85,7 @@ void Environment::OnMenuClosed()
 	originalLightingTemplate = nullptr;
 }
 
-template <typename T>
+template <bool HAS_ALPHA = true, typename T>
 static bool ColorEditor4(const char* label, T* color, ImGuiColorEditFlags flags = 0)
 {
 	float colors[4];
@@ -95,7 +95,11 @@ static bool ColorEditor4(const char* label, T* color, ImGuiColorEditFlags flags 
 		colors[0] = color->red / 255.0f;
 		colors[1] = color->green / 255.0f;
 		colors[2] = color->blue / 255.0f;
-		colors[3] = color->alpha / 255.0f;
+
+		if constexpr (HAS_ALPHA)
+			colors[3] = color->alpha / 255.0f;
+		else
+			colors[3] = 0.0f;
 	}
 	else
 	{
@@ -103,7 +107,11 @@ static bool ColorEditor4(const char* label, T* color, ImGuiColorEditFlags flags 
 	}
 
 	ImGui::PushFullItemWidth(label);
-	bool retVal = ImGui::ColorEdit4(label, colors, flags);
+	bool retVal;
+	if constexpr (HAS_ALPHA)
+		retVal = ImGui::ColorEdit4(label, colors, flags);
+	else
+		retVal = ImGui::ColorEdit3(label, colors, flags);
 	ImGui::PopItemWidth();
 
 	if (color)
@@ -111,9 +119,97 @@ static bool ColorEditor4(const char* label, T* color, ImGuiColorEditFlags flags 
 		color->red   = static_cast<uint8_t>(std::clamp(colors[0] * 255.0f, 0.0f, 255.0f));
 		color->green = static_cast<uint8_t>(std::clamp(colors[1] * 255.0f, 0.0f, 255.0f));
 		color->blue  = static_cast<uint8_t>(std::clamp(colors[2] * 255.0f, 0.0f, 255.0f));
-		color->alpha = static_cast<uint8_t>(std::clamp(colors[3] * 255.0f, 0.0f, 255.0f));
+
+		if constexpr (HAS_ALPHA)
+			color->alpha = static_cast<uint8_t>(std::clamp(colors[3] * 255.0f, 0.0f, 255.0f));
 	}
 	return retVal;
+}
+
+static void VolumetricLightingEditor(const char* label, RE::BGSVolumetricLighting* lighting)
+{
+	using MCM = MCM::Settings;
+
+	static float minContribution =
+		MCM::GetOrDefault_s("Volumetric Lighting", "fMinContribution", 0.0f);
+	static float maxContribution =
+		MCM::GetOrDefault_s("Volumetric Lighting", "fMaxContribution", 1.0f);
+	static float maxIntensity = MCM::GetOrDefault_s("Volumetric Lighting", "fMaxIntensity", 30.0f);
+	static float maxDensity   = MCM::GetOrDefault_s("Volumetric Lighting", "fMaxDensity", 10000.0f);
+	static float maxFallingSpeed =
+		MCM::GetOrDefault_s("Volumetric Lighting", "fMaxFallingSpeed", 100.0f);
+	static float minFallingSpeed =
+		MCM::GetOrDefault_s("Volumetric Lighting", "fMinFallingSpeed", 0.0f);
+	static float minWindSpeed = MCM::GetOrDefault_s("Volumetric Lighting", "fMinWindSpeed", 0.0f);
+	static float maxWindSpeed = MCM::GetOrDefault_s("Volumetric Lighting", "fMaxWindSpeed", 100.0f);
+
+	static float minScattering =
+		MCM::GetOrDefault_s("Volumetric Lighting", "fMinScattering", -1.0f);
+	static float maxScattering = MCM::GetOrDefault_s("Volumetric Lighting", "fMaxScattering", 1.0f);
+
+	static float minRangeFactor =
+		MCM::GetOrDefault_s("Volumetric Lighting", "fMinRangeFactor", 0.0f);
+	static float maxRangeFactor =
+		MCM::GetOrDefault_s("Volumetric Lighting", "fMaxRangeFactor", 80.0f);
+
+	if (!lighting)
+		return;
+
+	ImGui::PushID(label);
+	if (ImGui::CollapsingHeader(label))
+	{
+		ColorEditor4<false>("Custom Color", lighting);
+		ImGui::SliderAutoFill("Custom Color Intensity", &lighting->intensity, 0.0f, maxIntensity);
+		ImGui::SliderAutoFill(
+			"Custom Color Contribution",
+			&lighting->customColor.contribution,
+			minContribution,
+			maxContribution);
+
+		ImGui::SliderAutoFill(
+			"Density Contribution",
+			&lighting->density.contribution,
+			minContribution,
+			maxContribution);
+		ImGui::SliderAutoFill(
+			"Density Size",
+			&lighting->density.size,
+			0.0f,
+			maxDensity,
+			nullptr,
+			ImGuiSliderFlags_Logarithmic);
+
+		ImGui::SliderAutoFill(
+			"Wind Speed",
+			&lighting->density.windSpeed,
+			minWindSpeed,
+			maxWindSpeed);
+
+		ImGui::SliderAutoFill(
+			"Falling Speed",
+			&lighting->density.fallingSpeed,
+			minFallingSpeed,
+			maxFallingSpeed);
+
+		ImGui::SliderAutoFill(
+			"Phase Function Contribution",
+			&lighting->phaseFunction.contribution,
+			minContribution,
+			maxContribution);
+
+		ImGui::SliderAutoFill(
+			"Phase Function Scattering",
+			&lighting->phaseFunction.scattering,
+			minScattering,
+			maxScattering);
+
+		ImGui::SliderAutoFill(
+			"Sampling Repartition Range Factor",
+			&lighting->samplingRepartition.rangeFactor,
+			minRangeFactor,
+			maxRangeFactor);
+	}
+	ImGui::PopID();
 }
 
 void Environment::DrawColorDataEditor(
@@ -256,21 +352,6 @@ void TESFormComboBox(
 	ImGui::PopItemWidth();
 }
 
-template <typename T, typename U, typename K>
-bool EnumSetCheckbox(const char* label, REX::EnumSet<T, U>* enumSet, K keys)
-{
-	bool enabled = enumSet ? enumSet->all(keys) : false;
-	if (ImGui::Checkbox(label, &enabled))
-	{
-		if (enabled && enumSet)
-			enumSet->set(keys);
-		else if (enumSet)
-			enumSet->reset(keys);
-		return true;
-	}
-	return false;
-}
-
 void Environment::DrawLightingTemplateControl()
 {
 	const auto* player = RE::PlayerCharacter::GetSingleton();
@@ -331,7 +412,7 @@ void Environment::DrawWeatherControl()
 		{
 			ImGui::SliderAutoFill(
 				"Wind Speed",
-				&currentWeather->GetData().windSpeed,
+				&currentWeather->base->data.windSpeed,
 				std::numeric_limits<uint8_t>::min(),
 				std::numeric_limits<uint8_t>::max());
 		}
@@ -375,38 +456,86 @@ void Environment::DrawWeatherControl()
 	{
 		logger::warn("Could not find sun or sun directional light");
 	}
+
+	if (ImGui::BeginPanel("##VolumetricLighting") && currentWeather != weathers.end())
+	{
+		using ColorTimes = RE::TESWeather::ColorTimes;
+
+		auto* weather = currentWeather->base;
+
+		ImGui::Text("Volumetric Lighting");
+
+		if (weather)
+		{
+			VolumetricLightingEditor("Day", weather->volumetricLighting[ColorTimes::kDay]);
+			VolumetricLightingEditor("Night", weather->volumetricLighting[ColorTimes::kNight]);
+			VolumetricLightingEditor("Sunrise", weather->volumetricLighting[ColorTimes::kSunrise]);
+			VolumetricLightingEditor("Sunset", weather->volumetricLighting[ColorTimes::kSunset]);
+		}
+	}
+	ImGui::EndPanel();
 }
 
 Environment::WeatherItem::WeatherItem(RE::TESWeather* weather) :
 	BaseFormItem<RE::TESWeather>(weather), originalData(weather->data)
 {
 	memcpy(oldColorData, weather->colorData, sizeof(oldColorData));
+	for (size_t i = 0; i < RE::TESWeather::ColorTimes::kTotal; i++)
+	{
+		// volumetric lighting render data is POD
+		if (weather->volumetricLighting[i])
+		{
+			originalVolumetricLightingData[i] =
+				static_cast<RE::BSVolumetricLightingRenderData>(*weather->volumetricLighting[i]);
+			hasVolumetricLightingData[i] = true;
+		}
+		else
+		{
+			memset(
+				&originalVolumetricLightingData[i],
+				0,
+				sizeof(originalVolumetricLightingData[i]));
+			hasVolumetricLightingData[i] = false;
+		}
+	}
+}
+
+static void CopyVolumetricLightingRenderData(
+	RE::BGSVolumetricLighting*                dst,
+	const RE::BSVolumetricLightingRenderData& src)
+{
+	dst->red                 = src.red;
+	dst->green               = src.green;
+	dst->blue                = src.blue;
+	dst->density             = src.density;
+	dst->intensity           = src.intensity;
+	dst->customColor         = src.customColor;
+	dst->phaseFunction       = src.phaseFunction;
+	dst->samplingRepartition = src.samplingRepartition;
 }
 
 void Environment::WeatherItem::RestoreOriginalData()
 {
 	base->data = originalData;
 	memcpy(base->colorData, oldColorData, sizeof(oldColorData));
+	for (size_t i = 0; i < RE::TESWeather::ColorTimes::kTotal; i++)
+	{
+		if (hasVolumetricLightingData[i])
+		{
+			CopyVolumetricLightingRenderData(
+				base->volumetricLighting[i],
+				originalVolumetricLightingData[i]);
+		}
+	}
 }
-
-inline RE::TESWeather::Data& Environment::WeatherItem::GetData() { return base->data; }
 
 Environment::LightingTemplateItem::LightingTemplateItem(RE::BGSLightingTemplate* lightingTemplate) :
-	BaseFormItem<RE::BGSLightingTemplate>(lightingTemplate)
-{
-	assert(lightingTemplate);
-	memcpy(&originalData, &lightingTemplate->data, sizeof(lightingTemplate->data));
-	memcpy(
-		&originalDirectionalAmbientLightingColors,
-		&lightingTemplate->directionalAmbientLightingColors,
-		sizeof(lightingTemplate->directionalAmbientLightingColors));
-}
+	BaseFormItem<RE::BGSLightingTemplate>(lightingTemplate), originalData(lightingTemplate->data),
+	originalDirectionalAmbientLightingColors(lightingTemplate->directionalAmbientLightingColors)
+{}
 
 void Environment::LightingTemplateItem::RestoreOriginalData()
 {
-	memcpy(&base->data, &originalData, sizeof(originalData));
-	memcpy(
-		&base->directionalAmbientLightingColors,
-		&originalDirectionalAmbientLightingColors,
-		sizeof(originalDirectionalAmbientLightingColors));
+	base->data                             = originalData;
+	base->directionalAmbientLightingColors = originalDirectionalAmbientLightingColors;
 }

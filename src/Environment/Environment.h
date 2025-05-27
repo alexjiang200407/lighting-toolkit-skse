@@ -52,14 +52,14 @@ private:
 
 		using BaseFormItem<RE::TESWeather>::operator==;
 
-		RE::TESWeather::Data originalData;
-		RE::Color            oldColorData[ColorTypes::kTotal][ColorTime::kTotal];
+		RE::TESWeather::Data               originalData;
+		RE::Color                          oldColorData[ColorTypes::kTotal][ColorTime::kTotal];
+		RE::BSVolumetricLightingRenderData originalVolumetricLightingData[ColorTime::kTotal];
+		bool                               hasVolumetricLightingData[ColorTime::kTotal];
 
 		WeatherItem(RE::TESWeather* weather);
 
-		void                  RestoreOriginalData();
-		RE::TESWeather::Data& GetData();
-
+		void                                       RestoreOriginalData();
 		typedef std::vector<WeatherItem>::iterator iterator;
 	};
 
