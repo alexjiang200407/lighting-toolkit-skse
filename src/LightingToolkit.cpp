@@ -43,12 +43,20 @@ void LightingToolkit::DoFrame()
 		menuState.swap(newState);
 	}
 
-	if (firstRender && !ImGui::ImGuiRenderer::GetSingleton()->HasPreexistingIni())
+	if (const auto* renderer = RE::BSGraphics::Renderer::GetSingleton())
 	{
-		const auto& io = ImGui::GetIO();
-		ImGui::SetNextWindowSize({ io.DisplaySize.x * 0.35f, io.DisplaySize.y * 0.97f });
+		auto screenSize = renderer->GetScreenSize();
+
+		// Default menu height and width
+		ImGui::SetNextWindowSize(
+			{ screenSize.width * 0.35f, screenSize.height * 0.97f },
+			ImGuiCond_FirstUseEver);
 	}
-	firstRender = false;
+	else
+	{
+		SPDLOG_LOG_ONCE(warn, "Could not find renderer");
+	}
+
 	menuState->DoFrame(this);
 
 	sceneLighting.EndFrame();

@@ -129,14 +129,11 @@ void SceneLight::MoveToCameraLookingAt(bool resetOffset)
 	auto cameraNI   = reinterpret_cast<RE::NiCamera*>(
         (cameraNode->children.size() == 0) ? nullptr : cameraNode->children[0].get());
 
-	if (cameraNI)
+	if (auto* player = RE::PlayerCharacter::GetSingleton(); cameraNI && player)
 	{
 		bool doReset = GetCellID() != RE::PlayerCharacter::GetSingleton()->GetParentCell()->formID;
-		ref->MoveTo(RE::PlayerCharacter::GetSingleton());
+		ref->MoveTo(player->AsReference());
 		MoveTo(GetCameraPosition() + (cameraNI->world.rotate * cameraOffset));
-
-		assert(RE::PlayerCharacter::GetSingleton());
-		assert(RE::PlayerCharacter::GetSingleton()->GetParentCell());
 
 		if (doReset)
 		{

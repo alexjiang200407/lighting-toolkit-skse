@@ -49,7 +49,6 @@ private:
 	void               HandleToolMenuOpen();
 
 private:
-	bool                               firstRender = true;
 	SceneLighting                      sceneLighting;
 	Environment                        environment;
 	std::unique_ptr<MenuState>         menuState{ nullptr };
