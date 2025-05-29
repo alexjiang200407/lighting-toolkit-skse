@@ -26,6 +26,7 @@ private:
 public:
 	void                    Init();
 	void                    OnDataLoaded();
+	void                    OnPostLoad();
 	void                    OnSavePostLoaded();
 	void                    DoFrame();
 	ImGuiStyle              Style();

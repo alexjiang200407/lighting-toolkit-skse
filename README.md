@@ -15,8 +15,6 @@ Lighting Toolkit is an SKSE plugin that lets players place dynamic, shadow-casti
 * Change weather while in menu.
 * Change Sun color, intensity and position
 * Modify volumetric lighting
-* Attach Lights to objects
-* Saved attached lights as presets, to reuse on other objects.
 * Script free! (Except for SkyUI Mod Configuration).
 * Install and uninstall anytime.
 
@@ -26,6 +24,8 @@ Lighting Toolkit is an SKSE plugin that lets players place dynamic, shadow-casti
 * Modify existing lights
 * Additional languages
 * MFG?
+* Attach Lights to objects
+* Saved attached lights as presets, to reuse on other objects.
 
 ## Runtime Requirements
 

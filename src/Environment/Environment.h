@@ -17,11 +17,10 @@ private:
 		ASSERT_BASE(T, RE::TESForm);
 
 		T*          base;
-		std::string weatherDisplayName;
+		std::string displayName;
 
 		BaseFormItem(T* item) :
-			base(item),
-			weatherDisplayName(fmt::format("{}##{}", GetEditorID(item), item->formID)){};
+			base(item), displayName(fmt::format("{}##{}", GetEditorID(item), item->formID)){};
 
 		template <typename U, typename F>
 		static void GetAllFormsOfType(std::vector<U>& allForms, F create)
@@ -37,7 +36,7 @@ private:
 
 			std::sort(allForms.begin(), allForms.end());
 		}
-		const char* GetName() const { return weatherDisplayName.c_str(); };
+		const char* GetName() const { return displayName.c_str(); };
 
 		bool operator<(const BaseFormItem<T>& rhs) const { return base->formID < rhs.base->formID; }
 		bool operator==(const T* rhs) const { return base->formID == rhs->formID; }
@@ -52,27 +51,26 @@ private:
 
 		using BaseFormItem<RE::TESWeather>::operator==;
 
-		RE::TESWeather::Data               originalData;
-		RE::Color                          oldColorData[ColorTypes::kTotal][ColorTime::kTotal];
-		RE::BSVolumetricLightingRenderData originalVolumetricLightingData[ColorTime::kTotal];
-		bool                               hasVolumetricLightingData[ColorTime::kTotal];
+		RE::TESWeather::Data       originalData;
+		RE::Color                  oldColorData[ColorTypes::kTotal][ColorTime::kTotal];
+		RE::BGSVolumetricLighting* originalVolumetricLighting[ColorTime::kTotal];
 
 		WeatherItem(RE::TESWeather* weather);
 
-		void                                       RestoreOriginalData();
+		void                                       RestoreOriginalData(Environment& environment);
 		typedef std::vector<WeatherItem>::iterator iterator;
 	};
 
-	struct LightingTemplateItem : public BaseFormItem<RE::BGSLightingTemplate>
+	struct VolumetricLightingItem : public BaseFormItem<RE::BGSVolumetricLighting>
 	{
-		LightingTemplateItem(RE::BGSLightingTemplate* lightingTemplate);
-		using BaseFormItem<RE::BGSLightingTemplate>::operator==;
-		void RestoreOriginalData();
+		using ColorTime = RE::TESWeather::ColorTime;
 
-		RE::INTERIOR_DATA                       originalData;
-		RE::BGSDirectionalAmbientLightingColors originalDirectionalAmbientLightingColors;
+		VolumetricLightingItem(RE::BGSVolumetricLighting* volumetricLighting);
 
-		typedef std::vector<LightingTemplateItem>::iterator iterator;
+		void RestoreOriginal();
+
+		RE::BSVolumetricLightingRenderData                    originalVolumetricLightingData;
+		typedef std::vector<VolumetricLightingItem>::iterator iterator;
 	};
 
 private:
@@ -80,6 +78,9 @@ private:
 	std::vector<U>::iterator FindCurrent(T* current, std::vector<U>& all)
 	{
 		ASSERT_BASE(U, Environment::BaseFormItem<T>);
+
+		if (!current)
+			return all.end();
 
 		auto it = std::lower_bound(all.begin(), all.end(), current, [](const U& lhs, const T* rhs) {
 			return lhs.base->formID < rhs->formID;
@@ -92,18 +93,18 @@ private:
 		return all.end();
 	}
 
+	void DrawVolumetricLightingEditor(const char* label, RE::BGSVolumetricLighting*& lighting);
 	void DrawWeatherControl();
-	void DrawLightingTemplateControl();
 	void DrawColorDataEditor(const char* label, size_t colorType, WeatherItem currentWeather);
 	void Restore();
-	WeatherItem::iterator          GetCurrentWeather();
-	LightingTemplateItem::iterator GetCurrentLightingTemplate(const RE::TESObjectCELL* cell);
+	WeatherItem::iterator GetCurrentWeather();
+	VolumetricLightingItem::iterator
+		GetCurrentVolumetricLighting(RE::BGSVolumetricLighting* lighting);
 
 private:
-	float                             initialSunExtreme[2] = { 0.0f, 0.0f };
-	float                             initialSunIntensity;
-	std::vector<WeatherItem>          weathers;
-	std::vector<LightingTemplateItem> lightingTemplates;
-	std::optional<WeatherItem>        originalWeather;
-	RE::BGSLightingTemplate*          originalLightingTemplate = nullptr;
+	float                               initialSunExtreme[2] = { 0.0f, 0.0f };
+	float                               initialSunIntensity;
+	std::vector<WeatherItem>            weathers;
+	std::vector<VolumetricLightingItem> volumetricLighting;
+	std::optional<WeatherItem>          originalWeather;
 };

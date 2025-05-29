@@ -11,7 +11,9 @@ std::string GetEditorID(const RE::TESForm* form)
 		reinterpret_cast<_GetFormEditorID>(GetProcAddress(tweaks, "GetFormEditorID"));
 	if (function)
 	{
-		return function(form->formID);
+		std::string str = function(form->formID);
+		if (!str.empty())
+			return str;
 	}
 	return fmt::format("0x{:X}", form->formID);
 }

@@ -1,303 +1,7 @@
 #include "Environment/Environment.h"
 #include "MCM/Settings.h"
 
-void Environment::OnDataLoaded()
-{
-	BaseFormItem<RE::TESWeather>::GetAllFormsOfType<WeatherItem>(
-		weathers,
-		[](RE::TESWeather* weather) { return WeatherItem{ weather }; });
-
-	BaseFormItem<RE::BGSLightingTemplate>::GetAllFormsOfType<LightingTemplateItem>(
-		lightingTemplates,
-		[](auto* lightingTemplate) { return LightingTemplateItem(lightingTemplate); });
-}
-
-static float* GetSunXExtreme()
-{
-	static auto* sunX = REL::Relocation<float*>{ RELOCATION_ID(502621, 370250) }.get();
-	return sunX;
-}
-
-static float* GetSunYExtreme()
-{
-	static auto* sunY = REL::Relocation<float*>{ RELOCATION_ID(502623, 370253) }.get();
-	return sunY;
-}
-
-[[maybe_unused]] static float* GetSunZExtreme()
-{
-	static auto* sunZ = REL::Relocation<float*>{ RELOCATION_ID(502625, 370256) }.get();
-	return sunZ;
-}
-
-void Environment::DrawWindow()
-{
-	ImGui::PushID("environment");
-	{
-		DrawWeatherControl();
-		DrawLightingTemplateControl();
-		if (ImGui::Button("Reset Environment"))
-		{
-			Restore();
-		}
-	}
-	ImGui::PopID();
-}
-
-void Environment::OnMenuOpened()
-{
-	auto* sky = RE::Sky::GetSingleton();
-
-	initialSunExtreme[0] = *GetSunXExtreme();
-	initialSunExtreme[1] = *GetSunYExtreme();
-
-	if (!sky)
-	{
-		logger::error("Could not find sky");
-		return;
-	}
-
-	if (auto* skyWeather = sky->currentWeather)
-	{
-		originalWeather.emplace(skyWeather);
-	}
-
-	if (auto* sun = sky->sun; sun && sun->light)
-	{
-		initialSunIntensity = sun->light->fade;
-	}
-	else
-	{
-		logger::error("Sun not found");
-	}
-
-	if (auto* cell = RE::PlayerCharacter::GetSingleton()->GetParentCell();
-	    cell && cell->IsInteriorCell())
-	{
-		originalLightingTemplate = cell->lightingTemplate;
-	}
-}
-
-void Environment::OnMenuClosed()
-{
-	Restore();
-	originalWeather.reset();
-	originalLightingTemplate = nullptr;
-}
-
-template <bool HAS_ALPHA = true, typename T>
-static bool ColorEditor4(const char* label, T* color, ImGuiColorEditFlags flags = 0)
-{
-	float colors[4];
-
-	if (color)
-	{
-		colors[0] = color->red / 255.0f;
-		colors[1] = color->green / 255.0f;
-		colors[2] = color->blue / 255.0f;
-
-		if constexpr (HAS_ALPHA)
-			colors[3] = color->alpha / 255.0f;
-		else
-			colors[3] = 0.0f;
-	}
-	else
-	{
-		std::fill(colors, colors + sizeof(colors) / sizeof(float), 0.0f);
-	}
-
-	ImGui::PushFullItemWidth(label);
-	bool retVal;
-	if constexpr (HAS_ALPHA)
-		retVal = ImGui::ColorEdit4(label, colors, flags);
-	else
-		retVal = ImGui::ColorEdit3(label, colors, flags);
-	ImGui::PopItemWidth();
-
-	if (color)
-	{
-		color->red   = static_cast<uint8_t>(std::clamp(colors[0] * 255.0f, 0.0f, 255.0f));
-		color->green = static_cast<uint8_t>(std::clamp(colors[1] * 255.0f, 0.0f, 255.0f));
-		color->blue  = static_cast<uint8_t>(std::clamp(colors[2] * 255.0f, 0.0f, 255.0f));
-
-		if constexpr (HAS_ALPHA)
-			color->alpha = static_cast<uint8_t>(std::clamp(colors[3] * 255.0f, 0.0f, 255.0f));
-	}
-	return retVal;
-}
-
-static void VolumetricLightingEditor(const char* label, RE::BGSVolumetricLighting* lighting)
-{
-	using MCM = MCM::Settings;
-
-	static float minContribution =
-		MCM::GetOrDefault_s("Volumetric Lighting", "fMinContribution", 0.0f);
-	static float maxContribution =
-		MCM::GetOrDefault_s("Volumetric Lighting", "fMaxContribution", 1.0f);
-	static float maxIntensity = MCM::GetOrDefault_s("Volumetric Lighting", "fMaxIntensity", 30.0f);
-	static float maxDensity   = MCM::GetOrDefault_s("Volumetric Lighting", "fMaxDensity", 10000.0f);
-	static float maxFallingSpeed =
-		MCM::GetOrDefault_s("Volumetric Lighting", "fMaxFallingSpeed", 100.0f);
-	static float minFallingSpeed =
-		MCM::GetOrDefault_s("Volumetric Lighting", "fMinFallingSpeed", 0.0f);
-	static float minWindSpeed = MCM::GetOrDefault_s("Volumetric Lighting", "fMinWindSpeed", 0.0f);
-	static float maxWindSpeed = MCM::GetOrDefault_s("Volumetric Lighting", "fMaxWindSpeed", 100.0f);
-
-	static float minScattering =
-		MCM::GetOrDefault_s("Volumetric Lighting", "fMinScattering", -1.0f);
-	static float maxScattering = MCM::GetOrDefault_s("Volumetric Lighting", "fMaxScattering", 1.0f);
-
-	static float minRangeFactor =
-		MCM::GetOrDefault_s("Volumetric Lighting", "fMinRangeFactor", 0.0f);
-	static float maxRangeFactor =
-		MCM::GetOrDefault_s("Volumetric Lighting", "fMaxRangeFactor", 80.0f);
-
-	if (!lighting)
-		return;
-
-	ImGui::PushID(label);
-	if (ImGui::CollapsingHeader(label))
-	{
-		ColorEditor4<false>("Custom Color", lighting);
-		ImGui::SliderAutoFill("Custom Color Intensity", &lighting->intensity, 0.0f, maxIntensity);
-		ImGui::SliderAutoFill(
-			"Custom Color Contribution",
-			&lighting->customColor.contribution,
-			minContribution,
-			maxContribution);
-
-		ImGui::SliderAutoFill(
-			"Density Contribution",
-			&lighting->density.contribution,
-			minContribution,
-			maxContribution);
-		ImGui::SliderAutoFill(
-			"Density Size",
-			&lighting->density.size,
-			0.0f,
-			maxDensity,
-			nullptr,
-			ImGuiSliderFlags_Logarithmic);
-
-		ImGui::SliderAutoFill(
-			"Wind Speed",
-			&lighting->density.windSpeed,
-			minWindSpeed,
-			maxWindSpeed);
-
-		ImGui::SliderAutoFill(
-			"Falling Speed",
-			&lighting->density.fallingSpeed,
-			minFallingSpeed,
-			maxFallingSpeed);
-
-		ImGui::SliderAutoFill(
-			"Phase Function Contribution",
-			&lighting->phaseFunction.contribution,
-			minContribution,
-			maxContribution);
-
-		ImGui::SliderAutoFill(
-			"Phase Function Scattering",
-			&lighting->phaseFunction.scattering,
-			minScattering,
-			maxScattering);
-
-		ImGui::SliderAutoFill(
-			"Sampling Repartition Range Factor",
-			&lighting->samplingRepartition.rangeFactor,
-			minRangeFactor,
-			maxRangeFactor);
-	}
-	ImGui::PopID();
-}
-
-void Environment::DrawColorDataEditor(
-	const char* label,
-	size_t      colorType,
-	WeatherItem currentWeather)
-{
-	assert(currentWeather.base);
-
-	using ColorTimes = RE::TESWeather::ColorTimes;
-
-	ImGui::PushID(label);
-	if (ImGui::CollapsingHeader(label))
-	{
-		ColorEditor4("Day", &currentWeather.base->colorData[colorType][ColorTimes::kDay]);
-		ColorEditor4("Night", &currentWeather.base->colorData[colorType][ColorTimes::kNight]);
-		ColorEditor4("Sunrise", &currentWeather.base->colorData[colorType][ColorTimes::kSunrise]);
-		ColorEditor4("Sunset", &currentWeather.base->colorData[colorType][ColorTimes::kSunset]);
-	}
-	ImGui::PopID();
-}
-
-void Environment::Restore()
-{
-	*GetSunXExtreme() = initialSunExtreme[0];
-	*GetSunYExtreme() = initialSunExtreme[1];
-
-	if (auto currentWeather = GetCurrentWeather(); currentWeather != weathers.end())
-	{
-		currentWeather->RestoreOriginalData();
-	}
-
-	auto* sky = RE::Sky::GetSingleton();
-
-	if (!sky)
-	{
-		logger::error("Could not get Sky");
-		return;
-	}
-
-	if (auto* sun = sky->sun; sun && sun->light)
-		sun->light->fade = initialSunIntensity;
-	else
-		logger::error("Could not get Sun or Sun directional light");
-
-	auto* cell = RE::PlayerCharacter::GetSingleton()->parentCell;
-
-	if (originalWeather)
-	{
-		if (auto* taskQueueInterface = RE::TaskQueueInterface::GetSingleton())
-			taskQueueInterface->QueueForceWeather(originalWeather->base, true);
-		else
-			logger::error("Could not get task queue interface to force weather");
-	}
-
-	if (cell)
-	{
-		auto currentLightingTemplate = GetCurrentLightingTemplate(cell);
-		if (currentLightingTemplate != lightingTemplates.end())
-			currentLightingTemplate->RestoreOriginalData();
-	}
-
-	if (originalLightingTemplate && cell)
-	{
-		cell->lightingTemplate = originalLightingTemplate;
-	}
-}
-
-Environment::WeatherItem::iterator Environment::GetCurrentWeather()
-{
-	if (auto* sky = RE::Sky::GetSingleton(); sky && sky->currentWeather)
-	{
-		return FindCurrent(sky->currentWeather, weathers);
-	}
-
-	return weathers.end();
-}
-
-Environment::LightingTemplateItem::iterator
-	Environment::GetCurrentLightingTemplate(const RE::TESObjectCELL* cell)
-{
-	if (!cell || !cell->lightingTemplate)
-		return lightingTemplates.end();
-
-	return FindCurrent(cell->lightingTemplate, lightingTemplates);
-}
-
-template <typename T, bool HAS_NONE = false, typename It>
+template <typename T, bool HAS_NONE = false, typename It = std::vector<T>::iterator>
 void TESFormComboBox(
 	const char*                     label,
 	It&                             current,
@@ -352,34 +56,373 @@ void TESFormComboBox(
 	ImGui::PopItemWidth();
 }
 
-void Environment::DrawLightingTemplateControl()
+void Environment::OnDataLoaded()
 {
-	const auto* player = RE::PlayerCharacter::GetSingleton();
-	auto*       cell   = player->parentCell;
+	BaseFormItem<RE::BGSVolumetricLighting>::GetAllFormsOfType<VolumetricLightingItem>(
+		volumetricLighting,
+		[](RE::BGSVolumetricLighting* volumetricLighting) {
+			return VolumetricLightingItem(volumetricLighting);
+		});
+	BaseFormItem<RE::TESWeather>::GetAllFormsOfType<WeatherItem>(
+		weathers,
+		[](RE::TESWeather* weather) { return WeatherItem{ weather }; });
+}
 
-	if (!cell)
-		return;
+static float* GetSunXExtreme()
+{
+	static auto* sunX = REL::Relocation<float*>{ RELOCATION_ID(502621, 370250) }.get();
+	return sunX;
+}
 
-	if (ImGui::BeginPanel("LightingTemplateEditor"))
+static float* GetSunYExtreme()
+{
+	static auto* sunY = REL::Relocation<float*>{ RELOCATION_ID(502623, 370253) }.get();
+	return sunY;
+}
+
+[[maybe_unused]] static float* GetSunZExtreme()
+{
+	static auto* sunZ = REL::Relocation<float*>{ RELOCATION_ID(502625, 370256) }.get();
+	return sunZ;
+}
+
+void Environment::DrawWindow()
+{
+	ImGui::PushID("environment");
 	{
-		ImGui::BeginDisabled(!cell->IsInteriorCell());
+		DrawWeatherControl();
+		if (ImGui::Button("Reset Environment"))
 		{
-			auto current = GetCurrentLightingTemplate(cell);
-			TESFormComboBox<LightingTemplateItem, true, LightingTemplateItem::iterator>(
-				"Lighting Template",
+			Restore();
+		}
+	}
+	ImGui::PopID();
+}
+
+void Environment::OnMenuOpened()
+{
+	auto* sky = RE::Sky::GetSingleton();
+
+	initialSunExtreme[0] = *GetSunXExtreme();
+	initialSunExtreme[1] = *GetSunYExtreme();
+
+	if (!sky)
+	{
+		logger::error("Could not find sky");
+		return;
+	}
+
+	if (auto* skyWeather = sky->currentWeather)
+	{
+		originalWeather.emplace(skyWeather);
+	}
+
+	if (auto* sun = sky->sun; sun && sun->light)
+	{
+		initialSunIntensity = sun->light->fade;
+	}
+	else
+	{
+		logger::error("Sun not found");
+	}
+}
+
+void Environment::OnMenuClosed()
+{
+	Restore();
+	originalWeather.reset();
+}
+
+template <bool HAS_ALPHA = true, typename T>
+static bool ColorEditor4(const char* label, T* color, ImGuiColorEditFlags flags = 0)
+{
+	using U = decltype(color->red);
+	float colors[4];
+
+	if (color)
+	{
+		if constexpr (std::is_same_v<U, uint8_t>)
+		{
+			colors[0] = color->red / 255.0f;
+			colors[1] = color->green / 255.0f;
+			colors[2] = color->blue / 255.0f;
+			if constexpr (HAS_ALPHA)
+				colors[3] = color->alpha / 255.0f;
+			else
+				colors[3] = 0.0f;
+		}
+		else
+		{
+			colors[0] = static_cast<float>(color->red);
+			colors[1] = static_cast<float>(color->green);
+			colors[2] = static_cast<float>(color->blue);
+			if constexpr (HAS_ALPHA)
+				colors[3] = static_cast<float>(color->alpha);
+			else
+				colors[3] = 0.0f;
+		}
+	}
+	else
+	{
+		std::fill(std::begin(colors), std::end(colors), 0.0f);
+	}
+
+	ImGui::PushFullItemWidth(label);
+	bool retVal;
+	if constexpr (HAS_ALPHA)
+		retVal = ImGui::ColorEdit4(label, colors, flags);
+	else
+		retVal = ImGui::ColorEdit3(label, colors, flags);
+	ImGui::PopItemWidth();
+
+	if (color)
+	{
+		if constexpr (std::is_same_v<U, uint8_t>)
+		{
+			color->red   = static_cast<U>(std::clamp(colors[0] * 255.0f, 0.0f, 255.0f));
+			color->green = static_cast<U>(std::clamp(colors[1] * 255.0f, 0.0f, 255.0f));
+			color->blue  = static_cast<U>(std::clamp(colors[2] * 255.0f, 0.0f, 255.0f));
+			if constexpr (HAS_ALPHA)
+				color->alpha = static_cast<U>(std::clamp(colors[3] * 255.0f, 0.0f, 255.0f));
+		}
+		else
+		{
+			color->red   = static_cast<U>(colors[0]);
+			color->green = static_cast<U>(colors[1]);
+			color->blue  = static_cast<U>(colors[2]);
+			if constexpr (HAS_ALPHA)
+				color->alpha = static_cast<U>(colors[3]);
+		}
+	}
+
+	return retVal;
+}
+
+namespace ImGui
+{
+	template <typename T, typename U, typename F>
+	bool SliderAutoFill(
+		const char*      label,
+		T*               v,
+		F                getter,
+		U                v_min,
+		U                v_max,
+		const char*      format = nullptr,
+		ImGuiSliderFlags flags  = 0)
+	{
+		if (v)
+		{
+			if (U* val = getter(v))
+				return ImGui::SliderAutoFill(label, val, v_min, v_max, format, flags);
+		}
+
+		U dummy = v_min;
+		ImGui::SliderAutoFill(label, &dummy, v_min, v_max, format, flags);
+		return false;
+	}
+}
+
+void Environment::DrawVolumetricLightingEditor(
+	const char*                 label,
+	RE::BGSVolumetricLighting*& lighting)
+{
+	using MCM = MCM::Settings;
+
+	auto current = FindCurrent(lighting, volumetricLighting);
+
+	static float minContribution =
+		MCM::GetOrDefault_s("Volumetric Lighting", "fMinContribution", 0.0f);
+	static float maxContribution =
+		MCM::GetOrDefault_s("Volumetric Lighting", "fMaxContribution", 1.0f);
+	static float maxIntensity = MCM::GetOrDefault_s("Volumetric Lighting", "fMaxIntensity", 30.0f);
+	static float maxDensity   = MCM::GetOrDefault_s("Volumetric Lighting", "fMaxDensity", 10000.0f);
+	static float maxFallingSpeed =
+		MCM::GetOrDefault_s("Volumetric Lighting", "fMaxFallingSpeed", 100.0f);
+	static float minFallingSpeed =
+		MCM::GetOrDefault_s("Volumetric Lighting", "fMinFallingSpeed", 0.0f);
+	static float minWindSpeed = MCM::GetOrDefault_s("Volumetric Lighting", "fMinWindSpeed", 0.0f);
+	static float maxWindSpeed = MCM::GetOrDefault_s("Volumetric Lighting", "fMaxWindSpeed", 100.0f);
+
+	static float minScattering =
+		MCM::GetOrDefault_s("Volumetric Lighting", "fMinScattering", -1.0f);
+	static float maxScattering = MCM::GetOrDefault_s("Volumetric Lighting", "fMaxScattering", 1.0f);
+
+	static float minRangeFactor =
+		MCM::GetOrDefault_s("Volumetric Lighting", "fMinRangeFactor", 0.0f);
+	static float maxRangeFactor =
+		MCM::GetOrDefault_s("Volumetric Lighting", "fMaxRangeFactor", 80.0f);
+
+	ImGui::PushID(label);
+
+	if (ImGui::CollapsingHeader(label))
+	{
+		{
+			using It = VolumetricLightingItem::iterator;
+			TESFormComboBox<VolumetricLightingItem, true, VolumetricLightingItem::iterator>(
+				"Preset",
 				current,
-				lightingTemplates,
-				[cell](auto, auto newLightingTemplate, auto end) {
-					if (newLightingTemplate != end)
+				volumetricLighting,
+				[&](It oldItem, It newItem, It end) {
+					if (newItem != end)
 					{
-						cell->lightingTemplate = newLightingTemplate->base;
+						if (oldItem != end)
+							oldItem->RestoreOriginal();
+						lighting = newItem->base;
+					}
+					else
+					{
+						lighting = nullptr;
 					}
 					return true;
 				});
 		}
+
+		ImGui::BeginDisabled(!lighting);
+		ColorEditor4<false>("Custom Color", lighting);
+		ImGui::SliderAutoFill(
+			"Custom Color Intensity",
+			lighting,
+			[](RE::BGSVolumetricLighting* lighting) { return &lighting->intensity; },
+			0.0f,
+			maxIntensity);
+		ImGui::SliderAutoFill(
+			"Custom Color Contribution",
+			lighting,
+			[](RE::BGSVolumetricLighting* lighting) { return &lighting->customColor.contribution; },
+			minContribution,
+			maxContribution);
+
+		ImGui::SliderAutoFill(
+			"Density Contribution",
+			lighting,
+			[](RE::BGSVolumetricLighting* lighting) { return &lighting->density.contribution; },
+			minContribution,
+			maxContribution);
+
+		ImGui::SliderAutoFill(
+			"Density Size",
+			lighting,
+			[](RE::BGSVolumetricLighting* lighting) { return &lighting->density.size; },
+			0.0f,
+			maxDensity,
+			nullptr,
+			ImGuiSliderFlags_Logarithmic);
+
+		ImGui::SliderAutoFill(
+			"Wind Speed",
+			lighting,
+			[](RE::BGSVolumetricLighting* lighting) { return &lighting->density.windSpeed; },
+			minWindSpeed,
+			maxWindSpeed);
+
+		ImGui::SliderAutoFill(
+			"Falling Speed",
+			lighting,
+			[](RE::BGSVolumetricLighting* lighting) { return &lighting->density.fallingSpeed; },
+			minFallingSpeed,
+			maxFallingSpeed);
+
+		ImGui::SliderAutoFill(
+			"Phase Function Contribution",
+			lighting,
+			[](RE::BGSVolumetricLighting* lighting) {
+				return &lighting->phaseFunction.contribution;
+			},
+			minContribution,
+			maxContribution);
+
+		ImGui::SliderAutoFill(
+			"Phase Function Scattering",
+			lighting,
+			[](RE::BGSVolumetricLighting* lighting) { return &lighting->phaseFunction.scattering; },
+			minScattering,
+			maxScattering);
+
+		ImGui::SliderAutoFill(
+			"Sampling Repartition Range Factor",
+			lighting,
+			[](RE::BGSVolumetricLighting* lighting) {
+				return &lighting->samplingRepartition.rangeFactor;
+			},
+			minRangeFactor,
+			maxRangeFactor);
+
 		ImGui::EndDisabled();
 	}
-	ImGui::EndPanel();
+	ImGui::PopID();
+}
+
+void Environment::DrawColorDataEditor(
+	const char* label,
+	size_t      colorType,
+	WeatherItem currentWeather)
+{
+	assert(currentWeather.base);
+
+	using ColorTimes = RE::TESWeather::ColorTimes;
+
+	ImGui::PushID(label);
+	if (ImGui::CollapsingHeader(label))
+	{
+		ColorEditor4("Day", &currentWeather.base->colorData[colorType][ColorTimes::kDay]);
+		ColorEditor4("Night", &currentWeather.base->colorData[colorType][ColorTimes::kNight]);
+		ColorEditor4("Sunrise", &currentWeather.base->colorData[colorType][ColorTimes::kSunrise]);
+		ColorEditor4("Sunset", &currentWeather.base->colorData[colorType][ColorTimes::kSunset]);
+	}
+	ImGui::PopID();
+}
+
+void Environment::Restore()
+{
+	*GetSunXExtreme() = initialSunExtreme[0];
+	*GetSunYExtreme() = initialSunExtreme[1];
+
+	if (auto currentWeather = GetCurrentWeather(); currentWeather != weathers.end())
+	{
+		currentWeather->RestoreOriginalData(*this);
+	}
+
+	auto* sky = RE::Sky::GetSingleton();
+
+	if (!sky)
+	{
+		logger::error("Could not get Sky");
+		return;
+	}
+
+	if (auto* sun = sky->sun; sun && sun->light)
+		sun->light->fade = initialSunIntensity;
+	else
+		logger::error("Could not get Sun or Sun directional light");
+
+	auto* cell = RE::PlayerCharacter::GetSingleton()->parentCell;
+
+	if (originalWeather)
+	{
+		if (auto* taskQueueInterface = RE::TaskQueueInterface::GetSingleton())
+			taskQueueInterface->QueueForceWeather(originalWeather->base, true);
+		else
+			logger::error("Could not get task queue interface to force weather");
+	}
+}
+
+Environment::WeatherItem::iterator Environment::GetCurrentWeather()
+{
+	if (auto* sky = RE::Sky::GetSingleton(); sky && sky->currentWeather)
+	{
+		return FindCurrent(sky->currentWeather, weathers);
+	}
+
+	return weathers.end();
+}
+
+Environment::VolumetricLightingItem::iterator
+	Environment::GetCurrentVolumetricLighting(RE::BGSVolumetricLighting* lighting)
+{
+	if (!lighting)
+		return volumetricLighting.end();
+
+	return FindCurrent(lighting, volumetricLighting);
 }
 
 void Environment::DrawWeatherControl()
@@ -395,15 +438,13 @@ void Environment::DrawWeatherControl()
 			"Weather",
 			currentWeather,
 			weathers,
-			[](WeatherItem::iterator oldWeather,
-		       WeatherItem::iterator newWeather,
-		       WeatherItem::iterator end) {
+			[this](auto oldWeather, auto newWeather, auto end) {
 				if (auto* taskQueueInterface = RE::TaskQueueInterface::GetSingleton();
 			        taskQueueInterface && newWeather != end)
 				{
 					taskQueueInterface->QueueForceWeather(newWeather->base, true);
 					if (oldWeather != end)
-						oldWeather->RestoreOriginalData();
+						oldWeather->RestoreOriginalData(*this);
 					return true;
 				}
 				return false;
@@ -467,10 +508,14 @@ void Environment::DrawWeatherControl()
 
 		if (weather)
 		{
-			VolumetricLightingEditor("Day", weather->volumetricLighting[ColorTimes::kDay]);
-			VolumetricLightingEditor("Night", weather->volumetricLighting[ColorTimes::kNight]);
-			VolumetricLightingEditor("Sunrise", weather->volumetricLighting[ColorTimes::kSunrise]);
-			VolumetricLightingEditor("Sunset", weather->volumetricLighting[ColorTimes::kSunset]);
+			DrawVolumetricLightingEditor("Day", weather->volumetricLighting[ColorTimes::kDay]);
+			DrawVolumetricLightingEditor("Night", weather->volumetricLighting[ColorTimes::kNight]);
+			DrawVolumetricLightingEditor(
+				"Sunrise",
+				weather->volumetricLighting[ColorTimes::kSunrise]);
+			DrawVolumetricLightingEditor(
+				"Sunset",
+				weather->volumetricLighting[ColorTimes::kSunset]);
 		}
 	}
 	ImGui::EndPanel();
@@ -480,24 +525,10 @@ Environment::WeatherItem::WeatherItem(RE::TESWeather* weather) :
 	BaseFormItem<RE::TESWeather>(weather), originalData(weather->data)
 {
 	memcpy(oldColorData, weather->colorData, sizeof(oldColorData));
-	for (size_t i = 0; i < RE::TESWeather::ColorTimes::kTotal; i++)
-	{
-		// volumetric lighting render data is POD
-		if (weather->volumetricLighting[i])
-		{
-			originalVolumetricLightingData[i] =
-				static_cast<RE::BSVolumetricLightingRenderData>(*weather->volumetricLighting[i]);
-			hasVolumetricLightingData[i] = true;
-		}
-		else
-		{
-			memset(
-				&originalVolumetricLightingData[i],
-				0,
-				sizeof(originalVolumetricLightingData[i]));
-			hasVolumetricLightingData[i] = false;
-		}
-	}
+	memcpy(
+		originalVolumetricLighting,
+		weather->volumetricLighting,
+		sizeof(originalVolumetricLighting));
 }
 
 static void CopyVolumetricLightingRenderData(
@@ -514,28 +545,35 @@ static void CopyVolumetricLightingRenderData(
 	dst->samplingRepartition = src.samplingRepartition;
 }
 
-void Environment::WeatherItem::RestoreOriginalData()
+void Environment::WeatherItem::RestoreOriginalData(Environment& environment)
 {
 	base->data = originalData;
 	memcpy(base->colorData, oldColorData, sizeof(oldColorData));
-	for (size_t i = 0; i < RE::TESWeather::ColorTimes::kTotal; i++)
+
+	for (auto* v : base->volumetricLighting)
 	{
-		if (hasVolumetricLightingData[i])
+		if (auto current = environment.GetCurrentVolumetricLighting(v);
+		    current != environment.volumetricLighting.end())
 		{
-			CopyVolumetricLightingRenderData(
-				base->volumetricLighting[i],
-				originalVolumetricLightingData[i]);
+			current->RestoreOriginal();
 		}
 	}
+
+	memcpy(
+		base->volumetricLighting,
+		originalVolumetricLighting,
+		sizeof(originalVolumetricLighting));
 }
 
-Environment::LightingTemplateItem::LightingTemplateItem(RE::BGSLightingTemplate* lightingTemplate) :
-	BaseFormItem<RE::BGSLightingTemplate>(lightingTemplate), originalData(lightingTemplate->data),
-	originalDirectionalAmbientLightingColors(lightingTemplate->directionalAmbientLightingColors)
-{}
-
-void Environment::LightingTemplateItem::RestoreOriginalData()
+Environment::VolumetricLightingItem::VolumetricLightingItem(
+	RE::BGSVolumetricLighting* volumetricLighting) :
+	BaseFormItem<RE::BGSVolumetricLighting>(volumetricLighting)
 {
-	base->data                             = originalData;
-	base->directionalAmbientLightingColors = originalDirectionalAmbientLightingColors;
+	originalVolumetricLightingData =
+		static_cast<RE::BSVolumetricLightingRenderData>(*volumetricLighting);
+}
+
+void Environment::VolumetricLightingItem::RestoreOriginal()
+{
+	CopyVolumetricLightingRenderData(base, originalVolumetricLightingData);
 }
