@@ -71,6 +71,12 @@ void SceneLighting::DeserializeItems(SKSE::CoSaveIO io, preset::PresetDatabase* 
 void SceneLighting::Revert(SKSE::CoSaveIO)
 {
 	logger::info("Reverting Save");
+
+	for (auto& light : lights)
+	{
+		light.Remove();
+	}
+
 	lights.clear();
 }
 
