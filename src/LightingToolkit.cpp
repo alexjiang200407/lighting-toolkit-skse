@@ -68,11 +68,10 @@ void LightingToolkit::DrawMenu()
 {
 	static const char* labels[] = {
 		"Scene Light",
-		"Character Light",
 		"Camera",
 		"Environment",
 	};
-	static bool enabled[] = { true, true, true, true };
+	static bool enabled[] = { true, true, true };
 	bool        changedTool;
 
 	ImGui::Toolbar(
@@ -92,8 +91,6 @@ void LightingToolkit::DrawMenu()
 	{
 	case Tool::kSceneLight:
 		sceneLighting.DrawWindow(&config);
-		break;
-	case Tool::kCharacterLight:
 		break;
 	case Tool::kCamera:
 		DrawCameraControlWindow();

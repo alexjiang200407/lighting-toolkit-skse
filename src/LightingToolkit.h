@@ -18,7 +18,6 @@ private:
 	enum class Tool : size_t
 	{
 		kSceneLight = 0,
-		kCharacterLight,
 		kCamera,
 		kEnvironment
 	};
@@ -26,7 +25,6 @@ private:
 public:
 	void                    Init();
 	void                    OnDataLoaded();
-	void                    OnPostLoad();
 	void                    OnSavePostLoaded();
 	void                    DoFrame();
 	ImGuiStyle              Style();
