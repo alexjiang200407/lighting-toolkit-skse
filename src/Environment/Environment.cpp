@@ -35,6 +35,12 @@ void TESFormComboBox(
 		}
 	}
 
+	if constexpr (HAS_NONE)
+	{
+		if (currentItem == -1)
+			currentItem = 0;
+	}
+
 	if (ImGui::ComboWithFilter(label, &currentItem, labels, -1))
 	{
 		It newValue;
@@ -198,29 +204,6 @@ static bool ColorEditor4(const char* label, T* color, ImGuiColorEditFlags flags 
 	return retVal;
 }
 
-namespace ImGui
-{
-	template <typename T, typename U, typename F>
-	bool SliderAutoFill(
-		const char*      label,
-		T*               v,
-		F                getter,
-		U                v_min,
-		U                v_max,
-		const char*      format = nullptr,
-		ImGuiSliderFlags flags  = 0)
-	{
-		if (v)
-		{
-			if (U* val = getter(v))
-				return ImGui::SliderAutoFill(label, val, v_min, v_max, format, flags);
-		}
-
-		U dummy = v_min;
-		ImGui::SliderAutoFill(label, &dummy, v_min, v_max, format, flags);
-		return false;
-	}
-}
 
 void Environment::DrawVolumetricLightingEditor(
 	const char*                 label,

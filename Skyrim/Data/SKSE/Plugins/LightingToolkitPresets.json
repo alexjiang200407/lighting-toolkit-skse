@@ -1,7 +1,7 @@
 {
     "1": [
       {
-        "flags": 58,
+        "flags": 59,
         "name": "00 Soft Light",
         "sid": "0449b255-1d84-408b-b483-551d3fe5c524",
         "falloff": 1,
@@ -23,7 +23,7 @@
         "nearDistance": 5
       },
       {
-        "flags": 63,
+        "flags": 39,
         "name": "02 Back Lighting (Shadow)",
         "sid": "cd787520-e83a-43ce-b8bf-31f3c1d84f4c",
         "falloff": 1,

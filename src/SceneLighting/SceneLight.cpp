@@ -96,7 +96,7 @@ void SceneLight::DrawControlPanel()
 			if (auto* model = ref->Get3D();
 			    ImGui::ConditionalCheckbox("Hide Marker", model, &hideMarker))
 			{
-				model->GetObjectByName("Marker")->SetAppCulled(hideMarker);
+				HideGeom();
 			}
 		}
 		ImGui::EndPanel();
@@ -295,7 +295,7 @@ RE::BSFadeNode* SceneLight::Attach3D()
 		niLight->SetAppCulled(true);
 
 	if (hideMarker)
-		niRoot->GetObjectByName("Marker")->SetAppCulled(true);
+		HideGeom();
 
 	return niRoot;
 }
@@ -367,6 +367,21 @@ void SceneLight::Serialize(SKSE::CoSaveIO io) const
 	colorPalette.Serialize(io);
 	io.Write(lightCreateParams);
 	io.Write(ref->GetFormID());
+}
+
+void SceneLight::HideGeom(RE::NiAVObject* model)
+{
+	if (!model)
+		return;
+
+	if (auto* marker = model->GetObjectByName("LightingToolkitMarkerGeom"))
+		marker->SetAppCulled(hideMarker);
+}
+
+void SceneLight::HideGeom()
+{
+	if (ref)
+		HideGeom(ref->Get3D());
 }
 
 RE::NiPoint3 SceneLight::GetCameraPosition()

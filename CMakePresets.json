@@ -15,8 +15,7 @@
         "CMAKE_CXX_FLAGS_RELEASE": "/Zi", // Enable debugging symbols for Release
         "CMAKE_C_FLAGS_RELEASE": "/Zi", // Enable debugging symbols for C files
         "CMAKE_EXE_LINKER_FLAGS_RELEASE": "/DEBUG /OPT:REF /OPT:ICF", // Linker flags for .pdb
-        "CMAKE_SHARED_LINKER_FLAGS_RELEASE": "/DEBUG /OPT:REF /OPT:ICF",
-        "STRIPPED_PDB": false
+        "CMAKE_SHARED_LINKER_FLAGS_RELEASE": "/DEBUG /OPT:REF /OPT:ICF"
       },
       "errors": {
         "deprecated": true
@@ -73,59 +72,92 @@
       "name": "release",
       "cacheVariables": {
         "STRIPPED_PDB": true
-      }
+      },
+      "hidden": true
     },
     {
-      "name": "vs2022-windows-vcpkg-se",
+      "name": "debug",
+      "cacheVariables": {
+        "STRIPPED_PDB": false
+      },
+      "hidden": true
+    },
+    {
+      "name": "vs2022-windows-vcpkg-se-base",
       "inherits": [
         "cmake-dev",
         "vcpkg",
         "windows",
         "vs2022",
         "se"
-      ]
+      ],
+      "hidden": true
     },
     {
-      "name": "vs2022-windows-vcpkg-ae",
+      "name": "vs2022-windows-vcpkg-ae-base",
       "inherits": [
         "cmake-dev",
         "vcpkg",
         "windows",
         "vs2022",
         "ae"
-      ]
+      ],
+      "hidden": true
     },
     {
-      "name": "vs2022-windows-vcpkg-vr",
+      "name": "vs2022-windows-vcpkg-vr-base",
       "inherits": [
         "cmake-dev",
         "vcpkg",
         "windows",
         "vs2022",
         "vr"
-      ]
+      ],
+      "hidden": true
     },
     {
       "name": "vs2022-windows-vcpkg-se-release",
       "inherits": [
-        "vs2022-windows-vcpkg-se",
+        "vs2022-windows-vcpkg-se-base",
         "release"
       ]
     },
     {
       "name": "vs2022-windows-vcpkg-ae-release",
       "inherits": [
-        "vs2022-windows-vcpkg-ae",
+        "vs2022-windows-vcpkg-ae-base",
         "release"
       ]
     },
     {
       "name": "vs2022-windows-vcpkg-vr-release",
       "inherits": [
-        "vs2022-windows-vcpkg-vr",
+        "vs2022-windows-vcpkg-vr-base",
         "release"
       ]
+    },
+    {
+      "name": "vs2022-windows-vcpkg-se",
+      "inherits": [
+        "vs2022-windows-vcpkg-se-base",
+        "debug"
+      ]
+    },
+    {
+      "name": "vs2022-windows-vcpkg-ae",
+      "inherits": [
+        "vs2022-windows-vcpkg-ae-base",
+        "debug"
+      ]
+    },
+    {
+      "name": "vs2022-windows-vcpkg-vr",
+      "inherits": [
+        "vs2022-windows-vcpkg-vr-base",
+        "debug"
+      ]
     }
+
   ],
   "buildPresets": [
     {

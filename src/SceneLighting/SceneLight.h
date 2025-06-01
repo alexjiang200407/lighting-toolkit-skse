@@ -38,25 +38,28 @@ public:
 		bool                                     hideMarker = false);
 
 public:
-	bool                    DrawTabItem(bool& active);
-	void                    UpdateLightColor();
-	void                    UpdateLightTemplate();
-	virtual void            DrawControlPanel();
-	void                    Remove();
-	virtual void            MoveToCameraLookingAt(bool resetOffset = false);
-	virtual void            MoveTo(RE::NiPoint3 newPos);
-	void                    MoveToCurrentPosition();
-	virtual void            OnEnterCell();
-	RE::FormID              GetCellID() const;
-	void                    Rotate(float delta);
-	virtual void            Rotate(RE::NiMatrix3 rotation);
-	static RE::NiPoint3     GetCameraLookingAt(float distanceFromCamera);
-	virtual RE::BSFadeNode* Attach3D();
-	virtual void            Init3D();
+	bool                DrawTabItem(bool& active);
+	void                UpdateLightColor();
+	void                UpdateLightTemplate();
+	void                DrawControlPanel();
+	void                Remove();
+	void                MoveToCameraLookingAt(bool resetOffset = false);
+	void                MoveTo(RE::NiPoint3 newPos);
+	void                MoveToCurrentPosition();
+	void                OnEnterCell();
+	RE::FormID          GetCellID() const;
+	void                Rotate(float delta);
+	void                Rotate(RE::NiMatrix3 rotation);
+	static RE::NiPoint3 GetCameraLookingAt(float distanceFromCamera);
+	RE::BSFadeNode*     Attach3D();
+	void                Init3D();
+
 	static std::optional<SceneLight>
 		 Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB);
 	void DrawCameraOffsetSlider();
 	void Serialize(SKSE::CoSaveIO io) const;
+	void HideGeom(RE::NiAVObject* niAvObj);
+	void HideGeom();
 
 private:
 	static RE::NiPoint3 GetCameraPosition();
