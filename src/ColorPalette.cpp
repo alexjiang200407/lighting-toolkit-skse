@@ -48,7 +48,7 @@ preset::Color ColorPalette::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabas
 	return preset::Color(buf.get(), color, true);
 }
 
-bool DrawColorEditor(preset::Color& color, preset::PresetDatabase* presetDB);
+bool DrawColorEditor(preset::Color& color);
 
 bool ColorPalette::DrawEditor()
 {
@@ -71,14 +71,14 @@ bool ColorPalette::DrawEditor()
 	case ColorSelectionMode::kPreset:
 		return presetSelector.DrawValueEditor() || changedMode;
 	case ColorSelectionMode::kCustom:
-		return DrawColorEditor(editorColor, presetDB) || changedMode;
+		return DrawColorEditor(editorColor) || changedMode;
 	default:
 		logger::error("Invalid Color Selection Mode");
 		return false;
 	}
 }
 
-bool DrawColorEditor(preset::Color& color, preset::PresetDatabase* presetDB)
+bool DrawColorEditor(preset::Color& color)
 {
 	float rgb[3]  = { color.red, color.green, color.blue };
 	bool  changed = false;

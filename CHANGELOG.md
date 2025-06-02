@@ -5,4 +5,3 @@
 * Volumetric Lighting Editor
 * Fixed the menu size bug?
 * Moved camera options to new tab
-* Back lighting now ignores land

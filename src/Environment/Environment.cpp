@@ -96,11 +96,16 @@ void Environment::DrawWindow()
 {
 	ImGui::PushID("environment");
 	{
+		const auto* cell       = RE::PlayerCharacter::GetSingleton()->parentCell;
+		bool        isDisabled = !cell || cell->IsInteriorCell();
+
+		ImGui::BeginDisabled(isDisabled);
 		DrawWeatherControl();
 		if (ImGui::Button("Reset Environment"))
 		{
 			Restore();
 		}
+		ImGui::EndDisabled();
 	}
 	ImGui::PopID();
 }
@@ -203,7 +208,6 @@ static bool ColorEditor4(const char* label, T* color, ImGuiColorEditFlags flags 
 
 	return retVal;
 }
-
 
 void Environment::DrawVolumetricLightingEditor(
 	const char*                 label,
@@ -377,8 +381,6 @@ void Environment::Restore()
 		sun->light->fade = initialSunIntensity;
 	else
 		logger::error("Could not get Sun or Sun directional light");
-
-	auto* cell = RE::PlayerCharacter::GetSingleton()->parentCell;
 
 	if (originalWeather)
 	{

@@ -78,6 +78,7 @@ void ImGui::Toolbar(
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(paddingX, paddingY));
 
+	ImGui::PushID(str_id);
 	for (size_t i = 0; i < len; i++)
 	{
 		ImGui::BeginDisabled(!enabled_items[i]);
@@ -112,7 +113,7 @@ void ImGui::Toolbar(
 		if (i != len - 1)
 			ImGui::SameLine();
 	}
-
+	ImGui::PopID();
 	ImGui::PopStyleVar();
 }
 
@@ -154,7 +155,7 @@ void ImGui::EndPanel() { ImGui::EndChild(); }
 bool ImGui::NiColorEditor(const char* label, RE::NiColor& niColor, ImGuiColorEditFlags flags)
 {
 	float colors[3] = { niColor.red, niColor.green, niColor.blue };
-	bool  retVal    = ImGui::ColorEdit3(label, colors);
+	bool  retVal    = ImGui::ColorEdit3(label, colors, flags);
 	niColor.red     = colors[0];
 	niColor.green   = colors[1];
 	niColor.blue    = colors[2];
