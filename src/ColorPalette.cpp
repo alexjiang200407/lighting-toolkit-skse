@@ -5,7 +5,11 @@ ColorPalette::ColorPalette(preset::PresetDatabase* presetDB) :
 {}
 
 ColorPalette::ColorPalette(preset::PresetDatabase* presetDB, preset::Color color) :
-	presetSelector("Color Preset", presetDB, color), presetDB(presetDB)
+	presetSelector(
+		"Color Preset",
+		presetDB,
+		color.IsCustom() ? std::nullopt : std::optional(color)),
+	presetDB(presetDB), editorColor(color)
 {
 	mode = color.IsCustom() ? ColorSelectionMode::kCustom : ColorSelectionMode::kPreset;
 }
@@ -44,42 +48,21 @@ preset::Color ColorPalette::Deserialize(SKSE::CoSaveIO io, preset::PresetDatabas
 	return preset::Color(buf.get(), color, true);
 }
 
-bool DrawColorEditor(preset::Color& color, preset::PresetDatabase* presetDB);
+bool DrawColorEditor(preset::Color& color);
 
 bool ColorPalette::DrawEditor()
 {
-	bool changedMode = false;
-	if (ImGui::BeginTabBar("Choose Color"))
-	{
-		auto presetTabFlags = (firstRender && mode == ColorSelectionMode::kPreset) ?
-		                          ImGuiTabItemFlags_SetSelected :
-		                          ImGuiTabItemFlags_None;
-		auto customTabFlags = (firstRender && mode == ColorSelectionMode::kCustom) ?
-		                          ImGuiTabItemFlags_SetSelected :
-		                          ImGuiTabItemFlags_None;
-
-		if (ImGui::BeginTabItem("Presets", nullptr, presetTabFlags))
-		{
-			if (customTabFlags != ImGuiTabItemFlags_SetSelected)
-			{
-				mode        = ColorSelectionMode::kPreset;
-				changedMode = true;
-			}
-
-			ImGui::EndTabItem();
-		}
-
-		if (ImGui::BeginTabItem("Custom", nullptr, customTabFlags))
-		{
-			if (presetTabFlags != ImGuiTabItemFlags_SetSelected)
-			{
-				mode        = ColorSelectionMode::kCustom;
-				changedMode = true;
-			}
-			ImGui::EndTabItem();
-		}
-		ImGui::EndTabBar();
-	}
+	bool               changedMode = false;
+	static const char* tabs[]      = { "Presets", "Custom" };
+	static bool        enabled[]   = { true, true };
+	ImGui::NavBar(
+		"Choose Color",
+		tabs,
+		enabled,
+		sizeof(tabs) / sizeof(const char*),
+		reinterpret_cast<size_t*>(&mode),
+		&changedMode,
+		firstRender ? reinterpret_cast<size_t*>(&mode) : nullptr);
 
 	firstRender = false;
 
@@ -88,14 +71,14 @@ bool ColorPalette::DrawEditor()
 	case ColorSelectionMode::kPreset:
 		return presetSelector.DrawValueEditor() || changedMode;
 	case ColorSelectionMode::kCustom:
-		return DrawColorEditor(editorColor, presetDB) || changedMode;
+		return DrawColorEditor(editorColor) || changedMode;
 	default:
 		logger::error("Invalid Color Selection Mode");
 		return false;
 	}
 }
 
-bool DrawColorEditor(preset::Color& color, preset::PresetDatabase* presetDB)
+bool DrawColorEditor(preset::Color& color)
 {
 	float rgb[3]  = { color.red, color.green, color.blue };
 	bool  changed = false;
@@ -123,4 +106,12 @@ const preset::Color* ColorPalette::GetSelection() const
 		logger::error("Invalid Color Selection");
 		return nullptr;
 	}
+}
+
+void ColorPalette::SetCustomColor(RE::NiColor color)
+{
+	editorColor.red   = color.red;
+	editorColor.green = color.green;
+	editorColor.blue  = color.blue;
+	mode              = ColorSelectionMode::kCustom;
 }

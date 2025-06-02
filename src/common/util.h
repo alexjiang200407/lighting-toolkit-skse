@@ -1,3 +1,4 @@
+#pragma once
 #include <type_traits>
 
 #define ASSERT_BASE(super, sub)             \
@@ -53,3 +54,5 @@ bool parseStr(const char* str, T& buf)
 
 	return success;
 }
+
+std::string GetEditorID(const RE::TESForm* form);

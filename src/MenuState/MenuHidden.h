@@ -1,10 +1,11 @@
 #pragma once
-#include "MenuState.h"
+#include "MenuState/MenuLookingAround.h"
 
 class MenuHidden : public MenuState
 {
 public:
 	MenuHidden(Input::MenuInputContext* inputCtx);
+	~MenuHidden() override;
 
 public:
 	MenuStatePtr Transition(Input::MenuInputContext* inputCtx) override;

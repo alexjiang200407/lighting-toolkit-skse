@@ -3,6 +3,7 @@ set(HEADERS ${HEADERS}
 	src/ColorPalette.h
 	src/common/util.h
 	src/common/uuid.h
+	src/Environment/Environment.h
 	src/ImGui/ImGuiInputAdapter.h
 	src/ImGui/ImGuiPresetSelector.h
 	src/ImGui/ImGuiRenderer.h
@@ -21,7 +22,6 @@ set(HEADERS ${HEADERS}
 	src/Input/InputModifier/FreeCameraControl.h
 	src/Input/InputModifier/FreeCameraZTranslate.h
 	src/Input/InputModifier/InputModifier.h
-	src/Lighting.h
 	src/LightingPreset.h
 	src/LightingToolkit.h
 	src/LightSelector.h
@@ -40,6 +40,8 @@ set(HEADERS ${HEADERS}
 	src/Preset/PresetSerializationControl.h
 	src/Preset/SerializationStrategy.h
 	src/RE.h
+	src/SceneLighting/SceneLight.h
+	src/SceneLighting/SceneLighting.h
 	src/SKSE/CoSaveIO.h
 	src/SKSE/SerializableCollection.h
 	src/SKSE/SerializationControl.h

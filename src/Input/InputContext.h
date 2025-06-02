@@ -1,6 +1,6 @@
 #pragma once
-#include "InputFilter.h"
-#include "InputModifier/InputModifier.h"
+#include "Input/InputFilter.h"
+#include "Input/InputModifier/InputModifier.h"
 
 namespace Input
 {
@@ -14,6 +14,6 @@ namespace Input
 		void TransformInputFilter(InputFilter& data) const;
 
 	private:
-		std::map<int, InputModifierPtr> modifiers;
+		std::unordered_map<int, InputModifierPtr> modifiers;
 	};
 }

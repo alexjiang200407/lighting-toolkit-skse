@@ -55,3 +55,9 @@ using json = nlohmann::json;
 #define UUID_SYSTEM_GENERATOR
 #include "common/util.h"
 #include "common/uuid.h"
+
+#define SPDLOG_LOG_ONCE(level, ...)                                                        \
+	do {                                                                                   \
+		static std::once_flag _spdlog_once_flag_##__LINE__;                                \
+		std::call_once(_spdlog_once_flag_##__LINE__, [&] { spdlog::level(__VA_ARGS__); }); \
+	} while (0)

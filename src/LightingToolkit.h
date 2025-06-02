@@ -1,22 +1,27 @@
 #pragma once
+#include "Environment/Environment.h"
 #include "ImGui/ImGuiRenderTarget.h"
-#include "LightSelector.h"
-#include "Lighting.h"
 #include "MCM/Settings.h"
 #include "MenuInputContext.h"
 #include "MenuState/MenuState.h"
 #include "Preset/PresetDatabase.h"
 #include "Preset/PresetSerializationControl.h"
 #include "SKSE/SerializableCollection.h"
+#include "SceneLighting/SceneLighting.h"
 
 class MenuState;
 class MenuOpen;
 
-class LightingToolkit :
-	ImGui::ImGuiRenderTarget,
-	public RE::BSTEventSink<RE::BGSActorCellEvent>,
-	public SKSE::SerializableCollection
+class LightingToolkit : ImGui::ImGuiRenderTarget, public SKSE::SerializableCollection
 {
+private:
+	enum class Tool : size_t
+	{
+		kSceneLight = 0,
+		kCamera,
+		kEnvironment
+	};
+
 public:
 	void                    Init();
 	void                    OnDataLoaded();
@@ -24,11 +29,8 @@ public:
 	void                    DoFrame();
 	ImGuiStyle              Style();
 	static LightingToolkit* GetSingleton();
-	void                    DrawPropControlWindow();
-	void                    DrawCameraControlWindow();
-	void                    DrawSceneControlWindow();
-	void                    PositionLight();
-	void                    DrawTabBar();
+	void                    DrawMenu();
+	void                    Position();
 
 private:
 	LightingToolkit();
@@ -42,26 +44,20 @@ private:
 	void               DeserializeItems(SKSE::CoSaveIO io) override;
 	void               Revert(SKSE::CoSaveIO io) override;
 	constexpr uint32_t GetKey() override;
-
-	RE::BSEventNotifyControl ProcessEvent(
-		const RE::BGSActorCellEvent*               a_event,
-		RE::BSTEventSource<RE::BGSActorCellEvent>* a_eventSource) override;
-
-	Lighting* GetCurrentLight();
+	void               DrawCameraControlWindow();
+	void               HandleToolMenuOpen();
 
 private:
-	bool                               firstRender = true;
+	SceneLighting                      sceneLighting;
+	Environment                        environment;
 	std::unique_ptr<MenuState>         menuState{ nullptr };
 	Input::MenuInputContext            inputCtx;
 	preset::PresetSerializationControl presetSerializationControl;
 	preset::PresetDatabase             config;
-	LightSelector                      lightSelector{ &config };
 	bool                               previouslyInFreeCameraMode = false;
 	bool                               previouslyFreezeTime       = false;
 	bool                               doProcess                  = false;
 	static constexpr uint32_t          serializationKey           = 'CHIA';
 	static LightingToolkit             singleton;
-	std::vector<Lighting>              lights;
-	std::optional<size_t>              currentTab;
-	std::optional<RE::FormID>          currentFormID;
+	Tool                               currentTool;
 };

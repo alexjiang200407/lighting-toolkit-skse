@@ -11,7 +11,7 @@ public:
 	ColorPalette(preset::PresetDatabase* presetDB, preset::Color color);
 
 private:
-	enum class ColorSelectionMode
+	enum class ColorSelectionMode : size_t
 	{
 		kPreset = 0,
 		kCustom = 1,
@@ -22,6 +22,7 @@ public:
 	static preset::Color Deserialize(SKSE::CoSaveIO io, preset::PresetDatabase* presetDB);
 	bool                 DrawEditor();
 	const preset::Color* GetSelection() const;
+	void                 SetCustomColor(RE::NiColor color);
 
 private:
 	bool                                      firstRender = true;

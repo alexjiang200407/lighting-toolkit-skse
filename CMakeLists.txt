@@ -71,7 +71,7 @@ endif ()
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 
-project(InGameLightingToolkit VERSION 0.9.0 LANGUAGES CXX)
+project(InGameLightingToolkit VERSION 0.10.0 LANGUAGES CXX)
 
 configure_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/cmake/Version.h.in
@@ -130,6 +130,10 @@ add_library(
 	${CMAKE_CURRENT_BINARY_DIR}/version.rc
 	.clang-format
 	.editorconfig
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)

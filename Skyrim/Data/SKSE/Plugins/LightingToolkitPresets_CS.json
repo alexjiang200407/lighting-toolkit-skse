@@ -23,7 +23,7 @@
         "nearDistance": 5
       },
       {
-        "flags": 58,
+        "flags": 34,
         "name": "02 Back Lighting",
         "sid": "cd787520-e83a-43ce-b8bf-31f3c1d84f4c",
         "falloff": 1,

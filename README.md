@@ -12,15 +12,20 @@ Lighting Toolkit is an SKSE plugin that lets players place dynamic, shadow-casti
 * Place shadow casting and dynamic lights in game world.
 * Navigate scene in Free Camera mode.
 * Change light color, intensity, range.
+* Change weather while in menu.
+* Change Sun color, intensity and position
+* Modify volumetric lighting
 * Script free! (Except for SkyUI Mod Configuration).
 * Install and uninstall anytime.
 
 ## Planned Features
 
-* Change weather while in menu.
-* Change ambient lighting while in menu.
+* ENB integration
 * Modify existing lights
 * Additional languages
+* MFG?
+* Attach Lights to objects
+* Saved attached lights as presets, to reuse on other objects.
 
 ## Runtime Requirements
 
@@ -28,6 +33,7 @@ Lighting Toolkit is an SKSE plugin that lets players place dynamic, shadow-casti
 * Address Library for SKSE Plugins﻿
 * SkyUI﻿ to access plugin settings in Mod Configuration Menu
 * MCM Helper﻿ for the Mod Configuration Menu to work
+* PO3 Tweaks. Ensure you have Load EditorIDs enabled in the ini file. 
 
 
 ## Build Requirements
@@ -42,4 +48,5 @@ Lighting Toolkit is an SKSE plugin that lets players place dynamic, shadow-casti
 * Ryan for CommonLibSSE.
 * All Skyrim reverse engineers who shared their work.
 * Ersh. Copied his nexus mod description layout.
+* Jonahex. Skyrim In-Game editor source code
 * Bethesda Game Studios.

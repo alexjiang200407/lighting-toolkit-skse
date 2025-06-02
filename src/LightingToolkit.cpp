@@ -1,7 +1,6 @@
 #include "LightingToolkit.h"
 #include "ImGui/ImGuiInputAdapter.h"
 #include "ImGui/ImGuiRenderer.h"
-#include "Lighting.h"
 #include "LightingPreset.h"
 #include "MenuState/MenuOpen.h"
 #include "SKSE/SerializationControl.h"
@@ -20,15 +19,13 @@ void LightingToolkit::Init()
 	SKSE::SerializationControl::GetSingleton()->RegisterSerializer(this);
 }
 
-void LightingToolkit::OnDataLoaded() { RE::PlayerCharacter::GetSingleton()->AddEventSink(this); }
-
-void LightingToolkit::OnSavePostLoaded()
+void LightingToolkit::OnDataLoaded()
 {
-	for (auto& light : lights)
-	{
-		light.Init3D();
-	}
+	RE::PlayerCharacter::GetSingleton()->AddEventSink(&sceneLighting);
+	environment.OnDataLoaded();
 }
+
+void LightingToolkit::OnSavePostLoaded() { sceneLighting.OnSavePostLoaded(); }
 
 void LightingToolkit::DoFrame()
 {
@@ -43,24 +40,76 @@ void LightingToolkit::DoFrame()
 	if (auto newState = menuState->Transition(&inputCtx))
 	{
 		inputCtx.Update();
-		menuState = std::move(newState);
+		menuState.swap(newState);
 	}
 
-	if (firstRender && !ImGui::ImGuiRenderer::GetSingleton()->HasPreexistingIni())
+	if (const auto* renderer = RE::BSGraphics::Renderer::GetSingleton())
 	{
-		const auto& io = ImGui::GetIO();
-		ImGui::SetNextWindowSize({ io.DisplaySize.x * 0.35f, io.DisplaySize.y * 0.97f });
+		auto screenSize = renderer->GetScreenSize();
+
+		// Default menu height and width
+		ImGui::SetNextWindowSize(
+			{ screenSize.width * 0.35f, screenSize.height * 0.97f },
+			ImGuiCond_FirstUseEver);
 	}
-	firstRender = false;
+	else
+	{
+		SPDLOG_LOG_ONCE(warn, "Could not find renderer");
+	}
+
 	menuState->DoFrame(this);
 
-	// Reset currentTab and wait for next draw cycle
-	currentTab = std::nullopt;
+	sceneLighting.EndFrame();
 }
 
 LightingToolkit* LightingToolkit::GetSingleton() { return &singleton; }
 
-LightingToolkit::LightingToolkit() {}
+void LightingToolkit::DrawMenu()
+{
+	static const char* labels[] = {
+		"Scene Light",
+		"Camera",
+		"Environment",
+	};
+	static bool enabled[] = { true, true, true };
+	bool        changedTool;
+
+	ImGui::Toolbar(
+		"##ControlTabs",
+		labels,
+		enabled,
+		sizeof(enabled) / sizeof(bool),
+		reinterpret_cast<size_t*>(&currentTool),
+		&changedTool);
+
+	if (changedTool)
+	{
+		HandleToolMenuOpen();
+	}
+
+	switch (currentTool)
+	{
+	case Tool::kSceneLight:
+		sceneLighting.DrawWindow(&config);
+		break;
+	case Tool::kCamera:
+		DrawCameraControlWindow();
+		break;
+	case Tool::kEnvironment:
+		environment.DrawWindow();
+		break;
+	}
+}
+
+void LightingToolkit::Position()
+{
+	if (currentTool == Tool::kSceneLight)
+	{
+		sceneLighting.PositionLight();
+	}
+}
+
+LightingToolkit::LightingToolkit() : sceneLighting(&config), currentTool(Tool::kSceneLight) {}
 
 void LightingToolkit::ToggleMenu()
 {
@@ -77,19 +126,21 @@ void LightingToolkit::ToggleMenu()
 
 		RE::PlaySound("UIMenuOK");
 		logger::info("Opening Menu...");
-		inputCtx.MenuOpen();
-		inputCtx.Update();
-		menuState                  = std::make_unique<MenuOpen>(&inputCtx);
+
+		HandleToolMenuOpen();
+
 		previouslyInFreeCameraMode = RE::PlayerCamera::GetSingleton()->IsInFreeCameraMode();
 		if (!previouslyInFreeCameraMode)
 		{
-			RE::PlayerCamera::GetSingleton()->ToggleFreeCameraMode(true);
+			RE::PlayerCamera::GetSingleton()->ToggleFreeCameraMode(false);
 			RE::ControlMap::GetSingleton()->PushInputContext(
 				RE::ControlMap::InputContextID::kTFCMode);
 		}
-
+		RE::Main::GetSingleton()->freezeTime = false;
 		RE::UI::GetSingleton()->ShowMenus(false);
 		previouslyFreezeTime = RE::Main::GetSingleton()->freezeTime;
+
+		environment.OnMenuOpened();
 	}
 	else
 	{
@@ -105,6 +156,7 @@ void LightingToolkit::ToggleMenu()
 			RE::ControlMap::GetSingleton()->PopInputContext(
 				RE::ControlMap::InputContextID::kTFCMode);
 		}
+		environment.OnMenuClosed();
 	}
 }
 
@@ -157,192 +209,41 @@ float* LightingToolkit::GetCameraMoveSpeed()
 	return REL::Relocation<float*>{ RELOCATION_ID(509808, 382522) }.get();
 }
 
-void LightingToolkit::DrawPropControlWindow()
-{
-	ImGui::PushID("###PropControlWindow");
-	if (auto* currentLight = GetCurrentLight())
-	{
-		if (ImGui::ImGuiInputAdapter::IsKeyDown("iRotateLeftKey"))
-			currentLight->Rotate(-0.1f);
-		if (ImGui::ImGuiInputAdapter::IsKeyDown("iRotateRightKey"))
-			currentLight->Rotate(0.1f);
-
-		currentLight->DrawControlPanel();
-	}
-	ImGui::PopID();
-}
-
 void LightingToolkit::DrawCameraControlWindow()
 {
 	if (ImGui::BeginPanel("Camera Settings###CameraControlWindow"))
 	{
-		ImGui::Checkbox("Freeze Time", &RE::Main::GetSingleton()->freezeTime);
 		ImGui::SliderAutoFill("Camera Speed", GetCameraMoveSpeed(), 0.1f, 50.0f);
-		ImGui::EndPanel();
 	}
+	ImGui::EndPanel();
 }
 
-static RE::TESObjectREFRPtr PlaceLight()
+void LightingToolkit::HandleToolMenuOpen()
 {
-	const auto dataHandler = RE::TESDataHandler::GetSingleton();
-
-	if (!dataHandler)
+	switch (currentTool)
 	{
-		logger::error("Data Handler singleton not found");
-		return nullptr;
+	case Tool::kSceneLight:
+		inputCtx.EnablePositioning();
+		menuState = std::make_unique<MenuOpen>(&inputCtx);
+		break;
+	default:
+		inputCtx.DisablePositioning();
+		menuState = std::make_unique<MenuOpen>(&inputCtx);
+		break;
 	}
-
-	const RE::FormID id = dataHandler->LookupFormID(0x801, "InGameLightingToolkit.esp");
-
-	if (!id)
-	{
-		logger::error("Data Handler could not find ID");
-		return nullptr;
-	}
-
-	if (auto* boundObj = RE::TESForm::LookupByID(id)->As<RE::TESBoundObject>())
-	{
-		const auto ref = dataHandler
-		                     ->CreateReferenceAtLocation(
-								 boundObj,
-								 Lighting::GetCameraLookingAt(50.0f),
-								 RE::NiPoint3(),
-								 RE::PlayerCharacter::GetSingleton()->GetParentCell(),
-								 RE::PlayerCharacter::GetSingleton()->GetWorldspace(),
-								 nullptr,
-								 nullptr,
-								 RE::ObjectRefHandle(),
-								 true,
-								 true)
-		                     .get();
-		return ref;
-	}
-
-	logger::error("Could not find light reference in InGameLightingToolkit.esp");
-	return nullptr;
+	inputCtx.Update();
 }
 
-void LightingToolkit::DrawSceneControlWindow()
-{
-	if (ImGui::BeginPanel("Scene Settings###SceneControlWindow"))
-	{
-		lightSelector.DrawValueEditor();
-		if (ImGui::Button("Add Light"))
-		{
-			if (auto ref = PlaceLight())
-			{
-				Lighting newProp(ref, &config, *lightSelector.GetSelection());
-				newProp.Init3D();
-				lights.push_back(std::move(newProp));
-			}
-		}
-		ImGui::EndPanel();
-	}
-}
-
-RE::BSEventNotifyControl LightingToolkit::ProcessEvent(
-	const RE::BGSActorCellEvent* a_event,
-	RE::BSTEventSource<RE::BGSActorCellEvent>*)
-{
-	if (!a_event || a_event->flags == RE::BGSActorCellEvent::CellFlag::kLeave)
-	{
-		return RE::BSEventNotifyControl::kContinue;
-	}
-
-	auto cell = RE::TESForm::LookupByID<RE::TESObjectCELL>(a_event->cellID);
-	if (!cell)
-	{
-		return RE::BSEventNotifyControl::kContinue;
-	}
-
-	for (auto& light : lights)
-	{
-		if (light.GetCellID() == a_event->cellID)
-		{
-			light.OnEnterCell();
-		}
-	}
-	return RE::BSEventNotifyControl::kContinue;
-}
-
-Lighting* LightingToolkit::GetCurrentLight()
-{
-	if (!currentTab)
-		return nullptr;
-
-	if (*currentTab >= lights.size())
-	{
-		logger::error("CurrentTab index out of bounds");
-		return nullptr;
-	}
-
-	return &lights[*currentTab];
-}
-
-void LightingToolkit::SerializeItems(SKSE::CoSaveIO io) const
-{
-	logger::info("Serializing Lights...");
-	io.Write(lights.size());
-	for (const auto& light : lights)
-	{
-		light.Serialize(io);
-	}
-}
+void LightingToolkit::SerializeItems(SKSE::CoSaveIO io) const { sceneLighting.SerializeItems(io); }
 
 void LightingToolkit::DeserializeItems(SKSE::CoSaveIO io)
 {
-	size_t itemsCount;
-	io.Read(itemsCount);
-
-	for (size_t i = 0; i < itemsCount; i++)
-	{
-		if (auto light = Lighting::Deserialize(io, &config))
-		{
-			lights.push_back(std::move(*light));
-		}
-	}
+	sceneLighting.DeserializeItems(io, &config);
 }
 
-void LightingToolkit::Revert(SKSE::CoSaveIO)
-{
-	logger::info("Reverting Save");
-	lights.clear();
-}
+void LightingToolkit::Revert(SKSE::CoSaveIO io) { sceneLighting.Revert(io); }
 
 constexpr uint32_t LightingToolkit::GetKey() { return serializationKey; }
-
-void LightingToolkit::PositionLight()
-{
-	if (auto* light = GetCurrentLight())
-		light->MoveToCameraLookingAt(true);
-}
-
-void LightingToolkit::DrawTabBar()
-{
-	if (ImGui::BeginTabBar(
-			"###Lights",
-			(ImGuiTabBarFlags_AutoSelectNewTabs | ImGuiTabBarFlags_FittingPolicyScroll)))
-	{
-		for (auto it = lights.begin(); it != lights.end();)
-		{
-			bool active = false;
-			bool open   = it->DrawTabItem(active);
-
-			if (open)
-			{
-				if (active)
-					currentTab = std::distance(lights.begin(), it);
-				it++;
-			}
-			else if (!open)
-			{
-				it->Remove();
-				it = lights.erase(it);
-			}
-		}
-		ImGui::EndTabBar();
-	}
-}
 
 ImGuiStyle LightingToolkit::Style()
 {

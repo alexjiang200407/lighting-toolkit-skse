@@ -1,5 +1,5 @@
 #include "MenuOpen.h"
-#include "../ImGui/ImGuiInputAdapter.h"
+#include "ImGui/ImGuiInputAdapter.h"
 #include "MenuHidden.h"
 #include "MenuItemActive.h"
 #include "MenuLookingAround.h"
@@ -21,7 +21,7 @@ MenuStatePtr MenuOpen::Transition(Input::MenuInputContext* inputCtx)
 	{
 		return std::make_unique<MenuLookingAround>(inputCtx);
 	}
-	if (ImGui::ImGuiInputAdapter::IsKeyDown("iPositionLightKey"))
+	if (inputCtx->AllowsPositioning() && ImGui::ImGuiInputAdapter::IsKeyDown("iPositionLightKey"))
 	{
 		return std::make_unique<MenuPositioning>(inputCtx);
 	}
@@ -41,10 +41,4 @@ void MenuOpen::DoFrame(LightingToolkit* menu)
 	}
 }
 
-void MenuOpen::DrawMenu(LightingToolkit* menu)
-{
-	menu->DrawTabBar();
-	menu->DrawPropControlWindow();
-	menu->DrawCameraControlWindow();
-	menu->DrawSceneControlWindow();
-}
+void MenuOpen::DrawMenu(LightingToolkit* menu) { menu->DrawMenu(); }

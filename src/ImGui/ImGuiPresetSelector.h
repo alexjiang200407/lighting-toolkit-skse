@@ -12,11 +12,12 @@ namespace ImGui
 		ASSERT_BASE(T, preset::Preset);
 
 	public:
-		ImGuiPresetSelector(const char* selectionID, preset::PresetDatabase* presetDB) :
-			ImGuiSelector<T>(selectionID), presetDB(presetDB){};
-		ImGuiPresetSelector(const char* selectionID, preset::PresetDatabase* presetDB, T current) :
-			ImGuiSelector<T>(selectionID, current), presetDB(presetDB)
-		{}
+		ImGuiPresetSelector(
+			const char*             selectionID,
+			preset::PresetDatabase* presetDB,
+			std::optional<T>        current = std::nullopt) :
+			ImGuiSelector<T>(selectionID, current),
+			presetDB(presetDB){};
 
 	public:
 		bool DrawValueEditor() override
